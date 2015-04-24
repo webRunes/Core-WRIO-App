@@ -16,5 +16,5 @@ deploy:
     secure: bxuBwOeamiW+xysEbyJ1r1KhcHg5WtJUqDv8tIpw1t06D6AeJ0frny64bPWYq9DiOYJetqifUq9ppRdafVP4JbR5rbn9ryXkvR+NeySZ0tQZask9udwsxK8bz/YC00511TTYt7l3x24neIWqQJ3HNMJSU4bXMusdlK/wGYymn/o=
   bucket: wrio
   local-dir: widget
-  upload-dir: Core-WRIO-App
+  upload-dir: Core-WRIO-App/widget
   acl: public_read
