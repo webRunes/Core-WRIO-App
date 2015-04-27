@@ -72,7 +72,7 @@
 		var reg = /(<blockquote>([\s\S]+?)<\/blockquote>)/gi;
 
 		var blocks = txt.match(reg);
-		if(!blocks.length) return txt;
+		if(!blocks || !blocks.length) return txt;
 
 		for(var i = 0; i < blocks.length; i++){
 			var item = blocks[i].replace('<blockquote>', '<br>').replace('</blockquote>', '<br>');
