@@ -32,6 +32,7 @@
 		"supervisor": "*"
 	},
 	"dependencies": {
+	  "ejs": "^1.0.0"
 	},
 	"scripts": {
 		
