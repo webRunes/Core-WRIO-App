@@ -14,7 +14,7 @@ exports.init = function () {
 		nconf.file({file: path});
 	}
 	else if (fs.statSync('config.json')) {
-		nconf.file('config.json');
+		nconf.file('./config.json');
 	}
 	// end nconf config
 	return nconf;
