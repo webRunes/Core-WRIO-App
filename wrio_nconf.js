@@ -13,7 +13,7 @@ exports.init = function () {
 	if (path = nconf.get('conf')) {
 		nconf.file({file: path});
 	}
-	else if (fs.statSync('config.json')) {
+	else if (fs.statSync('./config.json')) {
 		nconf.file('./config.json');
 	}
 	// end nconf config
