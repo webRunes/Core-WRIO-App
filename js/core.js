@@ -194,8 +194,26 @@
 		textToWrite = textToWrite.replace('|TITLE|', json.name);
 
 		//ToDo: test
-		//$($test).val(textToWrite);
-		//return;
+		console.log(textToWrite);
+		var url = "zope.html";
+		var contents = "<html></html>";
+		$.ajax({
+//			url: "http://localhost:5002/api/save",
+			url: "http://storage.webrunes.com/api/save",
+			type: 'post',
+			'dataType':'json',
+//            'fileData': imageData,
+			data: {
+				'url': url,
+				'bodyData': textToWrite
+			}
+		}).success(function (res) {
+			window.location = res.url;
+		});
+
+
+
+		return;
 
 		var textFileAsBlob = new Blob([textToWrite], {type:'text/plain'});
 
