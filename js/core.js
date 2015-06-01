@@ -206,6 +206,9 @@
 			data: {
 				'url': url,
 				'bodyData': textToWrite
+			},
+			xhrFields: {
+				withCredentials: true
 			}
 		}).success(function (res) {
 			window.location = res.url;
