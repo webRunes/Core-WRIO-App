@@ -4,31 +4,32 @@
   "description": "https://github.com/webRunes/Core-WRIO-App/",
   "main": "gm-test.js",
   "dependencies": {
-	"body-parser": "^1.9.2",
-	"ejs": "^1.0.0",
-	"express": "^4.10.1",
-	"node-twitter": "*",
-	"nconf": "*",
-	"aws-sdk-apis": "*",
-	"supervisor": "*",
-	"gm" : "^1.17.0",
-	"mysql":"*",
-	"cookie-parser":"*",
-	"express-session":"*",
-	"express-mysql-session":"*"
+    "aws-sdk-apis": "*",
+    "body-parser": "^1.9.2",
+    "cheerio": "^0.19.0",
+    "cookie-parser": "*",
+    "ejs": "^1.0.0",
+    "express": "^4.10.1",
+    "express-mysql-session": "*",
+    "express-session": "*",
+    "gm": "^1.17.0",
+    "mysql": "*",
+    "nconf": "*",
+    "node-twitter": "*",
+    "supervisor": "*"
   },
   "devDependencies": {},
   "scripts": {
-	"start": "echo \"Build Completed.\" "
+    "start": "echo \"Build Completed.\" "
   },
   "repository": {
-	"type": "git",
-	"url": "https://github.com/webRunes/Core-WRIO-App.git"
+    "type": "git",
+    "url": "https://github.com/webRunes/Core-WRIO-App.git"
   },
   "author": "webRunes",
   "license": "MIT",
   "bugs": {
-	"url": "https://github.com/webRunes/Core-WRIO-App/issues"
+    "url": "https://github.com/webRunes/Core-WRIO-App/issues"
   },
   "homepage": "https://github.com/webRunes/Core-WRIO-App"
 }
