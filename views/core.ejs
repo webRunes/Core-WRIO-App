@@ -10,7 +10,14 @@
 <body>
 <p></p>
 <div class="container" style="width: 930px;">
-    <textarea rows="25" id="textarea-core-id" placeholder="Enter text ..." style="width: 900px;"></textarea>
+    <textarea rows="25" id="textarea-core-id" placeholder="Enter text ..." style="width: 900px;"
+        ><% if (article) { %>
+            <h1><%= article.name %></h1>
+            <% for (var i = 0; i < article.articleBody.length; i++) { %>
+                <p><%= article.articleBody[i] %></p>
+            <% } %>
+        <% } 
+    %></textarea>
 </div>
 
 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
