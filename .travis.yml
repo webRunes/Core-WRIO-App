@@ -14,7 +14,7 @@ deploy:
       secure: RSbJV8MZaIxbpJA0yT/qp+7nBPzQmjkzPErb8t4ZpAkebsTVKAd7/e//fXFJguSUoPx57zGRxCJNTvuF7uZSZ4Vl85JZXInzQnKI5nFP8FfqqSZmH6mYf6+m0MFHVYy4s0SX5/IGkMCRIFoKK3PJ7HnizrYdmTOywcSxrsSI8F0=
     secret_access_key:
       secure: bxuBwOeamiW+xysEbyJ1r1KhcHg5WtJUqDv8tIpw1t06D6AeJ0frny64bPWYq9DiOYJetqifUq9ppRdafVP4JbR5rbn9ryXkvR+NeySZ0tQZask9udwsxK8bz/YC00511TTYt7l3x24neIWqQJ3HNMJSU4bXMusdlK/wGYymn/o=
-    bucket: wrio
+    bucket: wrioos.com
     upload-dir: Core-WRIO-App
     acl: public_read
   - provider: opsworks
