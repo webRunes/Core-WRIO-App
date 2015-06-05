@@ -1,8 +1,8 @@
 var cheerio = require('cheerio');
 var http = require('http');
 
-exports.getArticle = function(startUrl, callback) {
-    var url = startUrl ? addHttp(startUrl) : '';
+exports.getArticle = function(unformattedUrl, callback) {
+    var url = unformattedUrl ? formatUrl(unformattedUrl) : '';
     
     getHtml(url, function(err, data) {
         if (err) {
@@ -23,9 +23,17 @@ exports.getArticle = function(startUrl, callback) {
     });
 };
 
-function getHtml(url, callback) {
+function getHtml(url, callback, cycles) {
     var data = '';
     var req = http.get(url, function(res) {
+        if (res.statusCode == 302) {
+            console.log('Responce code from server: 302. Resending request');
+            var cycles = cycles ? cycles + 1 : 1;
+            console.log('Cycles:', cycles);
+            if (cycles <= 5) {
+                return getHtml(url, callback, cycles);
+            }
+        }
         res.on('data', function(chunk) {
             data += chunk;
         });
@@ -40,7 +48,7 @@ function getHtml(url, callback) {
     });
 }
 
-function addHttp(url) {
+function formatUrl(url) {
     var splittedUrl = url.split('://');
     var host;
     var path;

@@ -10,13 +10,24 @@
 <body>
 <p></p>
 <div class="container" style="width: 930px;">
-    <textarea rows="25" id="textarea-core-id" placeholder="Enter text ..." style="width: 900px;"
-        ><% if (article) { %>
-            <h1><%= article.name %></h1>
-            <% for (var i = 0; i < article.articleBody.length; i++) { %>
-                <p><%= article.articleBody[i] %></p>
-            <% } %>
-        <% } 
+    <textarea rows="25" id="textarea-core-id" placeholder="Enter text ..." style="width: 900px;"><% 
+        if (article) { 
+            %><h1><%= article.name %></h1><% 
+            article.articleBody.forEach(function(paragraph) {
+                %><p><%= paragraph %></p><% 
+            });
+            article.hasPart.forEach(function(subArticle) { %>
+                <h2><%= subArticle.name %></h2><%
+                if (subArticle.articleBody) {
+                    subArticle.articleBody.forEach(function(paragraph) {
+                        %><p><%= paragraph %></p><% 
+                    });
+                }
+                if (subArticle.url) { 
+                    %><p><%= subArticle.url %></p><%
+                }
+            }); 
+        } 
     %></textarea>
 </div>
 
