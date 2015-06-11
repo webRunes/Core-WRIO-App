@@ -5,8 +5,13 @@ script: "/bin/date"
 node_js:
   - 0.10
 
-install : npm install
-script  : npm start
+install: 
+  - npm install
+  - npm install -g gulp
+  
+script: 
+  - gulp
+  - npm start
 
 deploy:
   - provider: s3
