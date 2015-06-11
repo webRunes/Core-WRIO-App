@@ -4,19 +4,16 @@
   "description": "https://github.com/webRunes/Core-WRIO-App/",
   "main": "gm-test.js",
   "dependencies": {
-    "aws-sdk-apis": "*",
-    "body-parser": "^1.9.2",
+    "babelify": "^6.1.2",
+    "browserify": "^10.2.4",
     "cheerio": "^0.19.0",
-    "cookie-parser": "*",
     "ejs": "^1.0.0",
     "express": "^4.10.1",
-    "express-mysql-session": "*",
-    "express-session": "*",
-    "gm": "^1.17.0",
-    "mysql": "*",
+    "gulp": "^3.9.0",
+    "gulp-babel": "^5.1.0",
+    "gulp-nodemon": "^2.0.3",
     "nconf": "*",
-    "node-twitter": "*",
-    "supervisor": "*"
+    "vinyl-source-stream": "^1.1.0"
   },
   "devDependencies": {},
   "scripts": {

@@ -1,10 +1,10 @@
-var cheerio = require('cheerio');
-var http = require('http');
+import cheerio from 'cheerio';
+import http from 'http';
 
-exports.getArticle = function(unformattedUrl, callback) {
+export function getArticle(unformattedUrl, callback) {
     var url = unformattedUrl ? formatUrl(unformattedUrl) : '';
     
-    getHtml(url, function(err, data) {
+    getHtml(url, (err, data) => {
         if (err) {
             return callback(err, null);
         }
@@ -12,40 +12,31 @@ exports.getArticle = function(unformattedUrl, callback) {
         var $ = cheerio.load(data);
         var scripts = $('script[type="application/ld+json"]');
         
-        var article = scripts.map(function(index, script) {
+        var article = scripts.map((index, script) => {
             var data = script.children[0].data;
             return JSON.parse(data);
-        }).filter(function(index, json) {
-            return json['@type'] == 'Article';
-        })[0];
+        }).filter((index, json) => 
+            json['@type'] == 'Article')[0];
         
         return callback(null, article);
     });
-};
+}
 
 function getHtml(url, callback, cycles) {
     var data = '';
-    var req = http.get(url, function(res) {
+    var req = http.get(url, res => {
         if (res.statusCode == 302) {
             console.log('Responce code from server: 302. Resending request');
             var cycles = cycles ? cycles + 1 : 1;
-            console.log('Cycles:', cycles);
             if (cycles <= 5) {
                 return getHtml(url, callback, cycles);
             }
         }
-        res.on('data', function(chunk) {
-            data += chunk;
-        });
-     
-        res.on('end', function() {
-            return callback(null, data);
-        });
+        res.on('data', chunk => data += chunk);
+        res.on('end', () => callback(null, data));
     });
     
-    req.on('error', function(err) {
-        return callback(err, null);
-    });
+    req.on('error', err => callback(err, null));
 }
 
 function formatUrl(url) {
