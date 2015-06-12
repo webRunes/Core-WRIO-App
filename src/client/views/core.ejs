@@ -3,16 +3,16 @@
 <head lang="en">
     <meta charset="UTF-8">
     <title>Core Editor</title>
-    <link rel="stylesheet" type="text/css" href="http://wrio.s3-website-us-east-1.amazonaws.com/Default-WRIO-Theme/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="http://wrio.s3-website-us-east-1.amazonaws.com/Default-WRIO-Theme/css/bootstrap-theme.min.css">
-    <link rel="stylesheet" type="text/css" href="http://wrio.s3-website-us-east-1.amazonaws.com/Default-WRIO-Theme/css/bootstrap3-wysihtml5.min.css">
+    <link rel="stylesheet" type="text/css" href="http://wrioos.com.s3-website-us-east-1.amazonaws.com/Default-WRIO-Theme/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="http://wrioos.com.s3-website-us-east-1.amazonaws.com/Default-WRIO-Theme/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" type="text/css" href="http://wrioos.com.s3-website-us-east-1.amazonaws.com/Default-WRIO-Theme/css/bootstrap3-wysihtml5.min.css">
 </head>
 <body>
 <p></p>
 <div class="container" style="width: 930px;">
     <textarea rows="25" id="textarea-core-id" placeholder="Enter text ..." style="width: 900px;"><% 
         if (article) { 
-            %><h1><%= article.name %></h1><% 
+            %><h2><%= article.name %></h2><% 
             article.articleBody.forEach(function(paragraph) {
                 %><p><%= paragraph %></p><% 
             });
@@ -32,8 +32,8 @@
 </div>
 
 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-<script src="http://wrio.s3-website-us-east-1.amazonaws.com/Default-WRIO-Theme/js/bootstrap.min.js"></script>
-<script src="http://wrio.s3-website-us-east-1.amazonaws.com/Default-WRIO-Theme/js/bootstrap3-wysihtml5.all.min.js"></script>
+<script src="http://wrioos.com.s3-website-us-east-1.amazonaws.com/Default-WRIO-Theme/js/bootstrap.min.js"></script>
+<script src="http://wrioos.com.s3-website-us-east-1.amazonaws.com/Default-WRIO-Theme/js/bootstrap3-wysihtml5.all.min.js"></script>
 
 <script>
     var customTemplates = {
@@ -46,10 +46,32 @@
                     "</div>" +
                     "</li>";
         },
+        "custom-font-styles": function(context) {
+            var locale = context.locale;
+            var options = context.options;
+            var size = (options && options.size) ? ' btn-'+options.size : '';
+            return "<li class='dropdown'>" +
+              "<a class='btn btn-default dropdown-toggle" + size + "' data-toggle='dropdown' href='#'>" +
+              "<span class='glyphicon glyphicon-font'></span>" +
+              "&nbsp;<span class='current-font'>" + locale.font_styles.normal + "</span>&nbsp;<b class='caret'></b>" +
+              "</a>" +
+              "<ul class='dropdown-menu'>" +
+                "<li><a data-wysihtml5-command='formatBlock' data-wysihtml5-command-value='div' tabindex='-1'>" + locale.font_styles.normal + "</a></li>" +
+                "<li><a data-wysihtml5-command='formatBlock' data-wysihtml5-command-value='h2' tabindex='-1'>Heading</a></li>" +
+              "</ul>" +
+            "</li>";
+        },
         save: function(context){
             return "<li id='save-button-id'>" +
                     "<div class='btn-group'>" +
                     "<a class='btn btn-default' title='Save'>Save</a>" +
+                    "</div>" +
+                    "</li>";
+        },
+        saveAs: function(context){
+            return "<li id='save-as-button-id'>" +
+                    "<div class='btn-group'>" +
+                    "<a class='btn btn-default' title='Save'>Save as...</a>" +
                     "</div>" +
                     "</li>";
         }
@@ -58,7 +80,8 @@
     $('#textarea-core-id').wysihtml5({
         toolbar: {
             custom1: false,
-            "font-styles": true,
+            "custom-font-styles": true,
+            "font-styles": false,
             "emphasis": false,
             "lists": true,
             "html": false,
@@ -66,7 +89,8 @@
             "image": false,
             "color": false,
             "blockquote": true,
-            save: true
+            save: true,
+            saveAs: true
         },
         customTemplates: customTemplates
 
