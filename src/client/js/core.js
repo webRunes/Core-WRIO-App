@@ -2,9 +2,8 @@
 
 (function($){
 	var $textarea, $saveBtn, $saveAsBtn;
-	var startHeader = '<h1>';
-	var endHeader = '</h1>';
-	var fileNameToSaveAs = "myNewFile.html";
+	var startHeader = '<h2>';
+	var endHeader = '</h2>';
 	var cleshe ='<!DOCTYPE html><html lang="en-US"><head><meta charset="utf-8">' +
 	'<meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0">' +
 	'<meta name="description" content=""><meta name="author" content=""><meta name="keywords" content="">' +
@@ -213,15 +212,25 @@
 		}).success(function (res) {
 			window.location = res.url;
 		});
+	};
+	var onClickSaveAs = function() {
+		var txt = $($textarea).val();
+		var json = calculateJson(txt);
+		if(!json) return;
 
+		var textToWrite = cleshe.replace('|BODY|', JSON.stringify(json));
+		textToWrite = textToWrite.replace('|TITLE|', json.name);
 
-
-		return;
+		//ToDo: test
+		console.log(textToWrite);
+		var url = "zope.html";
+		var contents = "<html></html>";
 
 		var textFileAsBlob = new Blob([textToWrite], {type:'text/plain'});
 
 		var downloadLink = document.createElement("a");
-		downloadLink.download = fileNameToSaveAs;
+		json
+		downloadLink.download = json.name.split(' ').join('_') + '.htm';qq
 		downloadLink.innerHTML = "My Hidden Link";
 
 		window.URL = window.URL || window.webkitURL;
@@ -232,16 +241,6 @@
 		document.body.appendChild(downloadLink);
 
 		downloadLink.click();
-	};
-	var onClickSaveAs = function() {
-		var txt = $($textarea).val();
-		var json = calculateJson(txt);
-		if(!json) return;
-
-		var textToWrite = cleshe.replace('|BODY|', JSON.stringify(json));
-		textToWrite = textToWrite.replace('|TITLE|', json.name);
-
-		console.log(textToWrite);
 	};
 	var init = function(){
 		$saveBtn = $('#save-button-id').on('click', onClickSave);
