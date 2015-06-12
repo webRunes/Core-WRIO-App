@@ -230,7 +230,7 @@
 
 		var downloadLink = document.createElement("a");
 		json
-		downloadLink.download = json.name.split(' ').join('_') + '.htm';qq
+		downloadLink.download = json.name.split(' ').join('_') + '.htm';
 		downloadLink.innerHTML = "My Hidden Link";
 
 		window.URL = window.URL || window.webkitURL;
