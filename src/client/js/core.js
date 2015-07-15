@@ -8,7 +8,7 @@
 	'<meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0">' +
 	'<meta name="description" content=""><meta name="author" content=""><meta name="keywords" content="">' +
 	'<title>|TITLE|</title><script type="application/ld+json">|BODY|</script>' +
-	'</head><body><script src="http://wrio.s3-website-us-east-1.amazonaws.com/WRIO-InternetOS/WRIO.js"></script></body></html>';
+	'</head><body><script type="text/javascript" src="//wrioos.com/start.js"></script></body></html>';
 
 	var getArticle = function(lang, keywords, author){
 		return {
