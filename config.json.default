@@ -4,7 +4,7 @@
 	"dbname": "YOUR_DB_NAME",
 	"user": "YOUR_DB_USER",
 	"password": "YOUR_DB_PASS",
-	"workdomain": ".wrioos.com"  // replace .wrioos.com domain with your domain
+	"workdomain": ".wrioos.com"  //replace .wrioos.com domain with your domain
   },
   "server": {
     "cookiesecret": "YOUR_COOKIE_SECRET",
