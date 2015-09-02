@@ -23,7 +23,7 @@
 			"articleBody": [],
 			"hasPart": [],
 			"mentions": [],
-			"data-widget-id": widgetData
+			"comment": widgetData
 		};
 	};
 	var getMentionsItem = function(name, about, link) {
