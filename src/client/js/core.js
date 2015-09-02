@@ -26,7 +26,11 @@
 			"comment": widgetData
 		};
 	};
-	var getMentionsItem = function(name, about, link) {
+	var replaceLineFeed = function (someText) {
+		var re=/\r\n|\n\r|\n|\r/g;
+		return someText.replace(re,"");
+	};
+	var getMentionsItem = function(name, about, link){
 		return {
 			"@type": "Article",
 			"name": name,
@@ -180,6 +184,7 @@
 		for (var i = 0; i < ps.length; i++) {
 			ps[i] = ps[i].replace(/&nbsp;/gi, ' ');
 			var p = checkMention(json.mentions, ps[i], num);
+			p = replaceLineFeed(p);
 			json.articleBody.push(p);
 			num += 1;
 		}
@@ -197,6 +202,7 @@
 		for (var i = 0; i < ps.length; i++) {
 			ps[i] = ps[i].replace(/&nbsp;/gi, ' ');
 			var p = checkMention(json.mentions, ps[i], num);
+			p = replaceLineFeed(p);
 			part.articleBody.push(p);
 			num += 1;
 		}
