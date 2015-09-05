@@ -260,24 +260,38 @@
 		var url = "zope.html";
 		var contents = "<html></html>";
 
-		var textFileAsBlob = new Blob([textToWrite], {
-			type: 'text/plain'
-		});
+		var ie = navigator.userAgent.match(/MSIE\s([\d.]+)/);
+		var ie11 = navigator.userAgent.match(/Trident\/7.0/) && navigator.userAgent.match(/rv:11/);
+		var ieEDGE = navigator.userAgent.match(/Edge/g);
+		var ieVer=(ie ? parseInt(ie[1]) : (ie11 ? 11 : -1));
 
-		var downloadLink = document.createElement("a");
-		json
-		downloadLink.download = (json.name === '' ? 'untitled' : json.name.split(' ')
-			.join('_')) + '.htm';
-		downloadLink.innerHTML = "My Hidden Link";
+		var fileName = json.name === '' ? 'untitled' : json.name.split(' ').join('_') + '.htm';
+		if (ie || ie11 || ieEDGE) {
+			if (ieVer>9 || ieEDGE) {
+				var textFileAsBlob = new Blob([textToWrite], {
+					type: 'text/plain'
+				});
+				window.navigator.msSaveBlob(textFileAsBlob, fileName);
+			} else {
+				console.log("No supported on IE ver<10");
+				return;
+			}
+		} else {
+			var downloadLink = document.createElement("a");
+			downloadLink.download = fileName;
+			downloadLink.innerHTML = "My Hidden Link";
 
-		window.URL = window.URL || window.webkitURL;
+			window.URL = window.URL || window.webkitURL;
+			textFileAsBlob = new Blob([textToWrite], {
+				type: 'text/plain'
+			});
+			downloadLink.href = window.URL.createObjectURL(textFileAsBlob);
+			downloadLink.onclick = destroyClickedLink;
+			downloadLink.style.display = "none";
+			document.body.appendChild(downloadLink);
 
-		downloadLink.href = window.URL.createObjectURL(textFileAsBlob);
-		downloadLink.onclick = destroyClickedLink;
-		downloadLink.style.display = "none";
-		document.body.appendChild(downloadLink);
-
-		downloadLink.click();
+			downloadLink.click();
+		}
 	};
 	var init = function() {
 		$saveBtn = $('#save-button-id')
