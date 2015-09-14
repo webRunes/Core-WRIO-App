@@ -1,32 +1,39 @@
 {
-  "name": "Core-WRIO-App",
-  "version": "1.0.0",
-  "description": "https://github.com/webRunes/Core-WRIO-App/",
-  "main": "gm-test.js",
-  "dependencies": {
-    "babelify": "^6.1.2",
-    "browserify": "^10.2.4",
-    "cheerio": "^0.19.0",
-    "ejs": "^1.0.0",
-    "express": "^4.10.1",
-    "gulp": "^3.9.0",
-    "gulp-babel": "^5.1.0",
-    "gulp-nodemon": "^2.0.3",
-    "nconf": "*",
-    "vinyl-source-stream": "^1.1.0"
-  },
-  "devDependencies": {},
-  "scripts": {
-    "start": "echo \"Build Completed.\" "
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/webRunes/Core-WRIO-App.git"
-  },
-  "author": "webRunes",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/webRunes/Core-WRIO-App/issues"
-  },
-  "homepage": "https://github.com/webRunes/Core-WRIO-App"
+	"name": "Core-WRIO-App",
+	"version": "1.0.0",
+	"description": "https://github.com/webRunes/Core-WRIO-App/",
+	"main": "gm-test.js",
+	"dependencies": {
+		"babelify": "^6.1.2",
+		"babel": "*",
+		"browserify": "^10.2.4",
+		"cheerio": "^0.19.0",
+		"connect-mongo": "^0.8.2",
+		"cookie-parser": "*",
+		"ejs": "^1.0.0",
+		"htm": "*",
+		"express": "^4.10.1",
+		"express-session": "*",
+		"mongodb": "~2.0",
+		"gulp": "^3.9.0",
+		"es6-promise": "^2.1.1",
+		"gulp-babel": "^5.1.0",
+		"gulp-nodemon": "^2.0.3",
+		"nconf": "*",
+		"vinyl-source-stream": "^1.1.0"
+	},
+	"devDependencies": {},
+	"scripts": {
+		"start": "echo \"Build Completed.\" "
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/webRunes/Core-WRIO-App.git"
+	},
+	"author": "webRunes",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/webRunes/Core-WRIO-App/issues"
+	},
+	"homepage": "https://github.com/webRunes/Core-WRIO-App"
 }
