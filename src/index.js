@@ -1,7 +1,10 @@
 import nconf from './server/wrio_nconf';
 import express from 'express';
 import path from 'path';
-import {getArticle} from './server/article';
+import {
+	getArticle
+}
+from './server/article';
 import ejs from 'ejs';
 import session from 'express-session';
 import db from './server/db';
@@ -32,54 +35,58 @@ db.mongo({
 			.createServer(app)
 			.listen(nconf.get("server:port"), function(req, res) {
 				console.log('app listening on port ' + nconf.get('server:port') + '...');
-				var sessionStore = new SessionStore({
-					db: db
-				});
-				app.use(session({
-
-					secret: cookie_secret,
-					saveUninitialized: true,
-					store: sessionStore,
-					resave: true,
-					cookie: {
-						secure: false,
-						domain: DOMAIN,
-						maxAge: 1000 * 60 * 60 * 24 * 30
-					},
-					key: 'sid'
-				}));
-				app.get('/', function(request, response) {
-					var command = '';
-					for (var i in request.query) {
-						if (command === '') {
-							command = i;
-						}
-					}
-					switch (command) {
-						case 'create':
-							{
-								getArticle(request.query.edit, function(err, article) {
-									if (err) {
-										console.log("Got error: " + err.message);
-										return response.render('core.ejs', {
-											article: null
-										});
-									}
-									response.render('core.ejs', {
-										article: article
-									});
-								});
-								break;
-							}
-						default:
-							{
-								response.sendFile(__dirname + '/index.htm');
-							}
-					}
-				});
+				server_setup(db);
 				console.log("Application Started!");
 			});
 	})
 	.catch(function(err) {
 		console.log('Error connect to database:' + err.code + ': ' + err.message);
 	});
+
+function server_setup(db) {
+	var sessionStore = new SessionStore({
+		db: db
+	});
+	app.use(session({
+
+		secret: cookie_secret,
+		saveUninitialized: true,
+		store: sessionStore,
+		resave: true,
+		cookie: {
+			secure: false,
+			domain: DOMAIN,
+			maxAge: 1000 * 60 * 60 * 24 * 30
+		},
+		key: 'sid'
+	}));
+	app.get('/', function(request, response) {
+		var command = '';
+		for (var i in request.query) {
+			if (command === '') {
+				command = i;
+			}
+		}
+		switch (command) {
+			case 'create':
+				{
+					getArticle(request.query.edit, function(err, article) {
+						if (err) {
+							console.log("Got error: " + err.message);
+							return response.render('core.ejs', {
+								article: null
+							});
+						}
+						response.render('core.ejs', {
+							article: article
+						});
+					});
+					break;
+				}
+			default:
+				{
+					response.sendFile(__dirname + '/index.htm');
+				}
+		}
+	});
+}
