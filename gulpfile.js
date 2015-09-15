@@ -14,6 +14,9 @@ gulp.task('babel-server', function() {
         })
         .pipe(gulp.dest('app'));
 
+    gulp.src('src/index.htm')
+        .pipe(gulp.dest('app'));
+
     gulp.src('src/server/**/*.*')
         .pipe(babel())
         .on('error', function(err) {
@@ -36,8 +39,6 @@ gulp.task('babel-client', function() {
 gulp.task('views', function() {
     gulp.src('src/client/views/**/*.*')
         .pipe(gulp.dest('app/client/views'));
-    gulp.src('src/client/index.htm')
-        .pipe(gulp.dest('app/client'));
 });
 
 gulp.task('nodemon', function() {

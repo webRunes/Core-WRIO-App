@@ -1,11 +1,7 @@
 import nconf from './server/wrio_nconf';
 import express from 'express';
 import path from 'path';
-import {
-	getArticle
-}
-from './server/article';
-import wrioLogin from './server/wriologin';
+import {getArticle} from './server/article';
 import ejs from 'ejs';
 import session from 'express-session';
 import db from './server/db';
@@ -15,8 +11,7 @@ var app = express();
 
 var DOMAIN = nconf.get('db:workdomain');
 app.set('views', __dirname + '/client/views');
-
-app.engine('htm', ejs.renderFile);
+app.set('view engine', 'ejs');
 
 import _SessionStore from 'connect-mongo';
 var SessionStore = _SessionStore(session);
@@ -53,39 +48,33 @@ db.mongo({
 					},
 					key: 'sid'
 				}));
-				wrioLogin.setDB(db);
 				app.get('/', function(request, response) {
-					var render;
-					if (request.query.create === '') {
-						render = 'core.ejs';
-						getArticle(request.query.edit, function(err, article) {
-							if (err) {
-								console.log("Got error: " + err.message);
-								return response.render(render, {
-									article: null
+					var command = '';
+					for (var i in request.query) {
+						if (command === '') {
+							command = i;
+						}
+					}
+					switch (command) {
+						case 'create':
+							{
+								getArticle(request.query.edit, function(err, article) {
+									if (err) {
+										console.log("Got error: " + err.message);
+										return response.render('core.ejs', {
+											article: null
+										});
+									}
+									response.render('core.ejs', {
+										article: article
+									});
 								});
+								break;
 							}
-
-							response.render(render, {
-								article: article
-							});
-						});
-					} else {
-						render = '../index.htm';
-						wrioLogin.loginWithSessionId(request.sessionID, function(err, res) {
-							if (err) {
-								console.log("User not found:", err);
-								response.render(render, {
-									"error": "Not logged in",
-									"user": undefined
-								});
-							} else {
-								response.render(render, {
-									"user": res
-								});
-								console.log("User found " + res);
+						default:
+							{
+								response.sendFile(__dirname + '/index.htm');
 							}
-						})
 					}
 				});
 				console.log("Application Started!");

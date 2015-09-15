@@ -16,7 +16,6 @@
 		"express-session": "*",
 		"mongodb": "~2.0",
 		"gulp": "^3.9.0",
-		"es6-promise": "^2.1.1",
 		"gulp-babel": "^5.1.0",
 		"gulp-nodemon": "^2.0.3",
 		"nconf": "*",
