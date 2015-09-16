@@ -6,13 +6,14 @@ var source = require('vinyl-source-stream');
 var nodemon = require('gulp-nodemon');
 
 gulp.task('babel-server', function() {
+
     gulp.src('src/index.js')
         .pipe(babel())
         .on('error', function(err) {
             console.log('Babel server:', err.toString());
         })
         .pipe(gulp.dest('app'));
-        
+
     gulp.src('src/server/**/*.*')
         .pipe(babel())
         .on('error', function(err) {
@@ -22,9 +23,9 @@ gulp.task('babel-server', function() {
 });
 
 gulp.task('babel-client', function() {
-    browserify({ 
+    browserify({
             entries: './src/client/js/client.js',
-            debug: true 
+            debug: true
         })
         .transform(babelify)
         .bundle()
@@ -39,10 +40,10 @@ gulp.task('views', function() {
 
 gulp.task('nodemon', function() {
     nodemon({
-        script: 'server.js',
-        ext: 'js',
-        ignore: ['src/**']
-    }) 
+            script: 'server.js',
+            ext: 'js',
+            ignore: ['src/**']
+        })
         .on('error', function(error) {
             console.log('Nodemon:', event.message);
         });
