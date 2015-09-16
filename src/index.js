@@ -1,10 +1,8 @@
 import nconf from './server/wrio_nconf';
 import express from 'express';
 import path from 'path';
-import {
-	getArticle
-}
-from './server/article';
+import {getArticle} from './server/article';
+import fs from 'fs';
 import ejs from 'ejs';
 import session from 'express-session';
 import db from './server/db';
@@ -85,7 +83,9 @@ function server_setup(db) {
 				}
 			default:
 				{
-					response.sendFile(__dirname + '/index.htm');
+					fs.readFile(path.join(__dirname, '/../index.htm'), (err, data) => {
+						response.end(data);
+					})
 				}
 		}
 	});

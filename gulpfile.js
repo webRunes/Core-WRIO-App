@@ -14,9 +14,6 @@ gulp.task('babel-server', function() {
         })
         .pipe(gulp.dest('app'));
 
-    gulp.src('src/index.htm')
-        .pipe(gulp.dest('app'));
-
     gulp.src('src/server/**/*.*')
         .pipe(babel())
         .on('error', function(err) {
