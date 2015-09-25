@@ -1,7 +1,10 @@
 import nconf from './server/wrio_nconf';
 import express from 'express';
 import path from 'path';
-import {getArticle} from './server/article';
+import {
+	getArticle
+}
+from './server/article';
 import fs from 'fs';
 import ejs from 'ejs';
 import session from 'express-session';
@@ -66,7 +69,7 @@ function server_setup(db) {
 			}
 		}
 		switch (command) {
-			case 'create':
+			case 'edit':
 				{
 					getArticle(request.query.edit, function(err, article) {
 						if (err) {
@@ -81,11 +84,16 @@ function server_setup(db) {
 					});
 					break;
 				}
+			case 'create':
+				{
+					return response.render('core.ejs', {
+						article: null
+					});
+					break;
+				}
 			default:
 				{
-					fs.readFile(path.join(__dirname, '/../index.htm'), (err, data) => {
-						response.end(data);
-					})
+					response.sendFile(__dirname + '/static/index.htm');
 				}
 		}
 	});
