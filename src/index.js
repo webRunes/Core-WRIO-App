@@ -93,9 +93,7 @@ function server_setup(db) {
 				}
 			default:
 				{
-					fs.readFile(path.join(__dirname, '/../index.htm'), (err, data) => {
-						response.end(data);
-					})
+					response.sendFile(__dirname + '/static/index.htm');
 				}
 		}
 	});

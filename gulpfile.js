@@ -36,6 +36,9 @@ gulp.task('babel-client', function() {
 gulp.task('views', function() {
     gulp.src('src/client/views/**/*.*')
         .pipe(gulp.dest('app/client/views'));
+
+    gulp.src('hub/index.htm')
+        .pipe(gulp.dest('app/static'));
 });
 
 gulp.task('nodemon', function() {
