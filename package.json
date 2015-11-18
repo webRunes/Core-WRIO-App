@@ -6,6 +6,7 @@
 	"dependencies": {
 		"babelify": "^6.1.2",
 		"babel": "*",
+	    "babel-polyfill":"*",
 		"browserify": "^10.2.4",
 		"cheerio": "^0.19.0",
 		"connect-mongo": "^0.8.2",

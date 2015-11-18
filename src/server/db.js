@@ -1,4 +1,4 @@
-import 'babel/polyfill';
+import 'babel-polyfill';
 import mongodb from 'mongodb';
 
 export function mongo(args) {
