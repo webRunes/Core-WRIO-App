@@ -5,8 +5,8 @@
 	"main": "gm-test.js",
 	"dependencies": {
 		"babelify": "^6.1.2",
-		"babel": "*",
-	    "babel-polyfill":"*",
+		"babel": "^6.1.18",
+	    "babel-polyfill":"^6.1.19",
 		"browserify": "^10.2.4",
 		"cheerio": "^0.19.0",
 		"connect-mongo": "^0.8.2",
