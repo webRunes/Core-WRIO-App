@@ -10,6 +10,9 @@
 		'<title>|TITLE|</title><script type="application/ld+json">|BODY|</script>' +
 		'</head><body><script type="text/javascript" src="//wrioos.com/start.js"></script></body></html>';
 
+	var domain = "wrioos.com";
+	domain = "wrioos.local";
+
 	var getArticle = function(lang, keywords, author, widgetData) {
 		return {
 			"@context": "http://schema.org",
@@ -228,7 +231,7 @@
 		var contents = "<html></html>";
 		$.ajax({
 				//			url: "http://localhost:5002/api/save",
-				url: "http://storage.webrunes.com/api/save",
+				url: "http://storage."+domain+"/api/save",
 				type: 'post',
 				'dataType': 'json',
 				//            'fileData': imageData,
