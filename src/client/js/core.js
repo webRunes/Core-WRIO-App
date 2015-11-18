@@ -228,7 +228,7 @@
 		var contents = "<html></html>";
 		$.ajax({
 				//			url: "http://localhost:5002/api/save",
-				url: "http://storage.webrunes.com/api/save",
+				url: "http://storage.wrioos.com/api/save",
 				type: 'post',
 				'dataType': 'json',
 				//            'fileData': imageData,
