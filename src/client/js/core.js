@@ -225,16 +225,16 @@
 		var textToWrite = cleshe.replace('|BODY|', JSON.stringify(json));
 		textToWrite = textToWrite.replace('|TITLE|', json.name);
 
+
+
 		//ToDo: test
 		console.log(textToWrite);
 		var url = "zope.html";
 		var contents = "<html></html>";
 		$.ajax({
-				//			url: "http://localhost:5002/api/save",
 				url: "http://storage."+domain+"/api/save",
 				type: 'post',
 				'dataType': 'json',
-				//            'fileData': imageData,
 				data: {
 					'url': url,
 					'bodyData': textToWrite
@@ -303,6 +303,13 @@
 			.on('click', onClickSaveAs);
 		$textarea = $('#textarea-core-id');
 		$textarea_widget = $('#textarea-widget-id');
+
+		var editUrl = window.location.search.match(/\?edit=([\.0-9a-zA-Z%:\/?]*)/);
+		if (editUrl) {
+			editUrl = editUrl[1];
+			console.log("Got editing url", editUrl);
+		}
+
 	};
 	init();
 })(jQuery);
