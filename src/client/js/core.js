@@ -10,8 +10,8 @@
 		'<title>|TITLE|</title><script type="application/ld+json">|BODY|</script>' +
 		'</head><body><script type="text/javascript" src="//wrioos.com/start.js"></script></body></html>';
 
-	var domain = "wrioos.com";
-	domain = "wrioos.local";
+	var domain = process.env.DOMAIN;
+
 
 	var getArticle = function(lang, keywords, author, widgetData) {
 		return {
@@ -309,6 +309,7 @@
 			editUrl = editUrl[1];
 			console.log("Got editing url", editUrl);
 		}
+
 
 	};
 	init();

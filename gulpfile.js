@@ -4,6 +4,9 @@ var babel = require('gulp-babel');
 var babelify = require('babelify');
 var source = require('vinyl-source-stream');
 var nodemon = require('gulp-nodemon');
+var yargs = require('yargs');
+var argv = require('yargs').argv;
+var envify = require('envify/custom');
 
 function restart_nodemon () {
     if (nodemon_instance) {
@@ -14,6 +17,7 @@ function restart_nodemon () {
     }
 
 }
+
 
 
 gulp.task('babel-server', function() {
@@ -36,12 +40,23 @@ gulp.task('babel-server', function() {
         });
 });
 
+
+var envify_params = {
+    DOMAIN:"wrioos.com"
+};
+console.log(argv);
+if (argv.docker) {
+    console.log("Got docker param");
+    envify_params['DOMAIN'] = "wrioos.local"
+}
+
 gulp.task('babel-client', function() {
     browserify({
             entries: './src/client/js/client.js',
             debug: true
         })
         .transform(babelify)
+        .transform(envify(envify_params))
         .bundle()
         .pipe(source('client.js'))
         .pipe(gulp.dest('app/client'))
