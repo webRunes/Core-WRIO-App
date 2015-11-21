@@ -20,7 +20,9 @@
 		"gulp-babel": "^5.1.0",
 		"gulp-nodemon": "^2.0.3",
 		"nconf": "*",
-		"vinyl-source-stream": "^1.1.0"
+		"vinyl-source-stream": "^1.1.0",
+	    "envify": "^3.4.0",
+	    "yargs": "^3.23.0"
 	},
 	"devDependencies": {},
 	"scripts": {
