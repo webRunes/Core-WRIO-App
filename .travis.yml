@@ -14,6 +14,10 @@ script:
   - gulp
   - npm start
 
+before_deploy:
+  - gem install mime-types -v 2.6.2
+
+
 deploy:
   - provider: s3
     access_key_id:
