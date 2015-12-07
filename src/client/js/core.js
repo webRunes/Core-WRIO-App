@@ -10,6 +10,26 @@
 		'<title>|TITLE|</title><script type="application/ld+json">|BODY|</script>' +
 		'</head><body><script type="text/javascript" src="//wrioos.com/start.js"></script></body></html>';
 
+	var domain = process.env.DOMAIN;
+	var wrioID;
+	var saveUrl;
+	var STORAGE_DOMAIN = "wr.io";
+
+
+	// helper func
+	function getLocation(href) {
+		var match = href.match(/^(https?\:)\/\/(([^:\/?#]*)(?:\:([0-9]+))?)(\/[^?#]*)(\?[^#]*|)(#.*|)$/);
+		return match && {
+				protocol: match[1],
+				host: match[2],
+				hostname: match[3],
+				port: match[4],
+				pathname: match[5],
+				search: match[6],
+				hash: match[7]
+			}
+	}
+
 	var getArticle = function(lang, keywords, author, widgetData) {
 		return {
 			"@context": "http://schema.org",
@@ -211,6 +231,9 @@
 
 		return num;
 	};
+
+
+
 	var onClickSave = function() {
 		var widgetData = $($textarea_widget)
 			.val();
@@ -222,16 +245,16 @@
 		var textToWrite = cleshe.replace('|BODY|', JSON.stringify(json));
 		textToWrite = textToWrite.replace('|TITLE|', json.name);
 
+
+
 		//ToDo: test
 		console.log(textToWrite);
-		var url = "zope.html";
+		var url = saveUrl;
 		var contents = "<html></html>";
 		$.ajax({
-				//			url: "http://localhost:5002/api/save",
-				url: "http://storage.webrunes.com/api/save",
+				url: "http://storage."+domain+"/api/save",
 				type: 'post',
 				'dataType': 'json',
-				//            'fileData': imageData,
 				data: {
 					'url': url,
 					'bodyData': textToWrite
@@ -244,6 +267,12 @@
 				window.location = res.url;
 			});
 	};
+
+	var disableSave = function () {
+		$('#save-button-id div a').addClass('disabled');
+		$('#save-button-id div').attr('title', 'You can\'t save to non webrunes hosted page. Use \"Save As\" and upload file manually');
+	}
+
 	var onClickSaveAs = function() {
 		var widgetData = $($textarea_widget)
 			.val();
@@ -293,6 +322,30 @@
 			downloadLink.click();
 		}
 	};
+
+	function parseEditingUrl() {
+		var editUrl = window.location.search.match(/\?edit=([\.0-9a-zA-Z%:\/?]*)/);
+		if (editUrl) {
+			editUrl = editUrl[1];
+			var editUrlParsed = getLocation(editUrl);
+			console.log("Got editing url", editUrl);
+			console.log(editUrlParsed);
+			if (editUrlParsed) {
+				if (editUrlParsed.host == STORAGE_DOMAIN) {
+					var match = editUrlParsed.pathname.match(/\/[0-9]+\/(.*)/);
+					if (match) {
+						saveUrl = match[1];
+						if (saveUrl == "") {
+							saveUrl = "index.htm"; // if no file specified, let's assume this is index.htm
+						}
+						return;
+					}
+				}
+			}
+		}
+		disableSave();
+	}
+
 	var init = function() {
 		$saveBtn = $('#save-button-id')
 			.on('click', onClickSave);
@@ -300,6 +353,27 @@
 			.on('click', onClickSaveAs);
 		$textarea = $('#textarea-core-id');
 		$textarea_widget = $('#textarea-widget-id');
+
+
+		parseEditingUrl();
+
+		$.ajax({
+			url: "//storage."+domain+"/api/get_profile",
+			type: 'post',
+			'dataType':'json',
+			data: {},
+			xhrFields: {
+				withCredentials: true
+			}
+		}).success(function (profile) {
+			console.log("Get_profile finish",profile);
+			wrioID = profile.id;
+
+		}).fail(function (e) {
+			disableSave();
+		});
+
+
 	};
 	init();
 })(jQuery);

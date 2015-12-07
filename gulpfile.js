@@ -4,6 +4,21 @@ var babel = require('gulp-babel');
 var babelify = require('babelify');
 var source = require('vinyl-source-stream');
 var nodemon = require('gulp-nodemon');
+var yargs = require('yargs');
+var argv = require('yargs').argv;
+var envify = require('envify/custom');
+
+function restart_nodemon () {
+    if (nodemon_instance) {
+        console.log("Restarting nodemon");
+        nodemon_instance.emit('restart');
+    } else {
+        console.log("Nodemon isntance not ready yet")
+    }
+
+}
+
+
 
 gulp.task('babel-server', function() {
 
@@ -19,8 +34,21 @@ gulp.task('babel-server', function() {
         .on('error', function(err) {
             console.log('Babel server:', err.toString());
         })
-        .pipe(gulp.dest('app/server'));
+        .pipe(gulp.dest('app/server'))
+        .on('end',function() {
+            restart_nodemon();
+        });
 });
+
+
+var envify_params = {
+    DOMAIN:"wrioos.com"
+};
+console.log(argv);
+if (argv.docker) {
+    console.log("Got docker param");
+    envify_params['DOMAIN'] = "wrioos.local"
+}
 
 gulp.task('babel-client', function() {
     browserify({
@@ -28,9 +56,13 @@ gulp.task('babel-client', function() {
             debug: true
         })
         .transform(babelify)
+        .transform(envify(envify_params))
         .bundle()
         .pipe(source('client.js'))
-        .pipe(gulp.dest('app/client'));
+        .pipe(gulp.dest('app/client'))
+        .on('end',function() {
+            restart_nodemon();
+        });
 });
 
 gulp.task('views', function() {
@@ -41,15 +73,23 @@ gulp.task('views', function() {
         .pipe(gulp.dest('app/static'));
 });
 
+var nodemon_instance;
+
 gulp.task('nodemon', function() {
-    nodemon({
+
+    if (!nodemon_instance) {
+        nodemon_instance = nodemon({
             script: 'server.js',
-            ext: 'js',
-            ignore: ['src/**']
-        })
-        .on('error', function(error) {
-            console.log('Nodemon:', event.message);
+            watch: 'src/__manual_watch__',
+            ext: '__manual_watch__',
+            verbose: false,
+        }).on('restart', function() {
+            console.log('~~~ restart server ~~~');
         });
+    } else {
+        nodemon_instance.emit('restart');
+    }
+
 });
 
 gulp.task('default', ['babel-server', 'babel-client', 'views']);
