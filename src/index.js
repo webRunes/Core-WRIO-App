@@ -69,7 +69,6 @@ function server_setup(db) {
 		return response.render('core.ejs', {
 			article: null
 		});
-		break;
 	});
 
 	app.get('/edit', function(request, response) {
