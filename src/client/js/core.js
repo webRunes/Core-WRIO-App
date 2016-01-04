@@ -61,8 +61,7 @@
 	var getPart = function(name) {
 		return {
 			"@type": "Article",
-			"name": name,
-			"articleBody": []
+			"name": name
 		};
 	};
 	var destroyClickedLink = function(event) {
@@ -197,13 +196,17 @@
 		if (!txt) return num;
 		var blocks = txt.split(endHeader);
 
-		json.name = blocks.length == 2 ? blocks[0] : '';
+		var name = blocks.length == 2 ? blocks[0] : '';
+		name = checkMention(json.mentions, name, 1);
+		name = replaceLineFeed(name);
+
+		json.name = name;
 
 		var ps = blocks[blocks.length - 1].split('<br>');
 		ps = normalizeOUL(ps);
 		for (var i = 0; i < ps.length; i++) {
 			ps[i] = ps[i].replace(/&nbsp;/gi, ' ');
-			var p = checkMention(json.mentions, ps[i], num);
+			var p = checkMention(json.mentions, ps[i], num + 2);
 			p = replaceLineFeed(p);
 			json.articleBody.push(p);
 			num += 1;
@@ -213,18 +216,29 @@
 	};
 	var addParagraph = function(json, txt, num) {
 		if (!txt) return num;
-
+		var regHttp = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/i;
+		var regTitle = /<a [^>]+>([^<]+)<\/a>/i;
 		var blocks = txt.split(endHeader);
-		var part = getPart(blocks[0]);
+		
+		var name = blocks[0];
+		name = checkMention(json.mentions, name, num + 1);
+		name = replaceLineFeed(name);
+		
+		var part = getPart(name);
 
 		var ps = blocks[1].split('<br>');
 		ps = normalizeOUL(ps);
 		for (var i = 0; i < ps.length; i++) {
-			ps[i] = ps[i].replace(/&nbsp;/gi, ' ');
-			var p = checkMention(json.mentions, ps[i], num);
-			p = replaceLineFeed(p);
-			part.articleBody.push(p);
-			num += 1;
+			if (ps[i].search(regHttp) === -1) {
+				part.articleBody = part.articleBody || [];
+				ps[i] = ps[i].replace(/&nbsp;/gi, ' ');
+				var p = checkMention(json.mentions, ps[i], num + 2);
+				p = replaceLineFeed(p);
+				part.articleBody.push(p);
+				num += 1;
+			} else {
+				part.url = regTitle.exec(ps[i])[1];
+			}
 		}
 
 		json.hasPart.push(part);
@@ -324,7 +338,7 @@
 	};
 
 	function parseEditingUrl() {
-		var editUrl = window.location.search.match(/\?edit=([\.0-9a-zA-Z%:\/?]*)/);
+		var editUrl = window.location.search.match(/\?article=([\.0-9a-zA-Z%:\/?]*)/);
 		if (editUrl) {
 			editUrl = editUrl[1];
 			var editUrlParsed = getLocation(editUrl);
