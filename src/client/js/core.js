@@ -6,6 +6,7 @@
 	var endHeader = '</h2>';
 	var cleshe = '<!DOCTYPE html><html lang="en-US"><head><meta charset="utf-8">' +
 		'<meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0">' +
+		'<noscript><meta http-equiv="refresh" content="0; URL=//wrioos.com/no_jscript.htm"></noscript>' +
 		'<meta name="description" content=""><meta name="author" content=""><meta name="keywords" content="">' +
 		'<title>|TITLE|</title><script type="application/ld+json">|BODY|</script>' +
 		'</head><body><script type="text/javascript" src="//wrioos.com/start.js"></script></body></html>';
