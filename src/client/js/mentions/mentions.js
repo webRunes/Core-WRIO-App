@@ -1,6 +1,6 @@
-var Mention = require('./mention'),
-	merge = Mention.merge,
-	mentions = undefined;
+import {Mention, merge} from './mention';
+
+var mentions = undefined;
 
 var attachMentionToElement = function(mention, json, order) {
 	order = order || 0;
@@ -32,19 +32,17 @@ var attachMentionToElement = function(mention, json, order) {
 					)
 				);
 				return true;
-			} else {
-				//order += articleBody.length;
 			}
 		}
 	}
 	return false;
 };
 
-var check = function(json, order) {
+export function check(json, order) {
 	mentions = json.mentions || mentions;
 	if (mentions) {
 		mentions = merge(mentions);
-		mentions.forEach(function(m) {
+		mentions.forEach((m) => {
 			var mention = new Mention(m),
 				ok;
 			if (mention.order > (order || 0)) {
@@ -65,5 +63,3 @@ var check = function(json, order) {
 		});
 	}
 };
-
-module.exports = check;

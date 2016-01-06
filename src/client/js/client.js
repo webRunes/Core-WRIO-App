@@ -1,9 +1,9 @@
 import React from 'react';
 import ReactDom from 'react-dom';
 import CustomTemplates from './customTemplates';
-import scripts from './mentions/scripts';
+import {scripts} from './mentions/scripts';
 import request from 'superagent';
-import mentions from './mixins/mentions';
+import {applyMentions} from './mixins/mentions';
 
 var domain = process.env.DOMAIN;
 
@@ -346,11 +346,6 @@ class Client extends React.Component {
 		var textToWrite = this.state.cleshe.replace('|BODY|', JSON.stringify(json));
 		textToWrite = textToWrite.replace('|TITLE|', json.name);
 
-		//ToDo: test
-		// /console.log(textToWrite);
-		var url = "zope.html";
-		var contents = "<html></html>";
-
 		var ie = navigator.userAgent.match(/MSIE\s([\d.]+)/);
 		var ie11 = navigator.userAgent.match(/Trident\/7.0/) && navigator.userAgent.match(/rv:11/);
 		var ieEDGE = navigator.userAgent.match(/Edge/g);
@@ -467,15 +462,15 @@ class Client extends React.Component {
 		this.getHttp(this.state.editUrl, (article) => {
 			article = article.filter((json) => json['@type'] == 'Article')[0];
 			if (article) {
-        		textarea = "<h2>" + ((article.m && article.m.name) ? mentions.applyMentions(article.m.name) : article.name) + "</h2>";
+        		textarea = "<h2>" + ((article.m && article.m.name) ? applyMentions(article.m.name) : article.name) + "</h2>";
         		article.articleBody.forEach((paragraph, i) => {
-            		textarea += "<p>" + ((article.m && article.m.articleBody && article.m.articleBody[i]) ? mentions.applyMentions(article.m.articleBody[i]) : paragraph) + "</p>";
+            		textarea += "<p>" + ((article.m && article.m.articleBody && article.m.articleBody[i]) ? applyMentions(article.m.articleBody[i]) : paragraph) + "</p>";
         		});
         		article.hasPart.forEach((subArticle) => {
-            		textarea += "<h2>" + ((subArticle.m && subArticle.m.name) ? mentions.applyMentions(subArticle.m.name) : subArticle.name) + "</h2>";
+            		textarea += "<h2>" + ((subArticle.m && subArticle.m.name) ? applyMentions(subArticle.m.name) : subArticle.name) + "</h2>";
 	        		if (subArticle.articleBody) {
 		        		subArticle.articleBody.forEach((paragraph, i) => {
-		            		textarea += "<p>" + ((subArticle.m && subArticle.m.articleBody && subArticle.m.articleBody[i]) ? mentions.applyMentions(subArticle.m.articleBody[i]) : paragraph) + "</p>";
+		            		textarea += "<p>" + ((subArticle.m && subArticle.m.articleBody && subArticle.m.articleBody[i]) ? applyMentions(subArticle.m.articleBody[i]) : paragraph) + "</p>";
 		        		});
 	        		}
 	        		if (subArticle.url) {

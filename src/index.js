@@ -29,18 +29,18 @@ var mongoUrl = 'mongodb://' + nconf.get('mongo:user') + ':' + nconf.get('mongo:p
 db.mongo({
 		url: mongoUrl
 	})
-	.then(function(res) {
+	.then((res) => {
 		console.log("Connected correctly to database");
 		var db = res.db || {};
 		var server = require('http')
 			.createServer(app)
-			.listen(nconf.get("server:port"), function(req, res) {
+			.listen(nconf.get("server:port"), (req, res) => {
 				console.log('app listening on port ' + nconf.get('server:port') + '...');
 				server_setup(db);
 				console.log("Application Started!");
 			});
 	})
-	.catch(function(err) {
+	.catch((err) => {
 		console.log('Error connect to database:' + err.code + ': ' + err.message);
 	});
 
@@ -61,16 +61,16 @@ function server_setup(db) {
 		},
 		key: 'sid'
 	}));
-	app.get('/', function(request, response) {
+	app.get('/', (request, response) => {
 		response.sendFile(__dirname + '/static/index.htm');
 	});
 
-	app.get('/create', function(request, response) {
+	app.get('/create', (request, response) => {
 		response.sendFile(__dirname +
 			'/client/views/core.htm');
 	});
 
-	app.get('/edit', function(request, response) {
+	app.get('/edit', (request, response) => {
 		response.sendFile(__dirname +
 			'/client/views/core.htm');
 	});

@@ -1,6 +1,6 @@
-var mentions = require('./mentions');
+import {check} from './mentions';
 
-module.exports = function(scripts) {
+export function scripts(scripts) {
 	var i,
 		json,
 		data = [];
@@ -19,7 +19,7 @@ module.exports = function(scripts) {
 		}
 	}
 	data.forEach((jsn) => {
-		mentions(jsn);
+		check(jsn);
 	});
 	return data;
 };
