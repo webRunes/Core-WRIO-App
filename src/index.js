@@ -66,23 +66,13 @@ function server_setup(db) {
 	});
 
 	app.get('/create', function(request, response) {
-		return response.render('core.ejs', {
-			article: null
-		});
+		response.sendFile(__dirname +
+			'/client/views/core.htm');
 	});
 
 	app.get('/edit', function(request, response) {
-		getArticle(request.query.article, function(err, article) {
-			if (err) {
-				console.log("Got error: " + err.message);
-				return response.render('core.ejs', {
-					article: null
-				});
-			}
-			response.render('core.ejs', {
-				article: article
-			});
-		});
+		response.sendFile(__dirname +
+			'/client/views/core.htm');
 	});
 
 }
