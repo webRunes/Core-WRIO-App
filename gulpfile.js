@@ -50,22 +50,7 @@ if (argv.docker) {
     envify_params['DOMAIN'] = "wrioos.local"
 }
 
-gulp.task('babel-client-customTemplates', function() {
-    browserify({
-            entries: './src/client/js/customTemplates.js',
-            debug: true
-        })
-        .transform(babelify)
-        .transform(envify(envify_params))
-        .bundle()
-        .pipe(source('customTemplates.js'))
-        .pipe(gulp.dest('app/client'))
-        .on('end',function() {
-            restart_nodemon();
-        });
-});
-
-gulp.task('babel-client', ['babel-client-customTemplates'], function() {
+gulp.task('babel-client', function() {
     browserify({
             entries: './src/client/js/client.js',
             debug: true
