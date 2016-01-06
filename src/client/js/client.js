@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDom from 'react-dom';
-import CustomTemplates from './CustomTemplates';
+import CustomTemplates from './customTemplates';
 import scripts from './mentions/scripts';
 import request from 'superagent';
 import mentions from './mixins/mentions';
@@ -26,7 +26,7 @@ class Client extends React.Component {
 			$textarea_widget: false,
 			editUrl: false,
 			textarea: false
-		}
+		};
 	}
 
 	getHttp(url, cb) {
@@ -434,10 +434,13 @@ class Client extends React.Component {
 
 		this.state.$textarea = $('#textarea-core-id');
 		this.state.$textarea_widget = $('#textarea-widget-id');
+
+		this.textareaCore();
 	}
 
 	componentWillMount() {
 		var that = this;
+
 		this.parseEditingUrl();
 
 		$.ajax({
@@ -455,7 +458,6 @@ class Client extends React.Component {
 		}).fail((e) => {
 			that.disableSave();
 		});
-		this.textareaCore();
 	}
 
 	textareaCore() {
