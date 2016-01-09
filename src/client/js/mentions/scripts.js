@@ -11,7 +11,7 @@ export function scripts(scripts) {
 				json = JSON.parse(scripts[i].textContent);
 			} catch (exception) {
 				json = undefined;
-				console.error('Your json-ld not valid: ' + exception);
+				console.error('Invalid JSON-LD: ' + exception);
 			}
 			if (typeof json === 'object') {
 				data.push(json);

@@ -314,7 +314,7 @@ class Client extends React.Component {
 		var url = this.state.saveUrl;
 		var contents = "<html></html>";
 		$.ajax({
-				url: "http://storage."+domain+"/api/save",
+				url: "//storage."+domain+"/api/save",
 				type: 'post',
 				'dataType': 'json',
 				data: {
@@ -332,7 +332,7 @@ class Client extends React.Component {
 
 	disableSave() {
 		$('#save-button-id div a').addClass('disabled');
-		$('#save-button-id div').attr('title', 'You can\'t save to non webrunes hosted page. Use \"Save As\" and upload file manually');
+		$('#save-button-id div').attr('title', 'You can only save the page at webrunes.com. Use "Save as" and upload file manually.');
 	}
 
 	saveAs() {
@@ -359,7 +359,7 @@ class Client extends React.Component {
 				});
 				window.navigator.msSaveBlob(textFileAsBlob, fileName);
 			} else {
-				console.log("No supported on IE ver<10");
+				console.log("IE v.10 or higher required");
 				return;
 			}
 		} else {
@@ -386,7 +386,7 @@ class Client extends React.Component {
 			this.state.editUrl = editUrl[1];
 			editUrl = this.state.editUrl;
 			var editUrlParsed = this.getLocation(editUrl);
-			console.log("Got editing url", editUrl);
+			console.log("Page edit link received", editUrl);
 			if (editUrlParsed) {
 				if (editUrlParsed.host == STORAGE_DOMAIN) {
 					var match = editUrlParsed.pathname.match(/\/[0-9]+\/(.*)/);

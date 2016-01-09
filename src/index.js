@@ -30,7 +30,7 @@ db.mongo({
 		url: mongoUrl
 	})
 	.then((res) => {
-		console.log("Connected correctly to database");
+		console.log("A connection was successfully established with the server");
 		var db = res.db || {};
 		var server = require('http')
 			.createServer(app)
@@ -41,7 +41,7 @@ db.mongo({
 			});
 	})
 	.catch((err) => {
-		console.log('Error connect to database:' + err.code + ': ' + err.message);
+		console.log('Error connecting to database:' + err.code + ': ' + err.message);
 	});
 
 function server_setup(db) {
