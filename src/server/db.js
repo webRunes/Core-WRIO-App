@@ -4,8 +4,8 @@ import mongodb from 'mongodb';
 export function mongo(args) {
 	var args = args || {},
 		url = args.url || '';
-	return new Promise(function(resolve, reject) {
-		mongodb.MongoClient.connect(url, function(err, db) {
+	return new Promise((resolve, reject) => {
+		mongodb.MongoClient.connect(url, (err, db) => {
 			if (err) {
 				reject({
 					code: err.code,
