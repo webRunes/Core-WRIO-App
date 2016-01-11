@@ -29,19 +29,19 @@ var mongoUrl = 'mongodb://' + nconf.get('mongo:user') + ':' + nconf.get('mongo:p
 db.mongo({
 		url: mongoUrl
 	})
-	.then(function(res) {
-		console.log("Connected correctly to database");
+	.then((res) => {
+		console.log("A connection was successfully established with the server");
 		var db = res.db || {};
 		var server = require('http')
 			.createServer(app)
-			.listen(nconf.get("server:port"), function(req, res) {
+			.listen(nconf.get("server:port"), (req, res) => {
 				console.log('app listening on port ' + nconf.get('server:port') + '...');
 				server_setup(db);
 				console.log("Application Started!");
 			});
 	})
-	.catch(function(err) {
-		console.log('Error connect to database:' + err.code + ': ' + err.message);
+	.catch((err) => {
+		console.log('Error connecting to database:' + err.code + ': ' + err.message);
 	});
 
 function server_setup(db) {
@@ -61,28 +61,18 @@ function server_setup(db) {
 		},
 		key: 'sid'
 	}));
-	app.get('/', function(request, response) {
+	app.get('/', (request, response) => {
 		response.sendFile(__dirname + '/static/index.htm');
 	});
 
-	app.get('/create', function(request, response) {
-		return response.render('core.ejs', {
-			article: null
-		});
+	app.get('/create', (request, response) => {
+		response.sendFile(__dirname +
+			'/client/views/core.htm');
 	});
 
-	app.get('/edit', function(request, response) {
-		getArticle(request.query.article, function(err, article) {
-			if (err) {
-				console.log("Got error: " + err.message);
-				return response.render('core.ejs', {
-					article: null
-				});
-			}
-			response.render('core.ejs', {
-				article: article
-			});
-		});
+	app.get('/edit', (request, response) => {
+		response.sendFile(__dirname +
+			'/client/views/core.htm');
 	});
 
 }

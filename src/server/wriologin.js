@@ -11,7 +11,7 @@ function deserialize(id, done) {
 	var webrunesUsers = db.collection('webRunes_Users');
 	var sessions = db.collection('sessions');
 	console.log("Deserializing user by id=" + id);
-	webrunesUsers.findOne(ObjectID(id), function(err, user) {
+	webrunesUsers.findOne(ObjectID(id), (err, user) => {
 		if (err || !user) {
 			console.log("User not found", err);
 			done(err);
@@ -33,7 +33,7 @@ export function loginWithSessionId(ssid, done) {
 	console.log("Trying deserialize session", ssid);
 	sessions.findOne({
 		"_id": ssid
-	}, function(err, session) {
+	}, (err, session) => {
 		if (err || !session) {
 			console.log("User not found", err);
 			done(err);
