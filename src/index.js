@@ -11,8 +11,6 @@ var app = express();
 app.ready = () => {};
 
 var DOMAIN = nconf.get('db:workdomain');
-app.set('views', __dirname + '/client/views');
-app.set('view engine', 'ejs');
 
 import _SessionStore from 'connect-mongo';
 var SessionStore = _SessionStore(session);
