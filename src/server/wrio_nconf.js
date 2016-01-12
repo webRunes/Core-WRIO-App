@@ -4,7 +4,6 @@ import nconf from 'nconf';
 
 nconf.env().argv();
 
-var basedirPath = path.dirname(require.main.filename);
-nconf.file(path.join(basedirPath + '/config.json'));
+nconf.file(path.resolve(__dirname, '../../config.json'));
 
 export default nconf;
