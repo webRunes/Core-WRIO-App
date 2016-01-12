@@ -70,7 +70,7 @@ gulp.task('views', function() {
         .pipe(gulp.dest('app/client/views'));
 
     gulp.src('hub/index.htm')
-        .pipe(gulp.dest('app/static'));
+        .pipe(gulp.dest('app/hub'));
 });
 
 var nodemon_instance;
