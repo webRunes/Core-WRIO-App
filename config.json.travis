@@ -1,0 +1,20 @@
+{
+  "db": {
+    "host": "localhost",
+    "dbname": "test",
+    "user": "test",
+    "password": "test",
+    "workdomain": ".wrioos.com"
+  },
+  "mongo": {
+    "host": "localhost",
+    "dbname": "test",
+    "user": "test",
+    "password": "test"
+  },
+  "server": {
+    "cookiesecret": "keyboard.cat",
+    "port": 5004,
+    "workdomain": ".wrioos.com"
+  }
+}
