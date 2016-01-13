@@ -25,9 +25,15 @@ gulp.task('test', function() {
     return gulp.src('test/**/*.js', {read: false})
         // gulp-mocha needs filepaths so you can't have any plugins before it
         .pipe(mocha({
-            reporter: 'nyan',
+            reporter: 'dot',
             timeout: 20000
-        }));
+        }))
+        .once('error', () => {
+            process.exit(1);
+        })
+        .once('end', () => {
+            process.exit();
+        });;
 });
 
 gulp.task('babel-server', function() {
