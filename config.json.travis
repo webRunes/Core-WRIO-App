@@ -2,15 +2,15 @@
   "db": {
     "host": "localhost",
     "dbname": "test",
-    "user": "test",
-    "password": "test",
+    "user": "",
+    "password": "",
     "workdomain": ".wrioos.com"
   },
   "mongo": {
     "host": "localhost",
     "dbname": "test",
-    "user": "test",
-    "password": "test"
+    "user": "",
+    "password": ""
   },
   "server": {
     "cookiesecret": "keyboard.cat",

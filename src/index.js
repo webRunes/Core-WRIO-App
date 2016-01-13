@@ -19,11 +19,8 @@ app.use(cookieParser(cookie_secret));
 
 app.use('/assets', express.static(path.join(__dirname, '/client')));
 
-var mongoUrl = 'mongodb://' + nconf.get('mongo:user') + ':' + nconf.get('mongo:password') + '@' + nconf.get('mongo:host') + '/' + nconf.get('mongo:dbname');
 
-db.mongo({
-        url: mongoUrl
-    })
+db.mongo()
     .then((res) => {
         console.log("A connection was successfully established with the server");
         var db = res.db || {};
