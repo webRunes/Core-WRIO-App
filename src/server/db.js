@@ -1,8 +1,17 @@
 import mongodb from 'mongodb';
+import nconf from 'nconf'
 
-export function mongo(args) {
-	var args = args || {},
-		url = args.url || '';
+export function mongo() {
+	var url = "";
+	var user = nconf.get('mongo:user');
+	var password =  nconf.get('mongo:password');
+
+	if (user) {
+		url = 'mongodb://' + user + ':' + password + '@' + nconf.get('mongo:host') + '/' + nconf.get('mongo:dbname');
+	} else {
+		url = 'mongodb://' + nconf.get('mongo:host') + '/' + nconf.get('mongo:dbname');
+	}
+
 	return new Promise((resolve, reject) => {
 		mongodb.MongoClient.connect(url, (err, db) => {
 			if (err) {
