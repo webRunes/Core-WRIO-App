@@ -1,0 +1,22 @@
+import request from 'supertest';
+import assert from 'assert';
+import should from 'should';
+import {Mention,merge} from '../src/client/js/mentions/mention.js';
+
+
+describe('mention test', () => {
+   before(() => {
+
+   });
+    it("Shoud determine correct mention start and order", () => {
+        var mention = new Mention({
+            "@type": "Article",
+            "name": "First url title",
+            "about": "Text inside the ticket popup.",
+            "url": "http://webrunes.com/blog.htm?'dolor sit amet':1,104"
+        })
+        mention.start.should.be.equal(104);
+        mention.order.should.be.equal(1);
+
+    })
+});
