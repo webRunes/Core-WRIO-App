@@ -12,13 +12,15 @@ install:
 
 services: mongodb
   
-script: 
+script:
+  - cp config.json.travis config.json
   - gulp
+  - gulp test
   - npm start
 
 before_deploy:
   - gem install mime-types -v 2.6.2
-  - cp config.json.travis config.json
+
 
 deploy:
   - provider: s3
