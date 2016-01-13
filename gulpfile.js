@@ -28,10 +28,10 @@ gulp.task('test', function() {
             reporter: 'dot',
             timeout: 20000
         }))
-        .once('error', () => {
+        .once('error', function () {
             process.exit(1);
         })
-        .once('end', () => {
+        .once('end', function () {
             process.exit();
         });;
 });
