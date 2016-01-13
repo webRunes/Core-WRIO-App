@@ -4,11 +4,13 @@ sudo: false
 script: "/bin/date"
 
 node_js:
-  - 0.10
+  - 0.12
 
 install: 
   - npm install
   - npm install -g gulp
+
+services: mongodb
   
 script: 
   - gulp
@@ -16,7 +18,7 @@ script:
 
 before_deploy:
   - gem install mime-types -v 2.6.2
-
+  - cp config.json.travis config.json
 
 deploy:
   - provider: s3
