@@ -439,7 +439,7 @@ class Client extends React.Component {
 		this.parseEditingUrl();
 
 		$.ajax({
-			url: "//storage."+domain+"/api/get_profile",
+			url: "//login."+domain+"/api/get_profile",
 			type: 'post',
 			'dataType':'json',
 			data: {},
