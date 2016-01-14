@@ -440,7 +440,7 @@ class Client extends React.Component {
 
 		$.ajax({
 			url: "//login."+domain+"/api/get_profile",
-			type: 'post',
+			type: 'get',
 			'dataType':'json',
 			data: {},
 			xhrFields: {
