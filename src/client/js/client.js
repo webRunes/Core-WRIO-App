@@ -388,7 +388,7 @@ class Client extends React.Component {
 			var editUrlParsed = this.getLocation(editUrl);
 			console.log("Page edit link received", editUrl);
 			if (editUrlParsed) {
-				if (editUrlParsed.host == STORAGE_DOMAIN) {
+				if (editUrlParsed.host == this.state.STORAGE_DOMAIN) {
 					var match = editUrlParsed.pathname.match(/\/[0-9]+\/(.*)/);
 					if (match) {
 						this.state.saveUrl = match[1];
