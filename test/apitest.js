@@ -9,8 +9,8 @@ app.ready = () => {
 };
 
 var waitdb = () => {
-    return new Promise((resolve,reject) => {
-        setInterval(() => {
+    return new Promise((resolve, reject) => {
+        setInterval(function() {
             if (ready) {
                 console.log("App ready, starting tests");
                 resolve();
@@ -20,37 +20,31 @@ var waitdb = () => {
     });
 };
 
-var apitest = (app, request) => {
+describe("API unit tests", () => {
 
-    describe("API unit tests", () => {
-
-        before(async () => {
-            await waitdb();
-        });
-
-        it("should return default page", (done) => {
-            request(app)
-                .get('/')
-                .expect(200, done);
-        });
-
-        it("/create should return core.htm page", (done) => {
-            request(app)
-                .get('/create')
-                .expect(200, done);
-        });
-
-        it("/edit should return core.htm page", (done) => {
-            request(app)
-                .get('/edit')
-                .expect(200, done);
-        });
-
-        after(()=>{
-
-        });
+    before(async() => {
+        await waitdb();
     });
 
-};
+    it("should return default page", (done) => {
+        request(app)
+            .get('/')
+            .expect(200, done);
+    });
 
-apitest(app, request);
+    it("/create should return core.htm page", (done) => {
+        request(app)
+            .get('/create')
+            .expect(200, done);
+    });
+
+    it("/edit should return core.htm page", (done) => {
+        request(app)
+            .get('/edit')
+            .expect(200, done);
+    });
+
+    after(() => {
+
+    });
+});
