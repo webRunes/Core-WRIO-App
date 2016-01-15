@@ -10,7 +10,7 @@ app.ready = () => {
 
 var waitdb = () => {
     return new Promise((resolve, reject) => {
-        setInterval(() => {
+        setInterval(function() {
             if (ready) {
                 console.log("App ready, starting tests");
                 resolve();
