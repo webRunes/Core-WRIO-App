@@ -314,7 +314,7 @@ class Client extends React.Component {
 		var url = this.state.saveUrl;
 		var contents = "<html></html>";
 		$.ajax({
-				url: "//storage."+domain+"/api/save",
+				url: "https://storage."+domain+"/api/save",
 				type: 'post',
 				'dataType': 'json',
 				data: {
@@ -439,7 +439,7 @@ class Client extends React.Component {
 		this.parseEditingUrl();
 
 		$.ajax({
-			url: "//login."+domain+"/api/get_profile",
+			url: "https://login."+domain+"/api/get_profile",
 			type: 'get',
 			'dataType':'json',
 			data: {},
