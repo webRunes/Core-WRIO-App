@@ -9,13 +9,13 @@ export function applyMentions(mentions) {
         },
         Link = link(m.link),
         After = m.after;
-	var before = function(str, i) {
-		i--;
-		m = mentions[i];
+    var before = function(str, i) {
+        i--;
+        m = mentions[i];
         if (m) {
             var L = link(m.link),
                 A = str.replace(m.before + (m.link ? m.link.text : ''), '');
-            return before(m.before, i) + L + A
+            return before(m.before, i) + L + A;
         }
         return str;
     };
