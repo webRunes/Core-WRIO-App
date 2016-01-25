@@ -67,6 +67,6 @@ var server_setup = (db) => {
             '/client/views/core.htm');
     });
 
-}
+};
 
 export default app;

@@ -37,6 +37,6 @@ var CustomTemplates = {
             "</div>" +
             "</li>";
     }
-}
+};
 
 module.exports = CustomTemplates;
