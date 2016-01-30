@@ -53,7 +53,7 @@ class Client extends React.Component {
             pathname: match[5],
             search: match[6],
             hash: match[7]
-        }
+        };
     }
 
     getArticle(lang, keywords, author, widgetData) {
@@ -449,7 +449,6 @@ class Client extends React.Component {
             .on('click', this.save.bind(this));
         $('#save-as-button-id')
             .on('click', this.saveAs.bind(this));
-
     }
 
     componentWillMount() {
@@ -504,7 +503,7 @@ class Client extends React.Component {
                 <textarea rows="25" id="textarea-core-id" placeholder="Enter text ..." style={{width: '100%'}}/>
                 <textarea rows="4" id="textarea-widget-id" placeholder="Enter widget data ..." style={{width: '100%', marginTop:'20px'}}/>
             </div>
-        )
+        );
     }
 }
 

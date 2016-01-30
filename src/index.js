@@ -6,19 +6,17 @@ import ejs from 'ejs';
 import session from 'express-session';
 import db from './server/db';
 import cookieParser from 'cookie-parser';
+import _SessionStore from 'connect-mongo';
 
 var app = express();
 app.ready = () => {};
 
 var DOMAIN = nconf.get('db:workdomain');
 
-import _SessionStore from 'connect-mongo';
 var SessionStore = _SessionStore(session);
 var cookie_secret = nconf.get("server:cookiesecret");
 app.use(cookieParser(cookie_secret));
-
 app.use('/assets', express.static(path.join(__dirname, '/client')));
-
 
 db.mongo()
     .then((res) => {
@@ -69,6 +67,6 @@ var server_setup = (db) => {
             '/client/views/core.htm');
     });
 
-}
+};
 
 export default app;
