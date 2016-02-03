@@ -25,7 +25,8 @@ class Client extends React.Component {
             $textarea: false,
             $textarea_widget: false,
             editUrl: false,
-            textarea: false
+            textarea: false,
+            coreAdditionalHeight: 200
         };
     }
 
@@ -434,11 +435,11 @@ class Client extends React.Component {
                     });
                     var heightInit = $body.height();
                     $iframe.height(heightInit);
-                    parent.postMessage(JSON.stringify({"coreHeight": heightInit + 200}), "*");
+                    parent.postMessage(JSON.stringify({"coreHeight": heightInit + this.state.coreAdditionalHeight}), "*");
                     $body.bind('keypress keyup keydown paste change focus blur', function(e) {
                         var height = $body[0].scrollHeight;        // 150
                         $iframe.height(height);
-                        parent.postMessage(JSON.stringify({"coreHeight": height + 200}), "*");
+                        parent.postMessage(JSON.stringify({"coreHeight": height + this.state.coreAdditionalHeight}), "*");
                     });
                 }
             },
