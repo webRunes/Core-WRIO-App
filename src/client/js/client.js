@@ -25,15 +25,15 @@ class Client extends React.Component {
             $textarea: false,
             $textarea_widget: false,
             editUrl: false,
-            textarea: false
+            textarea: false,
+            coreAdditionalHeight: 200
         };
     }
 
     getHttp(url, cb) {
         var self = this;
         request.get(
-            url,
-            (err, result) => {
+            url, (err, result) => {
                 if (!err && (typeof result === 'object')) {
                     var e = document.createElement('div');
                     e.innerHTML = result.text;
@@ -47,14 +47,14 @@ class Client extends React.Component {
     getLocation(href) {
         var match = href.match(/^(https?\:)\/\/(([^:\/?#]*)(?:\:([0-9]+))?)(\/[^?#]*)(\?[^#]*|)(#.*|)$/);
         return match && {
-                protocol: match[1],
-                host: match[2],
-                hostname: match[3],
-                port: match[4],
-                pathname: match[5],
-                search: match[6],
-                hash: match[7]
-            };
+            protocol: match[1],
+            host: match[2],
+            hostname: match[3],
+            port: match[4],
+            pathname: match[5],
+            search: match[6],
+            hash: match[7]
+        };
     }
 
     getArticle(lang, keywords, author, widgetData) {
@@ -75,11 +75,11 @@ class Client extends React.Component {
     }
 
     replaceLineFeed(someText) {
-        var re=/\r\n|\n\r|\n|\r/g;
-        return someText.replace(re,"");
+        var re = /\r\n|\n\r|\n|\r/g;
+        return someText.replace(re, "");
     }
 
-    getMentionsItem(name, about, link){
+    getMentionsItem(name, about, link) {
         return {
             "@type": "Article",
             "name": name,
@@ -276,7 +276,7 @@ class Client extends React.Component {
         ps = this.normalizeOUL(ps);
         for (var i = 0; i < ps.length; i++) {
             if (ps[i].trim() !== "") {
-                if (ps[i].replace(regHttp, "").trim() !== "" ) {
+                if (ps[i].replace(regHttp, "").trim() !== "") {
                     part.articleBody = part.articleBody || [];
                     ps[i] = ps[i].replace(/&nbsp;/gi, ' ');
                     var p = this.checkMention(json.mentions, ps[i], num + 2);
@@ -314,7 +314,7 @@ class Client extends React.Component {
         var url = this.state.saveUrl;
         var contents = "<html></html>";
         $.ajax({
-                url: "https://storage."+domain+"/api/save",
+                url: "//storage." + domain + "/api/save",
                 type: 'post',
                 'dataType': 'json',
                 data: {
@@ -349,11 +349,11 @@ class Client extends React.Component {
         var ie = navigator.userAgent.match(/MSIE\s([\d.]+)/);
         var ie11 = navigator.userAgent.match(/Trident\/7.0/) && navigator.userAgent.match(/rv:11/);
         var ieEDGE = navigator.userAgent.match(/Edge/g);
-        var ieVer=(ie ? parseInt(ie[1]) : (ie11 ? 11 : -1));
+        var ieVer = (ie ? parseInt(ie[1]) : (ie11 ? 11 : -1));
 
         var fileName = (json.name === '' ? 'untitled' : json.name.split(' ').join('_')) + '.htm';
         if (ie || ie11 || ieEDGE) {
-            if (ieVer>9 || ieEDGE) {
+            if (ieVer > 9 || ieEDGE) {
                 var textFileAsBlob = new Blob([textToWrite], {
                     type: 'text/plain'
                 });
@@ -404,6 +404,10 @@ class Client extends React.Component {
     }
 
     componentDidMount() {
+        this.textareaCore();
+        this.state.$textarea = $('#textarea-core-id');
+        this.state.$textarea_widget = $('#textarea-widget-id');
+
         $('#textarea-core-id').wysihtml5({
             toolbar: {
                 custom1: false,
@@ -419,6 +423,26 @@ class Client extends React.Component {
                 "save": true,
                 "saveAs": true
             },
+            events: {
+                load: function() {
+                    var $iframe = $(this.composer.editableArea);
+                    var $body = $(this.composer.element);
+                    $body.text(this.state.$textarea);
+                    $body.css({
+                        'min-height': 0,
+                        'line-height': '20px',
+                        'overflow': 'hidden',
+                    });
+                    var heightInit = $body.height();
+                    $iframe.height(heightInit);
+                    parent.postMessage(JSON.stringify({"coreHeight": heightInit + this.state.coreAdditionalHeight}), "*");
+                    $body.bind('keypress keyup keydown paste change focus blur', function(e) {
+                        var height = $body[0].scrollHeight;        // 150
+                        $iframe.height(height);
+                        parent.postMessage(JSON.stringify({"coreHeight": height + this.state.coreAdditionalHeight}), "*");
+                    });
+                }
+            },
             customTemplates: CustomTemplates
         });
 
@@ -426,32 +450,24 @@ class Client extends React.Component {
             .on('click', this.save.bind(this));
         $('#save-as-button-id')
             .on('click', this.saveAs.bind(this));
-
-        this.state.$textarea = $('#textarea-core-id');
-        this.state.$textarea_widget = $('#textarea-widget-id');
-
-        this.textareaCore();
     }
 
     componentWillMount() {
-        var that = this;
-
         this.parseEditingUrl();
 
         $.ajax({
-            url: "https://login."+domain+"/api/get_profile",
+            url: "//login." + domain + "/api/get_profile",
             type: 'get',
-            'dataType':'json',
+            'dataType': 'json',
             data: {},
             xhrFields: {
                 withCredentials: true
             }
         }).success((profile) => {
-            console.log("Get_profile finish",profile);
-            that.state.wrioID = profile.id;
-
+            console.log("Get_profile finish", profile);
+            this.state.wrioID = profile.id;
         }).fail((e) => {
-            that.disableSave();
+            this.disableSave();
         });
     }
 
@@ -460,8 +476,8 @@ class Client extends React.Component {
         var articleName;
         var paragraphs = [];
         this.getHttp(this.state.editUrl, (article) => {
-            article = article.filter((json) => json['@type'] == 'Article')[0];
             if (article) {
+                article = article.filter((json) => json['@type'] == 'Article')[0];
                 textarea = "<h2>" + ((article.m && article.m.name) ? applyMentions(article.m.name) : article.name) + "</h2>";
                 article.articleBody.forEach((paragraph, i) => {
                     textarea += "<p>" + ((article.m && article.m.articleBody && article.m.articleBody[i]) ? applyMentions(article.m.articleBody[i]) : paragraph) + "</p>";
@@ -492,4 +508,4 @@ class Client extends React.Component {
     }
 }
 
-ReactDom.render(< Client />, document.getElementById('clientholder'));
+ReactDom.render( < Client / > , document.getElementById('clientholder'));
