@@ -23,14 +23,13 @@ var attachMentionToElement = function(mention, json, order) {
                 pos;
             if (order + articleBody.length >= mention.order) {
                 pos = mention.order - order - 1;
-                json.m = json.m || {};
-                json.m[key] = json.m[key] || [];
-                json.m[key][pos] = json.m[key][pos] || [];
-                json.m[key][pos].push(
-                    mention.attach(
-                        articleBody[pos]
-                    )
-                );
+                var _mention = mention.attach(articleBody[pos]);
+                if (_mention) {
+                    json.m = json.m || {};
+                    json.m[key] = json.m[key] || [];
+                    json.m[key][pos] = json.m[key][pos] || [];
+                    json.m[key][pos].push(_mention);
+                }
                 return true;
             }
         }

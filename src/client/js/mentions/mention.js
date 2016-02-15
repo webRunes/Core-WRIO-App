@@ -32,9 +32,7 @@ export class Mention {
             };
         }
         this.warn();
-        return {
-            before: s
-        };
+        return null;
     }
 }
 
