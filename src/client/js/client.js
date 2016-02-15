@@ -404,52 +404,54 @@ class Client extends React.Component {
     }
 
     componentDidMount() {
-        this.textareaCore();
-        this.state.$textarea = $('#textarea-core-id');
-        this.state.$textarea_widget = $('#textarea-widget-id');
+        this.textareaCore(() => {
+            var that = this;
+            $('#textarea-core-id').wysihtml5({
+                toolbar: {
+                    custom1: false,
+                    "customFontStyles": true,
+                    "font-styles": false,
+                    "emphasis": false,
+                    "lists": true,
+                    "html": false,
+                    "link": true,
+                    "image": false,
+                    "color": false,
+                    "blockquote": true,
+                    "save": true,
+                    "saveAs": true
+                },
+                events: {
+                    load: function() {
+                        var $iframe = $(this.composer.editableArea);
+                        var $body = $(this.composer.element);
+                        $body.focus();
+                        $body.css({
+                            'min-height': 0,
+                            'line-height': '20px',
+                            'overflow': 'hidden',
+                        });
+                        var heightInit = $body.height();
+                        $iframe.height(heightInit);
+                        parent.postMessage(JSON.stringify({"coreHeight": heightInit + that.state.coreAdditionalHeight}), "*");
+                        $body.bind('keypress keyup keydown paste change focus blur', (e) => {
+                            var height = $body[0].scrollHeight;        // 150
+                            $iframe.height(height);
+                            parent.postMessage(JSON.stringify({"coreHeight": height + that.state.coreAdditionalHeight}), "*");
+                        });
+                    }
+                },
+                customTemplates: CustomTemplates
+            });
 
-        $('#textarea-core-id').wysihtml5({
-            toolbar: {
-                custom1: false,
-                "customFontStyles": true,
-                "font-styles": false,
-                "emphasis": false,
-                "lists": true,
-                "html": false,
-                "link": true,
-                "image": false,
-                "color": false,
-                "blockquote": true,
-                "save": true,
-                "saveAs": true
-            },
-            events: {
-                load: function() {
-                    var $iframe = $(this.composer.editableArea);
-                    var $body = $(this.composer.element);
-                    $body.text(this.state.$textarea);
-                    $body.css({
-                        'min-height': 0,
-                        'line-height': '20px',
-                        'overflow': 'hidden',
-                    });
-                    var heightInit = $body.height();
-                    $iframe.height(heightInit);
-                    parent.postMessage(JSON.stringify({"coreHeight": heightInit + this.state.coreAdditionalHeight}), "*");
-                    $body.bind('keypress keyup keydown paste change focus blur', function(e) {
-                        var height = $body[0].scrollHeight;        // 150
-                        $iframe.height(height);
-                        parent.postMessage(JSON.stringify({"coreHeight": height + this.state.coreAdditionalHeight}), "*");
-                    });
-                }
-            },
-            customTemplates: CustomTemplates
+            $('#save-button-id')
+                .on('click', this.save.bind(this));
+            $('#save-as-button-id')
+                .on('click', this.saveAs.bind(this));
         });
-
-        $('#save-button-id')
-            .on('click', this.save.bind(this));
-        $('#save-as-button-id')
-            .on('click', this.saveAs.bind(this));
+/*        this.state.$textarea = $('#textarea-core-id');
+        this.state.$textarea_widget = $('#textarea-widget-id');
+*/
     }
 
     componentWillMount() {
@@ -471,12 +473,13 @@ class Client extends React.Component {
         });
     }
 
-    textareaCore() {
+    textareaCore(cb) {
         var textarea;
         var articleName;
         var paragraphs = [];
         this.getHttp(this.state.editUrl, (article) => {
-            if (article) {
+            if (article && article.length !== 0) {
+                console.log(article)
                 article = article.filter((json) => json['@type'] == 'Article')[0];
                 textarea = "<h2>" + ((article.m && article.m.name) ? applyMentions(article.m.name) : article.name) + "</h2>";
                 article.articleBody.forEach((paragraph, i) => {
@@ -495,6 +498,7 @@ class Client extends React.Component {
                 });
                 $('#textarea-core-id').text(textarea);
             }
+            cb();
         });
     }
 
