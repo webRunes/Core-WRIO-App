@@ -131,7 +131,9 @@ class Client extends React.Component {
         var reg = /(<blockquote>([\s\S]+?)<\/blockquote>)/gi;
 
         var blocks = txt.match(reg);
-        if (!blocks || !blocks.length) return txt;
+        if (!blocks || !blocks.length) {
+            return txt;   
+        }
 
         for (var i = 0; i < blocks.length; i++) {
             var item = blocks[i].replace('<blockquote>', '<br>')
@@ -179,7 +181,9 @@ class Client extends React.Component {
             if (text) {
                 if (arr[i].indexOf('<li>') == 0) {
                     var num = ind + '. ';
-                    if (!!isOu) num = '* ';
+                    if (!!isOu) {
+                        num = '* ';
+                    }
                     text = text.replace('<li>', num);
                     ind += 1;
                 }
@@ -189,21 +193,28 @@ class Client extends React.Component {
     }
 
     calculateJson(text, widgetData) {
-        if (!text) return '';
+        if (!text) {
+            return '';
+        }
 
         text = this.normalizeText(text);
         widgetData = this.normalizeWidgetData(widgetData);
 
         var blocks = text.split(this.state.startHeader);
-        if (!blocks.length) return '';
+        if (!blocks.length) {
+            return '';
+        }
 
         var i = !blocks[0] ? 1 : 0;
         var j = i;
         var article = this.getArticle("en-US", "", "", widgetData);
         var num = 1;
         for (; i < blocks.length; i++) {
-            if (i == j) num = this.addCoreBlock(article, blocks[i], num);
-            else num = this.addParagraph(article, blocks[i], num);
+            if (i == j) {
+                num = this.addCoreBlock(article, blocks[i], num);
+            } else {
+                num = this.addParagraph(article, blocks[i], num);
+            }
         }
 
         return article;
@@ -235,7 +246,9 @@ class Client extends React.Component {
     }
 
     addCoreBlock(json, txt, num) {
-        if (!txt) return num;
+        if (!txt) {
+            return num;
+        }
         var blocks = txt.split(this.state.endHeader);
 
         var name = blocks.length == 2 ? blocks[0] : '';
@@ -260,7 +273,9 @@ class Client extends React.Component {
     }
 
     addParagraph(json, txt, num) {
-        if (!txt) return num;
+        if (!txt) {
+            return num;
+        }
         var regHttp = /(https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*))/i;
         var regTitle = /<a [^>]+>([^<]+)<\/a>/i;
         var regHref = /href=["|']([^'"]+)/i;
@@ -302,7 +317,9 @@ class Client extends React.Component {
         var txt = $(this.state.$textarea)
             .val();
         var json = this.calculateJson(txt, widgetData);
-        if (!json) return;
+        if (!json) {
+            return;  
+        }
 
         var textToWrite = this.state.cleshe.replace('|BODY|', JSON.stringify(json));
         textToWrite = textToWrite.replace('|TITLE|', json.name);
@@ -341,7 +358,9 @@ class Client extends React.Component {
         var txt = $(this.state.$textarea)
             .val();
         var json = this.calculateJson(txt, widgetData);
-        if (!json) return;
+        if (!json) {
+            return;
+        }
 
         var textToWrite = this.state.cleshe.replace('|BODY|', JSON.stringify(json));
         textToWrite = textToWrite.replace('|TITLE|', json.name);
@@ -479,7 +498,6 @@ class Client extends React.Component {
         var paragraphs = [];
         this.getHttp(this.state.editUrl, (article) => {
             if (article && article.length !== 0) {
-                console.log(article)
                 article = article.filter((json) => json['@type'] == 'Article')[0];
                 textarea = "<h2>" + ((article.m && article.m.name) ? applyMentions(article.m.name) : article.name) + "</h2>";
                 article.articleBody.forEach((paragraph, i) => {
