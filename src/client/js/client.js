@@ -424,50 +424,51 @@ class Client extends React.Component {
 
     componentDidMount() {
         this.textareaCore(() => {
-            var that = this;
-            $('#textarea-core-id').wysihtml5({
-                toolbar: {
-                    custom1: false,
-                    "customFontStyles": true,
-                    "font-styles": false,
-                    "emphasis": false,
-                    "lists": true,
-                    "html": false,
-                    "link": true,
-                    "image": false,
-                    "color": false,
-                    "blockquote": true,
-                    "save": true,
-                    "saveAs": true
-                },
-                events: {
-                    load: function() {
-                        var $iframe = $(this.composer.editableArea);
-                        var $body = $(this.composer.element);
-                        $body.focus();
-                        $body.css({
-                            'min-height': 0,
-                            'line-height': '20px',
-                            'overflow': 'hidden',
-                        });
-                        var heightInit = $body.height();
-                        $iframe.height(heightInit);
-                        parent.postMessage(JSON.stringify({"coreHeight": heightInit + that.state.coreAdditionalHeight}), "*");
-                        $body.bind('keypress keyup keydown paste change focus blur', (e) => {
-                            var height = $body[0].scrollHeight;        // 150
-                            $iframe.height(height);
-                            parent.postMessage(JSON.stringify({"coreHeight": height + that.state.coreAdditionalHeight}), "*");
-                        });
-                    }
-                },
-                customTemplates: CustomTemplates
-            });
 
-            $('#save-button-id')
-                .on('click', this.save.bind(this));
-            $('#save-as-button-id')
-                .on('click', this.saveAs.bind(this));
         });
+        var that = this;
+        $('#textarea-core-id').wysihtml5({
+            toolbar: {
+                custom1: false,
+                "customFontStyles": true,
+                "font-styles": false,
+                "emphasis": false,
+                "lists": true,
+                "html": false,
+                "link": true,
+                "image": false,
+                "color": false,
+                "blockquote": true,
+                "save": true,
+                "saveAs": true
+            },
+            events: {
+                load: function() {
+                    var $iframe = $(this.composer.editableArea);
+                    var $body = $(this.composer.element);
+                    $body.focus();
+                    $body.css({
+                        'min-height': 0,
+                        'line-height': '20px',
+                        'overflow': 'hidden',
+                    });
+                    var heightInit = $body.height();
+                    $iframe.height(heightInit);
+                    parent.postMessage(JSON.stringify({"coreHeight": heightInit + that.state.coreAdditionalHeight}), "*");
+                    $body.bind('keypress keyup keydown paste change focus blur', (e) => {
+                        var height = $body[0].scrollHeight;        // 150
+                        $iframe.height(height);
+                        parent.postMessage(JSON.stringify({"coreHeight": height + that.state.coreAdditionalHeight}), "*");
+                    });
+                }
+            },
+            customTemplates: CustomTemplates
+        });
+
+        $('#save-button-id')
+            .on('click', this.save.bind(this));
+        $('#save-as-button-id')
+            .on('click', this.saveAs.bind(this));
 /*        this.state.$textarea = $('#textarea-core-id');
         this.state.$textarea_widget = $('#textarea-widget-id');
 */
@@ -530,4 +531,4 @@ class Client extends React.Component {
     }
 }
 
-ReactDom.render( < Client / > , document.getElementById('clientholder'));
+ReactDom.render( < Client /> , document.getElementById('clientholder'));
