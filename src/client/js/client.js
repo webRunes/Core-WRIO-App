@@ -422,10 +422,7 @@ class Client extends React.Component {
         this.disableSave();
     }
 
-    componentDidMount() {
-        this.textareaCore(() => {
-
-        });
+    createTextArea() {
         var that = this;
         $('#textarea-core-id').wysihtml5({
             toolbar: {
@@ -465,10 +462,20 @@ class Client extends React.Component {
             customTemplates: CustomTemplates
         });
 
+    }
+
+    componentDidMount() {
+
+
         $('#save-button-id')
             .on('click', this.save.bind(this));
         $('#save-as-button-id')
             .on('click', this.saveAs.bind(this));
+
+        this.textareaCore(() => {
+            this.createTextArea();
+        });
+
 /*        this.state.$textarea = $('#textarea-core-id');
         this.state.$textarea_widget = $('#textarea-widget-id');
 */
