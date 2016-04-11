@@ -440,7 +440,9 @@ class Client extends React.Component {
                 "saveAs": true
             },
             events: {
-                load: function() {
+                load: function ()
+                {
+                    console.log("Loaded..");
                     var $iframe = $(this.composer.editableArea);
                     var $body = $(this.composer.element);
                     $body.focus();
@@ -457,6 +459,19 @@ class Client extends React.Component {
                         $iframe.height(height);
                         parent.postMessage(JSON.stringify({"coreHeight": height + that.state.coreAdditionalHeight}), "*");
                     });
+
+                    $('#save-button-id')
+                        .on('click', ()=> {
+                            console.log("Save click");
+                            that.save();
+                        });
+                    $('#save-as-button-id')
+                        .on('click', that.saveAs.bind(that));
+
+                    that.state.$textarea = $('#textarea-core-id');
+                    that.state.$textarea_widget = $('#textarea-widget-id');
+
+
                 }
             },
             customTemplates: CustomTemplates
@@ -467,18 +482,10 @@ class Client extends React.Component {
     componentDidMount() {
 
 
-        $('#save-button-id')
-            .on('click', this.save.bind(this));
-        $('#save-as-button-id')
-            .on('click', this.saveAs.bind(this));
-
         this.textareaCore(() => {
             this.createTextArea();
         });
 
-/*        this.state.$textarea = $('#textarea-core-id');
-        this.state.$textarea_widget = $('#textarea-widget-id');
-*/
     }
 
     componentWillMount() {
