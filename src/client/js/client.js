@@ -4,6 +4,7 @@ import CustomTemplates from './customTemplates';
 import {scripts} from './mentions/scripts';
 import request from 'superagent';
 import {applyMentions} from './mixins/mentions';
+import getHttp from './getHttp.js';
 
 var domain = process.env.DOMAIN;
 
@@ -30,19 +31,7 @@ class Client extends React.Component {
         };
     }
 
-    getHttp(url, cb) {
-        var self = this;
-        request.get(
-            url, (err, result) => {
-                if (!err && (typeof result === 'object')) {
-                    var e = document.createElement('div');
-                    e.innerHTML = result.text;
-                    result = scripts(e.getElementsByTagName('script'));
-                }
-                cb.call(self, result || []);
-            }
-        );
-    }
+
 
     getLocation(href) {
         var match = href.match(/^(https?\:)\/\/(([^:\/?#]*)(?:\:([0-9]+))?)(\/[^?#]*)(\?[^#]*|)(#.*|)$/);
@@ -343,7 +332,8 @@ class Client extends React.Component {
                 }
             })
             .success((res) => {
-                window.location = res.url;
+                parent.postMessage(JSON.stringify({"coreSaved":true}), "*");
+               // window.location = res.url;
             });
     };
 
@@ -422,6 +412,12 @@ class Client extends React.Component {
         this.disableSave();
     }
 
+    initHeight() {
+        var $body = $('body');
+        var heightInit = $body.height();
+        parent.postMessage(JSON.stringify({"coreHeight": heightInit}), "*");
+    }
+
     createTextArea() {
         var that = this;
         $('#textarea-core-id').wysihtml5({
@@ -451,6 +447,7 @@ class Client extends React.Component {
                         'line-height': '20px',
                         'overflow': 'hidden',
                     });
+
                     var heightInit = $body.height();
                     $iframe.height(heightInit);
                     parent.postMessage(JSON.stringify({"coreHeight": heightInit + that.state.coreAdditionalHeight}), "*");
@@ -480,6 +477,8 @@ class Client extends React.Component {
     }
 
     componentDidMount() {
+
+        this.initHeight();
 
 
         this.textareaCore(() => {
@@ -511,7 +510,13 @@ class Client extends React.Component {
         var textarea;
         var articleName;
         var paragraphs = [];
-        this.getHttp(this.state.editUrl, (article) => {
+
+        if (window.location.pathname === "/create") {
+            return cb();
+        }
+
+        getHttp(this.state.editUrl, (article) => {
+
             if (article && article.length !== 0) {
                 article = article.filter((json) => json['@type'] == 'Article')[0];
                 textarea = "<h2>" + ((article.m && article.m.name) ? applyMentions(article.m.name) : article.name) + "</h2>";
@@ -530,6 +535,8 @@ class Client extends React.Component {
                     }
                 });
                 $('#textarea-core-id').text(textarea);
+            } else {
+                console.log("Unable to download source article");
             }
             cb();
         });
