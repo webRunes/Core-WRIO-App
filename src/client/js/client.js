@@ -4,6 +4,7 @@ import CustomTemplates from './customTemplates';
 import {scripts} from './mentions/scripts';
 import request from 'superagent';
 import {applyMentions} from './mixins/mentions';
+import getHttp from './getHttp.js';
 
 var domain = process.env.DOMAIN;
 
@@ -30,19 +31,7 @@ class Client extends React.Component {
         };
     }
 
-    getHttp(url, cb) {
-        var self = this;
-        request.get(
-            url, (err, result) => {
-                if (!err && (typeof result === 'object')) {
-                    var e = document.createElement('div');
-                    e.innerHTML = result.text;
-                    result = scripts(e.getElementsByTagName('script'));
-                }
-                cb.call(self, result || []);
-            }
-        );
-    }
+
 
     getLocation(href) {
         var match = href.match(/^(https?\:)\/\/(([^:\/?#]*)(?:\:([0-9]+))?)(\/[^?#]*)(\?[^#]*|)(#.*|)$/);
@@ -343,7 +332,8 @@ class Client extends React.Component {
                 }
             })
             .success((res) => {
-                window.location = res.url;
+                parent.postMessage(JSON.stringify({"coreSaved":true}), "*");
+               // window.location = res.url;
             });
     };
 
@@ -422,55 +412,79 @@ class Client extends React.Component {
         this.disableSave();
     }
 
-    componentDidMount() {
-        this.textareaCore(() => {
-            var that = this;
-            $('#textarea-core-id').wysihtml5({
-                toolbar: {
-                    custom1: false,
-                    "customFontStyles": true,
-                    "font-styles": false,
-                    "emphasis": false,
-                    "lists": true,
-                    "html": false,
-                    "link": true,
-                    "image": false,
-                    "color": false,
-                    "blockquote": true,
-                    "save": true,
-                    "saveAs": true
-                },
-                events: {
-                    load: function() {
-                        var $iframe = $(this.composer.editableArea);
-                        var $body = $(this.composer.element);
-                        $body.focus();
-                        $body.css({
-                            'min-height': 0,
-                            'line-height': '20px',
-                            'overflow': 'hidden',
-                        });
-                        var heightInit = $body.height();
-                        $iframe.height(heightInit);
-                        parent.postMessage(JSON.stringify({"coreHeight": heightInit + that.state.coreAdditionalHeight}), "*");
-                        $body.bind('keypress keyup keydown paste change focus blur', (e) => {
-                            var height = $body[0].scrollHeight;        // 150
-                            $iframe.height(height);
-                            parent.postMessage(JSON.stringify({"coreHeight": height + that.state.coreAdditionalHeight}), "*");
-                        });
-                    }
-                },
-                customTemplates: CustomTemplates
-            });
+    initHeight() {
+        var $body = $('body');
+        var heightInit = $body.height();
+        parent.postMessage(JSON.stringify({"coreHeight": heightInit}), "*");
+    }
 
-            $('#save-button-id')
-                .on('click', this.save.bind(this));
-            $('#save-as-button-id')
-                .on('click', this.saveAs.bind(this));
+    createTextArea() {
+        var that = this;
+        $('#textarea-core-id').wysihtml5({
+            toolbar: {
+                custom1: false,
+                "customFontStyles": true,
+                "font-styles": false,
+                "emphasis": false,
+                "lists": true,
+                "html": false,
+                "link": true,
+                "image": false,
+                "color": false,
+                "blockquote": true,
+                "save": true,
+                "saveAs": true
+            },
+            events: {
+                load: function ()
+                {
+                    console.log("Loaded..");
+                    var $iframe = $(this.composer.editableArea);
+                    var $body = $(this.composer.element);
+                    $body.focus();
+                    $body.css({
+                        'min-height': 0,
+                        'line-height': '20px',
+                        'overflow': 'hidden',
+                    });
+
+                    var heightInit = $body.height();
+                    $iframe.height(heightInit);
+                    parent.postMessage(JSON.stringify({"coreHeight": heightInit + that.state.coreAdditionalHeight}), "*");
+                    $body.bind('keypress keyup keydown paste change focus blur', (e) => {
+                        var height = $body[0].scrollHeight;        // 150
+                        $iframe.height(height);
+                        parent.postMessage(JSON.stringify({"coreHeight": height + that.state.coreAdditionalHeight}), "*");
+                    });
+
+                    $('#save-button-id')
+                        .on('click', ()=> {
+                            console.log("Save click");
+                            that.save();
+                        });
+                    $('#save-as-button-id')
+                        .on('click', that.saveAs.bind(that));
+
+                    that.state.$textarea = $('#textarea-core-id');
+                    that.state.$textarea_widget = $('#textarea-widget-id');
+
+
+                }
+            },
+            customTemplates: CustomTemplates
         });
-/*        this.state.$textarea = $('#textarea-core-id');
-        this.state.$textarea_widget = $('#textarea-widget-id');
-*/
+
+    }
+
+    componentDidMount() {
+
+        this.initHeight();
+
+
+        this.textareaCore(() => {
+            this.createTextArea();
+        });
+
     }
 
     componentWillMount() {
@@ -496,7 +510,13 @@ class Client extends React.Component {
         var textarea;
         var articleName;
         var paragraphs = [];
-        this.getHttp(this.state.editUrl, (article) => {
+
+        if (window.location.pathname === "/create") {
+            return cb();
+        }
+
+        getHttp(this.state.editUrl, (article) => {
+
             if (article && article.length !== 0) {
                 article = article.filter((json) => json['@type'] == 'Article')[0];
                 textarea = "<h2>" + ((article.m && article.m.name) ? applyMentions(article.m.name) : article.name) + "</h2>";
@@ -515,6 +535,8 @@ class Client extends React.Component {
                     }
                 });
                 $('#textarea-core-id').text(textarea);
+            } else {
+                console.log("Unable to download source article");
             }
             cb();
         });
@@ -523,11 +545,11 @@ class Client extends React.Component {
     render() {
         return (
             <div className="container" cssStyles={{width: '100%'}}>
-                <textarea rows="25" id="textarea-core-id" placeholder="Enter text ..." style={{width: '100%'}}/>
+                <textarea rows="4" id="textarea-core-id" placeholder="Enter text ..." style={{width: '100%'}}/>
                 <textarea rows="4" id="textarea-widget-id" placeholder="Enter widget data ..." style={{width: '100%', marginTop:'20px'}}/>
             </div>
         );
     }
 }
 
-ReactDom.render( < Client / > , document.getElementById('clientholder'));
+ReactDom.render( < Client /> , document.getElementById('clientholder'));
