@@ -181,6 +181,15 @@ class Client extends React.Component {
         }
     }
 
+    formatAuthor(id) {
+        if (id) {
+            return "https://wr.io/"+id+'/?wr.io='+id;
+        } else {
+            return "unknown";
+        }
+
+    }
+
     calculateJson(text, widgetData) {
         if (!text) {
             return '';
@@ -196,7 +205,7 @@ class Client extends React.Component {
 
         var i = !blocks[0] ? 1 : 0;
         var j = i;
-        var article = this.getArticle("en-US", "", "", widgetData);
+        var article = this.getArticle("en-US", "", this.formatAuthor(this.state.wrioID), widgetData);
         var num = 1;
         for (; i < blocks.length; i++) {
             if (i == j) {
@@ -500,7 +509,10 @@ class Client extends React.Component {
             }
         }).success((profile) => {
             console.log("Get_profile finish", profile);
-            this.state.wrioID = profile.id;
+           // this.state.wrioID = profile.id;
+            this.setState({
+                wrioID: profile.id
+            });
         }).fail((e) => {
             this.disableSave();
         });
