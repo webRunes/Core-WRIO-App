@@ -518,7 +518,7 @@ class Client extends React.Component {
         let key = 0;
         const keyGen = () => {
             return key++;
-        }
+        };
 
         if (window.location.pathname === "/create") {
             cb([]);
@@ -528,7 +528,9 @@ class Client extends React.Component {
             if (article && article.length !== 0) {
                 article = article.filter((json) => json['@type'] == 'Article')[0];
                 let headerText = ((article.m && article.m.name && article.m.name.filter(e => {
-                        if (e) return e;
+                        if (e) {
+                            return e;
+                        };
                     }).length) ? applyMentions(article.m.name) : article.name),
                     articleText = '',
                     contentBlocks = new Array();
@@ -540,7 +542,9 @@ class Client extends React.Component {
                 ]));
                 article.articleBody.forEach((paragraph, i) => {
                     articleText += ((article.m && article.m.articleBody && article.m.articleBody[i] && article.m.articleBody[i].filter(e => {
-                        if (e) return e;
+                        if (e) {
+                            return e;
+                        };
                     }).length) ? applyMentions(article.m.articleBody[i]) : paragraph);
                 });
                 contentBlocks.push(new ContentBlock([
@@ -551,7 +555,9 @@ class Client extends React.Component {
                 ]));
                 article.hasPart.forEach((subArticle) => {
                     headerText = ((subArticle.m && subArticle.m.name && subArticle.m.name.filter(e => {
-                        if (e) return e;
+                        if (e) {
+                            return e;
+                        };
                     }).length) ? applyMentions(subArticle.m.name) : subArticle.name);
                     articleText = '';
                     contentBlocks.push(new ContentBlock([
@@ -563,7 +569,9 @@ class Client extends React.Component {
                     if (subArticle.articleBody) {
                         subArticle.articleBody.forEach((paragraph, i) => {
                             articleText += ((subArticle.m && subArticle.m.articleBody && subArticle.m.articleBody[i] && subArticle.m.articleBody[i].filter(e => {
-                                if (e) return e;
+                                if (e) {
+                                    return e;
+                                };
                             }).length) ? applyMentions(subArticle.m.articleBody[i]) : paragraph);
                         });
                     }

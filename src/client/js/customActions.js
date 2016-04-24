@@ -56,7 +56,6 @@ const saveAsAction = (editorState) => {
             ieEDGE = navigator.userAgent.match(/Edge/g),
             ieVer = (ie ? parseInt(ie[1]) : (ie11 ? 11 : -1));
 
-        console.log(json)
         let fileName = (json.name === '' ? 'untitled' : json.name.split(' ').join('_')) + '.htm';
 
         if (ie || ie11 || ieEDGE) {

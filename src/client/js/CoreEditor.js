@@ -14,8 +14,11 @@ import CustomActions from './customActions';
 class CoreEditor extends React.Component {
     constructor(props) {
         super(props);
+        let {
+            contentBlocks
+        } = props;
         this.state = {
-            editorState: props.contentBlocks.length > 0 ? EditorState.createWithContent(ContentState.createFromBlockArray(props.contentBlocks)) : EditorState.createEmpty(),
+            editorState: contentBlocks.length > 0 ? EditorState.createWithContent(ContentState.createFromBlockArray(contentBlocks)) : EditorState.createEmpty(),
             showURLInput: false,
             urlValue: ''
         };
@@ -180,6 +183,10 @@ class CoreEditor extends React.Component {
     }
 }
 
+CoreEditor.propTypes = {
+    contentBlocks: React.PropTypes.array.isRequired
+};
+
 function getBlockStyle(block) {
     switch (block.getType()) {
         case 'blockquote':
@@ -211,6 +218,13 @@ class StyleButton extends React.Component {
         );
     }
 }
+
+StyleButton.propTypes = {
+    onToggle: React.PropTypes.func,
+    style: React.PropTypes.string,
+    active: React.PropTypes.bool,
+    label: React.PropTypes.string
+};
 
 const BLOCK_TYPES = [{
     label: 'Header',
@@ -258,6 +272,11 @@ const BlockStyleControls = (props) => {
     );
 };
 
+BlockStyleControls.propTypes = {
+    editorState: React.PropTypes.object,
+    onToggle: React.PropTypes.func
+};
+
 var INLINE_STYLES = [{
     label: 'Bold',
     style: 'BOLD'
@@ -273,7 +292,8 @@ var INLINE_STYLES = [{
 }, ];
 
 const InlineStyleControls = (props) => {
-    var currentStyle = props.editorState.getCurrentInlineStyle();
+    let {editorState} = props;
+    var currentStyle = editorState.getCurrentInlineStyle();
     return (
         <div className="RichEditor-controls">
             {INLINE_STYLES.map(type =>
@@ -287,6 +307,11 @@ const InlineStyleControls = (props) => {
             )}
           </div>
     );
+};
+
+InlineStyleControls.propTypes = {
+    editorState: React.PropTypes.object,
+    onToggle: React.PropTypes.func
 };
 
 class ActionButton extends React.Component {
@@ -309,6 +334,12 @@ class ActionButton extends React.Component {
     }
 }
 
+ActionButton.propTypes = {
+    onToggle: React.PropTypes.func,
+    label: React.PropTypes.string,
+    action: React.PropTypes.string
+};
+
 var CUSTOM_ACTIONS = [{
     label: 'Save',
     action: 'save'
@@ -330,6 +361,10 @@ const CustomActionControls = (props) => {
             )}
           </div>
     );
+};
+
+CustomActionControls.propTypes = {
+    onToggle: React.PropTypes.func
 };
 
 /*class CoreEditor extends React.Component {
@@ -443,6 +478,11 @@ const Link = (props) => {
             {props.children}
           </a>
     );
+};
+
+Link.propTypes = {
+    entityKey: React.PropTypes.object,
+    children: React.PropTypes.object
 };
 
 const styles = {
