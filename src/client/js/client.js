@@ -165,18 +165,39 @@ class Client extends React.Component {
                 }
             }
         }
+    }
 
-        calculateJson(text, widgetData) {
-            if (!text) {
-                return '';
-            }
+    formatAuthor(id) {
+        if (id) {
+            return "https://wr.io/"+id+'/?wr.io='+id;
+        } else {
+            return "unknown";
+        }
 
-            text = this.normalizeText(text);
-            widgetData = this.normalizeWidgetData(widgetData);
+    }
 
-            var blocks = text.split(this.state.startHeader);
-            if (!blocks.length) {
-                return '';
+    calculateJson(text, widgetData) {
+        if (!text) {
+            return '';
+        }
+
+        text = this.normalizeText(text);
+        widgetData = this.normalizeWidgetData(widgetData);
+
+        var blocks = text.split(this.state.startHeader);
+        if (!blocks.length) {
+            return '';
+        }
+
+        var i = !blocks[0] ? 1 : 0;
+        var j = i;
+        var article = this.getArticle("en-US", "", this.formatAuthor(this.state.wrioID), widgetData);
+        var num = 1;
+        for (; i < blocks.length; i++) {
+            if (i == j) {
+                num = this.addCoreBlock(article, blocks[i], num);
+            } else {
+                num = this.addParagraph(article, blocks[i], num);
             }
 
             var i = !blocks[0] ? 1 : 0;
@@ -482,10 +503,13 @@ class Client extends React.Component {
             'dataType': 'json',
             data: {}
         }).success((profile) => {
-            console.log("client.js:Get_profile finish", profile);
-            this.state.wrioID = profile.id;
+            console.log("Get_profile finish", profile);
+            // this.state.wrioID = profile.id;
+            this.setState({
+                wrioID: profile.id
+            });
         }).fail((e) => {
-            this.disableSave();
+            //this.disableSave();
         });
     }
 
