@@ -12,7 +12,11 @@ import {
 from './mixins/mentions';
 import getHttp from './getHttp';
 import CoreEditor from './CoreEditor';
-import {ContentBlock, CharacterMetadata} from 'draft-js';
+import {
+    ContentBlock, CharacterMetadata
+}
+from 'draft-js';
+import Immutable from 'immutable';
 
 var domain = process.env.DOMAIN;
 
@@ -32,10 +36,7 @@ class Client extends React.Component {
             saveUrl: false,
             saveDisabled: 0,
             STORAGE_DOMAIN: "wr.io",
-            $textarea: false,
-            $textarea_widget: false,
             editUrl: false,
-            textarea: false,
             coreAdditionalHeight: 200,
             contentBlocks: [],
             render: 0
@@ -496,7 +497,7 @@ class Client extends React.Component {
     */
     componentWillMount() {
         this.parseEditingUrl();
-        this.textareaCore(res => this.setState({
+        this.parseArticleCore(res => this.setState({
             contentBlocks: res,
             render: 1
         }));
@@ -513,38 +514,70 @@ class Client extends React.Component {
         });
     }
 
-    textareaCore(cb) {
-        var textarea;
-        var articleName;
-        var paragraphs = [];
+    parseArticleCore(cb) {
         var cb = cb || function() {};
+
+        const keyGen = () => {
+            return (new Date()).toString(4) + Math.random().toString(4);
+        }
+
         if (window.location.pathname === "/create") {
             cb([]);
             return;
         }
         getHttp(this.state.editUrl, (article) => {
             if (article && article.length !== 0) {
-                let contentBlocks = [];
                 article = article.filter((json) => json['@type'] == 'Article')[0];
-                let header = new ContentBlock();
-                let headerText = ((article.m && article.m.name) ? applyMentions(article.m.name) : article.name);
-                header = header.set('text', headerText);
-                header = header.set('characterList', Immutable.List(headerText.split('').map(e => CharacterMetadata.create())));
-                header = header.set('type', 'header-two');
-                header = header.set('depth', 4);
-                contentBlocks.push(header);
+                let headerText = ((article.m && article.m.name && article.m.name.filter(e => {
+                        if (e) return e;
+                    }).length) ? applyMentions(article.m.name) : article.name),
+                    articleText = '',
+                    contentBlocks = new Array();
+                contentBlocks.push(new ContentBlock([
+                    ['text', headerText],
+                    ['key', keyGen()],
+                    ['characterList', Immutable.List(headerText.split('').map(e => CharacterMetadata.create()))],
+                    ['type', 'header-two']
+                ]));
                 article.articleBody.forEach((paragraph, i) => {
-                    textarea += "<p>" + ((article.m && article.m.articleBody && article.m.articleBody[i]) ? applyMentions(article.m.articleBody[i]) : paragraph) + "</p>";
+                    articleText += ((article.m && article.m.articleBody && article.m.articleBody[i] && article.m.articleBody[i].filter(e => {
+                        if (e) return e;
+                    }).length) ? applyMentions(article.m.articleBody[i]) : paragraph);
                 });
+                contentBlocks.push(new ContentBlock([
+                    ['text', articleText],
+                    ['key', keyGen()],
+                    ['characterList', Immutable.List(articleText.split('').map(e => CharacterMetadata.create()))],
+                    ['type', 'unstyled']
+                ]));
                 article.hasPart.forEach((subArticle) => {
-                    textarea += "<h2>" + ((subArticle.m && subArticle.m.name) ? applyMentions(subArticle.m.name) : subArticle.name) + "</h2>";
+                    headerText = ((subArticle.m && subArticle.m.name && subArticle.m.name.filter(e => {
+                        if (e) return e;
+                    }).length) ? applyMentions(subArticle.m.name) : subArticle.name);
+                    articleText = '';
+                    contentBlocks.push(new ContentBlock([
+                        ['text', headerText],
+                        ['key', keyGen()],
+                        ['characterList', Immutable.List(headerText.split('').map(e => CharacterMetadata.create()))],
+                        ['type', 'header-two']
+                    ]));
                     if (subArticle.articleBody) {
                         subArticle.articleBody.forEach((paragraph, i) => {
-                            textarea += "<p>" + ((subArticle.m && subArticle.m.articleBody && subArticle.m.articleBody[i]) ? applyMentions(subArticle.m.articleBody[i]) : paragraph) + "</p>";
+                            articleText += ((subArticle.m && subArticle.m.articleBody && subArticle.m.articleBody[i] && subArticle.m.articleBody[i].filter(e => {
+                                if (e) return e;
+                            }).length) ? applyMentions(subArticle.m.articleBody[i]) : paragraph);
                         });
                     }
                     if (subArticle.url) {
-                        textarea += "<p>" + subArticle.url + "</p>";
+                        articleText += subArticle.url;
+                    }
+                    if (articleText !== '') {
+                        contentBlocks.push(new ContentBlock([
+                            ['text', articleText],
+                            ['key', keyGen()],
+                            ['characterList', Immutable.List(articleText.split('').map(e => CharacterMetadata.create()))],
+                            ['type', 'unstyled']
+                        ]));
                     }
                 });
                 cb(contentBlocks);

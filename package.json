@@ -18,6 +18,7 @@
     "gulp-babel": "^5.1.0",
     "gulp-nodemon": "^2.0.3",
     "htm": "0.0.0",
+    "immutable": "^3.8.1",
     "lodash.sortby": "^3.1.4",
     "mongodb": "~2.0",
     "nconf": "0.8.2",

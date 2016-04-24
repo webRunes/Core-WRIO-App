@@ -12,13 +12,12 @@ from 'draft-js';
 
 class CoreEditor extends React.Component {
     constructor(props) {
-        super(props);
+        super(props);        
         this.state = {
-            editorState: EditorState.createWithContent(ContentState.createFromBlockArray(props.contentBlocks)),
+            editorState: props.contentBlocks.length > 0 ? EditorState.createWithContent(ContentState.createFromBlockArray(props.contentBlocks)) : EditorState.createEmpty(),
             showURLInput: false,
             urlValue: ''
         };
-        console.log(this.state.editorState.getCurrentContent())
         this.focus = () => this.refs.editor.focus();
         this.onChange = (editorState) => this.setState({
             editorState
