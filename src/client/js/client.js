@@ -1,10 +1,18 @@
 import React from 'react';
 import ReactDom from 'react-dom';
 import CustomTemplates from './customTemplates';
-import {scripts} from './mentions/scripts';
+import {
+    scripts
+}
+from './mentions/scripts';
 import request from 'superagent';
-import {applyMentions} from './mixins/mentions';
-import getHttp from './getHttp.js';
+import {
+    applyMentions
+}
+from './mixins/mentions';
+import getHttp from './getHttp';
+import CoreEditor from './CoreEditor';
+import {ContentBlock, CharacterMetadata} from 'draft-js';
 
 var domain = process.env.DOMAIN;
 
@@ -22,16 +30,17 @@ class Client extends React.Component {
                 '</head><body><script type="text/javascript" src="//wrioos.com/start.js"></script></body></html>',
             wrioID: false,
             saveUrl: false,
+            saveDisabled: 0,
             STORAGE_DOMAIN: "wr.io",
             $textarea: false,
             $textarea_widget: false,
             editUrl: false,
             textarea: false,
-            coreAdditionalHeight: 200
+            coreAdditionalHeight: 200,
+            contentBlocks: [],
+            render: 0
         };
     }
-
-
 
     getLocation(href) {
         var match = href.match(/^(https?\:)\/\/(([^:\/?#]*)(?:\:([0-9]+))?)(\/[^?#]*)(\?[^#]*|)(#.*|)$/);
@@ -121,7 +130,7 @@ class Client extends React.Component {
 
         var blocks = txt.match(reg);
         if (!blocks || !blocks.length) {
-            return txt;   
+            return txt;
         }
 
         for (var i = 0; i < blocks.length; i++) {
@@ -307,7 +316,7 @@ class Client extends React.Component {
             .val();
         var json = this.calculateJson(txt, widgetData);
         if (!json) {
-            return;  
+            return;
         }
 
         var textToWrite = this.state.cleshe.replace('|BODY|', JSON.stringify(json));
@@ -316,30 +325,30 @@ class Client extends React.Component {
 
 
         //ToDo: test
-        //console.log(textToWrite);
+        console.log(textToWrite);
         var url = this.state.saveUrl;
         var contents = "<html></html>";
         $.ajax({
-                url: "//storage." + domain + "/api/save",
+                url: "https://crossorigin.me/https://storage." + domain + "/api/save",
                 type: 'post',
                 'dataType': 'json',
                 data: {
                     'url': url,
                     'bodyData': textToWrite
-                },
-                xhrFields: {
-                    withCredentials: true
                 }
             })
             .success((res) => {
-                parent.postMessage(JSON.stringify({"coreSaved":true}), "*");
-               // window.location = res.url;
+                parent.postMessage(JSON.stringify({
+                    "coreSaved": true
+                }), "*");
+                // window.location = res.url;
+            }).error(err => {
+                console.log(err);
             });
     };
 
     disableSave() {
-        $('#save-button-id div a').addClass('disabled');
-        $('#save-button-id div').attr('title', 'You can only save the page at webrunes.com. Use "Save as" and upload file manually.');
+        this.state.saveDisabled = 1;
     }
 
     saveAs() {
@@ -401,7 +410,7 @@ class Client extends React.Component {
                     var match = editUrlParsed.pathname.match(/\/[0-9]+\/(.*)/);
                     if (match) {
                         this.state.saveUrl = match[1];
-                        if (this.state.saveUrl == "") {
+                        if (this.state.saveUrl == "" || !this.state.saveUrl) {
                             this.state.saveUrl = "index.htm"; // if no file specified, let's assume this is index.htm
                         }
                         return;
@@ -415,91 +424,89 @@ class Client extends React.Component {
     initHeight() {
         var $body = $('body');
         var heightInit = $body.height();
-        parent.postMessage(JSON.stringify({"coreHeight": heightInit}), "*");
+        parent.postMessage(JSON.stringify({
+            "coreHeight": heightInit
+        }), "*");
     }
 
-    createTextArea() {
-        var that = this;
-        $('#textarea-core-id').wysihtml5({
-            toolbar: {
-                custom1: false,
-                "customFontStyles": true,
-                "font-styles": false,
-                "emphasis": false,
-                "lists": true,
-                "html": false,
-                "link": true,
-                "image": false,
-                "color": false,
-                "blockquote": true,
-                "save": true,
-                "saveAs": true
-            },
-            events: {
-                load: function ()
-                {
-                    console.log("Loaded..");
-                    var $iframe = $(this.composer.editableArea);
-                    var $body = $(this.composer.element);
-                    $body.focus();
-                    $body.css({
-                        'min-height': 0,
-                        'line-height': '20px',
-                        'overflow': 'hidden',
-                    });
+    /*    createTextArea(args) {
+            var that = this,
+                args = args || {},
+                text = args.text || '';
+            $('#textarea-core-id').wysihtml5({
+                toolbar: {
+                    custom1: false,
+                    "customFontStyles": true,
+                    "font-styles": false,
+                    "emphasis": false,
+                    "lists": true,
+                    "html": false,
+                    "link": true,
+                    "image": false,
+                    "color": false,
+                    "blockquote": true,
+                    "save": true,
+                    "saveAs": true
+                },
+                events: {
+                    load: function() {
 
-                    var heightInit = $body.height();
-                    $iframe.height(heightInit);
-                    parent.postMessage(JSON.stringify({"coreHeight": heightInit + that.state.coreAdditionalHeight}), "*");
-                    $body.bind('keypress keyup keydown paste change focus blur', (e) => {
-                        var height = $body[0].scrollHeight;        // 150
-                        $iframe.height(height);
-                        parent.postMessage(JSON.stringify({"coreHeight": height + that.state.coreAdditionalHeight}), "*");
-                    });
-
-                    $('#save-button-id')
-                        .on('click', ()=> {
-                            console.log("Save click");
-                            that.save();
+                        console.log("Loaded..");
+                        var $iframe = $(this.composer.editableArea);
+                        var $body = $(this.composer.element);
+                        $body.focus();
+                        $body.css({
+                            'min-height': 0,
+                            'line-height': '20px',
+                            'overflow': 'hidden',
                         });
-                    $('#save-as-button-id')
-                        .on('click', that.saveAs.bind(that));
+                        console.log($body.height());
+                        var heightInit = $body.height();
+                        $iframe.height(heightInit);
+                        $iframe.text(text);
+                        // parent.postMessage(JSON.stringify({"coreHeight": heightInit + that.state.coreAdditionalHeight}), "*");
+                        $body.bind('keypress keyup keydown paste change focus blur', (e) => {
+                            var height = $body[0].scrollHeight; // 150
+                            $iframe.height(height);
+                            parent.postMessage(JSON.stringify({
+                                "coreHeight": height + that.state.coreAdditionalHeight
+                            }), "*");
+                        });
 
-                    that.state.$textarea = $('#textarea-core-id');
-                    that.state.$textarea_widget = $('#textarea-widget-id');
+                        if (that.state.saveDisabled) {
+                            $('#save-button-id div a').addClass('disabled');
+                        } else {
+                            $('#save-button-id')
+                                .on('click', () => {
+                                    console.log("Save click");
+                                    that.save();
+                                });
+                        }
+                        $('#save-as-button-id')
+                            .on('click', that.saveAs.bind(that));
 
+                        that.state.$textarea = $('#textarea-core-id');
+                        that.state.$textarea_widget = $('#textarea-widget-id');
+                    }
+                },
+                customTemplates: CustomTemplates
+            });
 
-                }
-            },
-            customTemplates: CustomTemplates
-        });
-
-    }
-
-    componentDidMount() {
-
-        this.initHeight();
-
-
-        this.textareaCore(() => {
-            this.createTextArea();
-        });
-
-    }
-
+        }
+    */
     componentWillMount() {
         this.parseEditingUrl();
-
+        this.textareaCore(res => this.setState({
+            contentBlocks: res,
+            render: 1
+        }));
         $.ajax({
-            url: "//login." + domain + "/api/get_profile",
+            url: "https://crossorigin.me/https://login." + domain + "/api/get_profile",
             type: 'get',
             'dataType': 'json',
-            data: {},
-            xhrFields: {
-                withCredentials: true
-            }
+            data: {}
         }).success((profile) => {
-            console.log("Get_profile finish", profile);
+            console.log("client.js:Get_profile finish", profile);
             this.state.wrioID = profile.id;
         }).fail((e) => {
             this.disableSave();
@@ -510,16 +517,22 @@ class Client extends React.Component {
         var textarea;
         var articleName;
         var paragraphs = [];
-
+        var cb = cb || function() {};
         if (window.location.pathname === "/create") {
-            return cb();
+            cb([]);
+            return;
         }
-
         getHttp(this.state.editUrl, (article) => {
-
             if (article && article.length !== 0) {
+                let contentBlocks = [];
                 article = article.filter((json) => json['@type'] == 'Article')[0];
-                textarea = "<h2>" + ((article.m && article.m.name) ? applyMentions(article.m.name) : article.name) + "</h2>";
+                let header = new ContentBlock();
+                let headerText = ((article.m && article.m.name) ? applyMentions(article.m.name) : article.name);
+                header = header.set('text', headerText);
+                header = header.set('characterList', Immutable.List(headerText.split('').map(e => CharacterMetadata.create())));
+                header = header.set('type', 'header-two');
+                header = header.set('depth', 4);
+                contentBlocks.push(header);
                 article.articleBody.forEach((paragraph, i) => {
                     textarea += "<p>" + ((article.m && article.m.articleBody && article.m.articleBody[i]) ? applyMentions(article.m.articleBody[i]) : paragraph) + "</p>";
                 });
@@ -534,22 +547,19 @@ class Client extends React.Component {
                         textarea += "<p>" + subArticle.url + "</p>";
                     }
                 });
-                $('#textarea-core-id').text(textarea);
+                cb(contentBlocks);
             } else {
                 console.log("Unable to download source article");
+                cb([]);
             }
-            cb();
         });
     }
 
     render() {
-        return (
-            <div className="container" cssStyles={{width: '100%'}}>
-                <textarea rows="4" id="textarea-core-id" placeholder="Enter text ..." style={{width: '100%'}}/>
-                <textarea rows="4" id="textarea-widget-id" placeholder="Enter widget data ..." style={{width: '100%', marginTop:'20px'}}/>
-            </div>
-        );
+        return this.state.render ? (<div className="container" cssStyles={{width: '100%'}}>
+                        <CoreEditor contentBlocks={this.state.contentBlocks}/>
+                    </div>) : null;
     }
 }
 
-ReactDom.render( < Client /> , document.getElementById('clientholder'));
+ReactDom.render( < Client / > , document.getElementById('clientholder'));
