@@ -9,10 +9,11 @@ import {
     RichUtils
 }
 from 'draft-js';
+import CustomActions from './customActions';
 
 class CoreEditor extends React.Component {
     constructor(props) {
-        super(props);        
+        super(props);
         this.state = {
             editorState: props.contentBlocks.length > 0 ? EditorState.createWithContent(ContentState.createFromBlockArray(props.contentBlocks)) : EditorState.createEmpty(),
             showURLInput: false,
@@ -26,6 +27,7 @@ class CoreEditor extends React.Component {
         this.handleKeyCommand = (command) => this._handleKeyCommand(command);
         this.toggleBlockType = (type) => this._toggleBlockType(type);
         this.toggleInlineStyle = (style) => this._toggleInlineStyle(style);
+        this.toggleCustomAction = (action) => this._toggleCustomAction(action);
 
         const decorator = new CompositeDecorator([{
             strategy: findLinkEntities,
@@ -129,6 +131,10 @@ class CoreEditor extends React.Component {
         );
     }
 
+    _toggleCustomAction(action) {
+        CustomActions.toggleCustomAction(this.state.editorState, action);
+    }
+
     render() {
         const {
             editorState
@@ -153,6 +159,10 @@ class CoreEditor extends React.Component {
               <InlineStyleControls
                 editorState={editorState}
                 onToggle={this.toggleInlineStyle}
+              />
+              <CustomActionControls
+                editorState={editorState}
+                onToggle={this.toggleCustomAction}
               />
               <div className={className} onClick={this.focus}>
                 <Editor
@@ -273,6 +283,49 @@ const InlineStyleControls = (props) => {
                 label={type.label}
                 onToggle={props.onToggle}
                 style={type.style}
+              />
+            )}
+          </div>
+    );
+};
+
+class ActionButton extends React.Component {
+    constructor() {
+        super();
+        this.onToggle = (e) => {
+            e.preventDefault();
+            this.props.onToggle(this.props.action);
+        };
+    }
+
+    render() {
+        let className = 'RichEditor-styleButton';
+
+        return (
+            <span className={className} onMouseDown={this.onToggle}>
+              {this.props.label}
+            </span>
+        );
+    }
+}
+
+var CUSTOM_ACTIONS = [{
+    label: 'Save',
+    action: 'save'
+}, {
+    label: 'Save As',
+    action: 'saveas'
+}];
+
+const CustomActionControls = (props) => {
+    return (
+        <div className="RichEditor-controls">
+            {CUSTOM_ACTIONS.map(type =>
+              <ActionButton
+                key={type.label}
+                label={type.label}
+                onToggle={props.onToggle}
+                action={type.action}
               />
             )}
           </div>

@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactDom from 'react-dom';
-import CustomTemplates from './customTemplates';
 import {
     scripts
 }
@@ -56,23 +55,6 @@ class Client extends React.Component {
         };
     }
 
-    getArticle(lang, keywords, author, widgetData) {
-        return {
-            "@context": "http://schema.org",
-            "@type": "Article",
-            "inLanguage": lang,
-            "keywords": keywords,
-            "author": author,
-            "editor": "",
-            "name": "",
-            "about": "",
-            "articleBody": [],
-            "hasPart": [],
-            "mentions": [],
-            "comment": widgetData
-        };
-    }
-
     replaceLineFeed(someText) {
         var re = /\r\n|\n\r|\n|\r/g;
         return someText.replace(re, "");
@@ -86,13 +68,6 @@ class Client extends React.Component {
             "url": link
         };
     };
-
-    getPart(name) {
-        return {
-            "@type": "Article",
-            "name": name
-        };
-    }
 
     destroyClickedLink(event) {
         document.body.removeChild(event.target);
@@ -326,7 +301,6 @@ class Client extends React.Component {
 
 
         //ToDo: test
-        console.log(textToWrite);
         var url = this.state.saveUrl;
         var contents = "<html></html>";
         $.ajax({
@@ -516,9 +490,9 @@ class Client extends React.Component {
 
     parseArticleCore(cb) {
         var cb = cb || function() {};
-
+        let key = 0;
         const keyGen = () => {
-            return (new Date()).toString(4) + Math.random().toString(4);
+            return key++;
         }
 
         if (window.location.pathname === "/create") {
