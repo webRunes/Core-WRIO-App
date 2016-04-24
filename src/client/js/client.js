@@ -42,337 +42,338 @@ class Client extends React.Component {
         };
     }
 
-    getLocation(href) {
-        var match = href.match(/^(https?\:)\/\/(([^:\/?#]*)(?:\:([0-9]+))?)(\/[^?#]*)(\?[^#]*|)(#.*|)$/);
-        return match && {
-            protocol: match[1],
-            host: match[2],
-            hostname: match[3],
-            port: match[4],
-            pathname: match[5],
-            search: match[6],
-            hash: match[7]
-        };
-    }
-
-    replaceLineFeed(someText) {
-        var re = /\r\n|\n\r|\n|\r/g;
-        return someText.replace(re, "");
-    }
-
-    getMentionsItem(name, about, link) {
-        return {
-            "@type": "Article",
-            "name": name,
-            "about": about,
-            "url": link
-        };
-    };
-
-    destroyClickedLink(event) {
-        document.body.removeChild(event.target);
-    }
-
-    normalizeText(text) {
-        text = text.replace(/<p>/gi, '')
-            .replace(/<\/p>/gi, '<br>');
-        text = text.replace(/<div>/gi, '')
-            .replace(/<\/div>/gi, '<br>');
-        text = text.replace(/<br><br>/gi, '<br>');
-        text = text.replace(/<br><\/li>/gi, '</li>');
-
-        text = this.normalizeQuote(text);
-        return text;
-    }
-
-    normalizeOUL(arr) {
-        var regOl = /<ol>/gi;
-        var regUl = /<ul>/gi;
-        var list = [];
-        for (var i = 0; i < arr.length; i++) {
-            if (regOl.test(arr[i])) {
-                this.convertOUlToList(list, arr[i], 0);
-            } else if (regUl.test(arr[i])) {
-                this.convertOUlToList(list, arr[i], 1);
-            } else {
-                list.push(arr[i]);
-            }
+    /*    getLocation(href) {
+            var match = href.match(/^(https?\:)\/\/(([^:\/?#]*)(?:\:([0-9]+))?)(\/[^?#]*)(\?[^#]*|)(#.*|)$/);
+            return match && {
+                protocol: match[1],
+                host: match[2],
+                hostname: match[3],
+                port: match[4],
+                pathname: match[5],
+                search: match[6],
+                hash: match[7]
+            };
         }
-        return list;
-    }
 
-    normalizeQuote(txt) {
-        var reg = /(<blockquote>([\s\S]+?)<\/blockquote>)/gi;
+        replaceLineFeed(someText) {
+            var re = /\r\n|\n\r|\n|\r/g;
+            return someText.replace(re, "");
+        }
 
-        var blocks = txt.match(reg);
-        if (!blocks || !blocks.length) {
+        getMentionsItem(name, about, link) {
+            return {
+                "@type": "Article",
+                "name": name,
+                "about": about,
+                "url": link
+            };
+        };
+
+        destroyClickedLink(event) {
+            document.body.removeChild(event.target);
+        }
+
+        normalizeText(text) {
+            text = text.replace(/<p>/gi, '')
+                .replace(/<\/p>/gi, '<br>');
+            text = text.replace(/<div>/gi, '')
+                .replace(/<\/div>/gi, '<br>');
+            text = text.replace(/<br><br>/gi, '<br>');
+            text = text.replace(/<br><\/li>/gi, '</li>');
+
+            text = this.normalizeQuote(text);
+            return text;
+        }
+
+        normalizeOUL(arr) {
+            var regOl = /<ol>/gi;
+            var regUl = /<ul>/gi;
+            var list = [];
+            for (var i = 0; i < arr.length; i++) {
+                if (regOl.test(arr[i])) {
+                    this.convertOUlToList(list, arr[i], 0);
+                } else if (regUl.test(arr[i])) {
+                    this.convertOUlToList(list, arr[i], 1);
+                } else {
+                    list.push(arr[i]);
+                }
+            }
+            return list;
+        }
+
+        normalizeQuote(txt) {
+            var reg = /(<blockquote>([\s\S]+?)<\/blockquote>)/gi;
+
+            var blocks = txt.match(reg);
+            if (!blocks || !blocks.length) {
+                return txt;
+            }
+
+            for (var i = 0; i < blocks.length; i++) {
+                var item = blocks[i].replace('<blockquote>', '<br>')
+                    .replace('</blockquote>', '<br>');
+                var ps = item.split('<br>');
+                var newBlocks = ['<br>'];
+                for (var j = 0; j < ps.length; j++) {
+                    if (ps[j]) {
+                        ps[j] = '> ' + ps[j] + '<br>';
+                        newBlocks.push(ps[j]);
+                    }
+                }
+                txt = txt.replace(blocks[i], newBlocks.join(''));
+            }
+
             return txt;
         }
 
-        for (var i = 0; i < blocks.length; i++) {
-            var item = blocks[i].replace('<blockquote>', '<br>')
-                .replace('</blockquote>', '<br>');
-            var ps = item.split('<br>');
-            var newBlocks = ['<br>'];
-            for (var j = 0; j < ps.length; j++) {
-                if (ps[j]) {
-                    ps[j] = '> ' + ps[j] + '<br>';
-                    newBlocks.push(ps[j]);
+        normalizeWidgetData(widgetData) {
+            var data_widget_id = widgetData.match(/([^0-9])/i);
+            if (data_widget_id) {
+                var result = widgetData.match(/data-widget-id=\"([0-9]+)\"/i);
+                if (result) {
+                    data_widget_id = result[1];
+                } else {
+                    return "";
                 }
-            }
-            txt = txt.replace(blocks[i], newBlocks.join(''));
-        }
-
-        return txt;
-    }
-
-    normalizeWidgetData(widgetData) {
-        var data_widget_id = widgetData.match(/([^0-9])/i);
-        if (data_widget_id) {
-            var result = widgetData.match(/data-widget-id=\"([0-9]+)\"/i);
-            if (result) {
-                data_widget_id = result[1];
             } else {
-                return "";
+                data_widget_id = widgetData;
             }
-        } else {
-            data_widget_id = widgetData;
+            return data_widget_id;
         }
-        return data_widget_id;
-    }
 
-    convertOUlToList(list, txt, isOu) {
-        txt = txt.replace(/<ol>/gi, '<br>')
-            .replace(/<ul>/gi, '<br>')
-            .replace(/<\/ol>/gi, '<br>')
-            .replace(/<\/ul>/gi, '<br>')
-            .replace(/<\/li>/gi, '<br>');
-        var arr = txt.split('<br>');
+        convertOUlToList(list, txt, isOu) {
+            txt = txt.replace(/<ol>/gi, '<br>')
+                .replace(/<ul>/gi, '<br>')
+                .replace(/<\/ol>/gi, '<br>')
+                .replace(/<\/ul>/gi, '<br>')
+                .replace(/<\/li>/gi, '<br>');
+            var arr = txt.split('<br>');
 
-        var ind = 1;
-        for (var i = 0; i < arr.length; i++) {
-            var text = arr[i];
-            if (text) {
-                if (arr[i].indexOf('<li>') == 0) {
-                    var num = ind + '. ';
-                    if (!!isOu) {
-                        num = '* ';
+            var ind = 1;
+            for (var i = 0; i < arr.length; i++) {
+                var text = arr[i];
+                if (text) {
+                    if (arr[i].indexOf('<li>') == 0) {
+                        var num = ind + '. ';
+                        if (!!isOu) {
+                            num = '* ';
+                        }
+                        text = text.replace('<li>', num);
+                        ind += 1;
                     }
-                    text = text.replace('<li>', num);
-                    ind += 1;
+                    list.push(text);
                 }
-                list.push(text);
-            }
-        }
-    }
-
-    calculateJson(text, widgetData) {
-        if (!text) {
-            return '';
-        }
-
-        text = this.normalizeText(text);
-        widgetData = this.normalizeWidgetData(widgetData);
-
-        var blocks = text.split(this.state.startHeader);
-        if (!blocks.length) {
-            return '';
-        }
-
-        var i = !blocks[0] ? 1 : 0;
-        var j = i;
-        var article = this.getArticle("en-US", "", "", widgetData);
-        var num = 1;
-        for (; i < blocks.length; i++) {
-            if (i == j) {
-                num = this.addCoreBlock(article, blocks[i], num);
-            } else {
-                num = this.addParagraph(article, blocks[i], num);
             }
         }
 
-        return article;
-    }
-
-    checkMention(arr, txt, num) {
-        var reg1 = /<a/i;
-        var reg2 = /<\/a>/i;
-        var regHref = /href=["|']([^'"]+)/i;
-        var regTitle = /<a [^>]+>([^<]+)<\/a>/i;
-
-        var ind;
-        while ((ind = txt.search(reg1)) >= 0) {
-            var end = txt.search(reg2) + 4;
-            var a = txt.substring(ind, end);
-
-            var name = regTitle.exec(a)[1];
-            var link = regHref.exec(a)[1];
-            link = link.split('?');
-            var _name = link[1] || "";
-            link = link[0];
-            link += "?'" + name + "':" + num + "," + ind;
-
-            txt = txt.replace(a, name);
-            var ment = this.getMentionsItem(_name, '', link);
-            arr.push(ment);
-        }
-        return txt;
-    }
-
-    addCoreBlock(json, txt, num) {
-        if (!txt) {
-            return num;
-        }
-        var blocks = txt.split(this.state.endHeader);
-
-        var name = blocks.length == 2 ? blocks[0] : '';
-        name = this.checkMention(json.mentions, name, 1);
-        name = this.replaceLineFeed(name);
-
-        json.name = name;
-
-        var ps = blocks[blocks.length - 1].split('<br>');
-        ps = this.normalizeOUL(ps);
-        for (var i = 0; i < ps.length; i++) {
-            if (ps[i].trim() !== "") {
-                ps[i] = ps[i].replace(/&nbsp;/gi, ' ');
-                var p = this.checkMention(json.mentions, ps[i], num + 2);
-                p = this.replaceLineFeed(p);
-                json.articleBody.push(p);
+        calculateJson(text, widgetData) {
+            if (!text) {
+                return '';
             }
-            num += 1;
+
+            text = this.normalizeText(text);
+            widgetData = this.normalizeWidgetData(widgetData);
+
+            var blocks = text.split(this.state.startHeader);
+            if (!blocks.length) {
+                return '';
+            }
+
+            var i = !blocks[0] ? 1 : 0;
+            var j = i;
+            var article = this.getArticle("en-US", "", "", widgetData);
+            var num = 1;
+            for (; i < blocks.length; i++) {
+                if (i == j) {
+                    num = this.addCoreBlock(article, blocks[i], num);
+                } else {
+                    num = this.addParagraph(article, blocks[i], num);
+                }
+            }
+
+            return article;
         }
 
-        return num;
-    }
+        checkMention(arr, txt, num) {
+            var reg1 = /<a/i;
+            var reg2 = /<\/a>/i;
+            var regHref = /href=["|']([^'"]+)/i;
+            var regTitle = /<a [^>]+>([^<]+)<\/a>/i;
 
-    addParagraph(json, txt, num) {
-        if (!txt) {
-            return num;
+            var ind;
+            while ((ind = txt.search(reg1)) >= 0) {
+                var end = txt.search(reg2) + 4;
+                var a = txt.substring(ind, end);
+
+                var name = regTitle.exec(a)[1];
+                var link = regHref.exec(a)[1];
+                link = link.split('?');
+                var _name = link[1] || "";
+                link = link[0];
+                link += "?'" + name + "':" + num + "," + ind;
+
+                txt = txt.replace(a, name);
+                var ment = this.getMentionsItem(_name, '', link);
+                arr.push(ment);
+            }
+            return txt;
         }
-        var regHttp = /(https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*))/i;
-        var regTitle = /<a [^>]+>([^<]+)<\/a>/i;
-        var regHref = /href=["|']([^'"]+)/i;
-        var blocks = txt.split(this.state.endHeader);
 
-        var name = blocks[0];
-        name = this.checkMention(json.mentions, name, num + 1);
-        name = this.replaceLineFeed(name);
+        addCoreBlock(json, txt, num) {
+            if (!txt) {
+                return num;
+            }
+            var blocks = txt.split(this.state.endHeader);
 
-        var part = this.getPart(name);
+            var name = blocks.length == 2 ? blocks[0] : '';
+            name = this.checkMention(json.mentions, name, 1);
+            name = this.replaceLineFeed(name);
 
-        var ps = blocks[1].split('<br>');
-        ps = this.normalizeOUL(ps);
-        for (var i = 0; i < ps.length; i++) {
-            if (ps[i].trim() !== "") {
-                if (ps[i].replace(regHttp, "").trim() !== "") {
-                    part.articleBody = part.articleBody || [];
+            json.name = name;
+
+            var ps = blocks[blocks.length - 1].split('<br>');
+            ps = this.normalizeOUL(ps);
+            for (var i = 0; i < ps.length; i++) {
+                if (ps[i].trim() !== "") {
                     ps[i] = ps[i].replace(/&nbsp;/gi, ' ');
                     var p = this.checkMention(json.mentions, ps[i], num + 2);
                     p = this.replaceLineFeed(p);
-                    part.articleBody.push(p);
-                    num += 1;
-                } else {
-                    part.url = regHref.exec(ps[i]) ? regHref.exec(ps[i])[1] : regHttp.exec(ps[i])[1];
+                    json.articleBody.push(p);
                 }
-            } else {
                 num += 1;
             }
+
+            return num;
         }
 
-        json.hasPart.push(part);
+        addParagraph(json, txt, num) {
+            if (!txt) {
+                return num;
+            }
+            var regHttp = /(https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*))/i;
+            var regTitle = /<a [^>]+>([^<]+)<\/a>/i;
+            var regHref = /href=["|']([^'"]+)/i;
+            var blocks = txt.split(this.state.endHeader);
 
-        return num;
-    }
+            var name = blocks[0];
+            name = this.checkMention(json.mentions, name, num + 1);
+            name = this.replaceLineFeed(name);
 
-    save() {
-        var widgetData = $(this.state.$textarea_widget)
-            .val();
-        var txt = $(this.state.$textarea)
-            .val();
-        var json = this.calculateJson(txt, widgetData);
-        if (!json) {
-            return;
-        }
+            var part = this.getPart(name);
 
-        var textToWrite = this.state.cleshe.replace('|BODY|', JSON.stringify(json));
-        textToWrite = textToWrite.replace('|TITLE|', json.name);
-
-
-
-        //ToDo: test
-        var url = this.state.saveUrl;
-        var contents = "<html></html>";
-        $.ajax({
-                url: "https://crossorigin.me/https://storage." + domain + "/api/save",
-                type: 'post',
-                'dataType': 'json',
-                data: {
-                    'url': url,
-                    'bodyData': textToWrite
+            var ps = blocks[1].split('<br>');
+            ps = this.normalizeOUL(ps);
+            for (var i = 0; i < ps.length; i++) {
+                if (ps[i].trim() !== "") {
+                    if (ps[i].replace(regHttp, "").trim() !== "") {
+                        part.articleBody = part.articleBody || [];
+                        ps[i] = ps[i].replace(/&nbsp;/gi, ' ');
+                        var p = this.checkMention(json.mentions, ps[i], num + 2);
+                        p = this.replaceLineFeed(p);
+                        part.articleBody.push(p);
+                        num += 1;
+                    } else {
+                        part.url = regHref.exec(ps[i]) ? regHref.exec(ps[i])[1] : regHttp.exec(ps[i])[1];
+                    }
+                } else {
+                    num += 1;
                 }
-            })
-            .success((res) => {
-                parent.postMessage(JSON.stringify({
-                    "coreSaved": true
-                }), "*");
-                // window.location = res.url;
-            }).error(err => {
-                console.log(err);
-            });
-    };
+            }
 
-    disableSave() {
-        this.state.saveDisabled = 1;
-    }
+            json.hasPart.push(part);
 
-    saveAs() {
-        var widgetData = $(this.state.$textarea_widget)
-            .val();
-        var txt = $(this.state.$textarea)
-            .val();
-        var json = this.calculateJson(txt, widgetData);
-        if (!json) {
-            return;
+            return num;
         }
 
-        var textToWrite = this.state.cleshe.replace('|BODY|', JSON.stringify(json));
-        textToWrite = textToWrite.replace('|TITLE|', json.name);
-
-        var ie = navigator.userAgent.match(/MSIE\s([\d.]+)/);
-        var ie11 = navigator.userAgent.match(/Trident\/7.0/) && navigator.userAgent.match(/rv:11/);
-        var ieEDGE = navigator.userAgent.match(/Edge/g);
-        var ieVer = (ie ? parseInt(ie[1]) : (ie11 ? 11 : -1));
-
-        var fileName = (json.name === '' ? 'untitled' : json.name.split(' ').join('_')) + '.htm';
-        if (ie || ie11 || ieEDGE) {
-            if (ieVer > 9 || ieEDGE) {
-                var textFileAsBlob = new Blob([textToWrite], {
-                    type: 'text/plain'
-                });
-                window.navigator.msSaveBlob(textFileAsBlob, fileName);
-            } else {
-                console.log("IE v.10 or higher required");
+    */
+    /*    save() {
+            var widgetData = $(this.state.$textarea_widget)
+                .val();
+            var txt = $(this.state.$textarea)
+                .val();
+            var json = this.calculateJson(txt, widgetData);
+            if (!json) {
                 return;
             }
-        } else {
-            var downloadLink = document.createElement("a");
-            downloadLink.download = fileName;
-            downloadLink.innerHTML = "My Hidden Link";
 
-            window.URL = window.URL || window.webkitURL;
-            textFileAsBlob = new Blob([textToWrite], {
-                type: 'text/plain'
-            });
-            downloadLink.href = window.URL.createObjectURL(textFileAsBlob);
-            downloadLink.onclick = this.destroyClickedLink.bind(this);
-            downloadLink.style.display = "none";
-            document.body.appendChild(downloadLink);
+            var textToWrite = this.state.cleshe.replace('|BODY|', JSON.stringify(json));
+            textToWrite = textToWrite.replace('|TITLE|', json.name);
 
-            downloadLink.click();
+
+
+            //ToDo: test
+            var url = this.state.saveUrl;
+            var contents = "<html></html>";
+            $.ajax({
+                    url: "https://crossorigin.me/https://storage." + domain + "/api/save",
+                    type: 'post',
+                    'dataType': 'json',
+                    data: {
+                        'url': url,
+                        'bodyData': textToWrite
+                    }
+                })
+                .success((res) => {
+                    parent.postMessage(JSON.stringify({
+                        "coreSaved": true
+                    }), "*");
+                    // window.location = res.url;
+                }).error(err => {
+                    console.log(err);
+                });
+        };
+
+        disableSave() {
+            this.state.saveDisabled = 1;
         }
-    }
 
+        saveAs() {
+            var widgetData = $(this.state.$textarea_widget)
+                .val();
+            var txt = $(this.state.$textarea)
+                .val();
+            var json = this.calculateJson(txt, widgetData);
+            if (!json) {
+                return;
+            }
+
+            var textToWrite = this.state.cleshe.replace('|BODY|', JSON.stringify(json));
+            textToWrite = textToWrite.replace('|TITLE|', json.name);
+
+            var ie = navigator.userAgent.match(/MSIE\s([\d.]+)/);
+            var ie11 = navigator.userAgent.match(/Trident\/7.0/) && navigator.userAgent.match(/rv:11/);
+            var ieEDGE = navigator.userAgent.match(/Edge/g);
+            var ieVer = (ie ? parseInt(ie[1]) : (ie11 ? 11 : -1));
+
+            var fileName = (json.name === '' ? 'untitled' : json.name.split(' ').join('_')) + '.htm';
+            if (ie || ie11 || ieEDGE) {
+                if (ieVer > 9 || ieEDGE) {
+                    var textFileAsBlob = new Blob([textToWrite], {
+                        type: 'text/plain'
+                    });
+                    window.navigator.msSaveBlob(textFileAsBlob, fileName);
+                } else {
+                    console.log("IE v.10 or higher required");
+                    return;
+                }
+            } else {
+                var downloadLink = document.createElement("a");
+                downloadLink.download = fileName;
+                downloadLink.innerHTML = "My Hidden Link";
+
+                window.URL = window.URL || window.webkitURL;
+                textFileAsBlob = new Blob([textToWrite], {
+                    type: 'text/plain'
+                });
+                downloadLink.href = window.URL.createObjectURL(textFileAsBlob);
+                downloadLink.onclick = this.destroyClickedLink.bind(this);
+                downloadLink.style.display = "none";
+                document.body.appendChild(downloadLink);
+
+                downloadLink.click();
+            }
+        }
+    */
     parseEditingUrl() {
         var editUrl = window.location.search.match(/\?article=([\.0-9a-zA-Z%:\/?]*)/);
         if (editUrl) {
@@ -476,7 +477,7 @@ class Client extends React.Component {
             render: 1
         }));
         $.ajax({
-            url: "https://crossorigin.me/https://login." + domain + "/api/get_profile",
+            url: "https://login." + domain + "/api/get_profile",
             type: 'get',
             'dataType': 'json',
             data: {}
