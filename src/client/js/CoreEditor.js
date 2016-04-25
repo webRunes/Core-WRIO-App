@@ -20,7 +20,8 @@ class CoreEditor extends React.Component {
             editorState: contentBlocks.length > 0 ? EditorState.createWithContent(ContentState.createFromBlockArray(contentBlocks)) : EditorState.createEmpty(),
             showURLInput: false,
             urlValue: '',
-            saveUrl: props.saveUrl
+            saveUrl: props.saveUrl,
+            author: props.author
         };
         this.focus = () => this.refs.editor.focus();
         this.onChange = (editorState) => this.setState({
@@ -135,7 +136,7 @@ class CoreEditor extends React.Component {
     }
 
     _toggleCustomAction(action) {
-        CustomActions.toggleCustomAction(this.state.editorState, action, this.state.saveUrl);
+        CustomActions.toggleCustomAction(this.state.editorState, action, this.state.saveUrl, this.state.author);
     }
 
     render() {
@@ -185,7 +186,8 @@ class CoreEditor extends React.Component {
 
 CoreEditor.propTypes = {
     contentBlocks: React.PropTypes.array.isRequired,
-    saveUrl: React.PropTypes.string
+    saveUrl: React.PropTypes.string,
+    author: React.PropTypes.string
 };
 
 function getBlockStyle(block) {

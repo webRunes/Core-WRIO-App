@@ -1,12 +1,12 @@
 export default class CustomActions {
 
-    static toggleCustomAction(editorState, action, saveUrl) {
+    static toggleCustomAction(editorState, action, saveUrl, author) {
         switch (action) {
             case 'save':
-                saveAction(editorState, saveUrl);
+                saveAction(editorState, author, saveUrl);
                 break;
             case 'saveas':
-                saveAsAction(editorState);
+                saveAsAction(editorState, author);
                 break;
             default:
                 console.log('Invalid action');
@@ -17,9 +17,9 @@ export default class CustomActions {
 
 var domain = process.env.DOMAIN;
 
-const saveAction = (editorState, saveUrl) => {
+const saveAction = (editorState, author, saveUrl) => {
     console.log('save_action');
-    toJSON(editorState.getCurrentContent()).then(res => {
+    toJSON(editorState.getCurrentContent(), author).then(res => {
         let {
             json,
             html
@@ -45,9 +45,9 @@ const saveAction = (editorState, saveUrl) => {
     });
 };
 
-const saveAsAction = (editorState) => {
+const saveAsAction = (editorState, author) => {
     console.log('save_as_action');
-    toJSON(editorState.getCurrentContent()).then(res => {
+    toJSON(editorState.getCurrentContent(), author).then(res => {
         let {
             json,
             html
@@ -88,10 +88,10 @@ const saveAsAction = (editorState) => {
     });
 };
 
-const toJSON = (contentState) => {
+const toJSON = (contentState, author) => {
     return new Promise((resolve, reject) => {
         contentState = contentState || {};
-        let json = getArticle("en-US", "", "", ""),
+        let json = getArticle("en-US", "", author, ""),
             blockMap = contentState.getBlockMap(),
             firstBlock = blockMap.first(),
             lastBlock = blockMap.last(),

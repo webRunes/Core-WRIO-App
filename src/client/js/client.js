@@ -158,14 +158,7 @@ class Client extends React.Component {
         }
     }
 
-    formatAuthor(id) {
-        if (id) {
-            return "https://wr.io/"+id+'/?wr.io='+id;
-        } else {
-            return "unknown";
-        }
-
-    }
+    
 
     calculateJson(text, widgetData) {
         if (!text) {
@@ -386,6 +379,15 @@ class Client extends React.Component {
             }
         }
     */
+    formatAuthor(id) {
+        if (id) {
+            return "https://wr.io/"+id+'/?wr.io='+id;
+        } else {
+            return "unknown";
+        }
+
+    }
+
     parseEditingUrl() {
         var editUrl = window.location.search.match(/\?article=([\.0-9a-zA-Z%:\/?]*)/);
         if (editUrl) {
@@ -588,7 +590,7 @@ class Client extends React.Component {
 
     render() {
         return this.state.render ? (<div className="container" cssStyles={{width: '100%'}}>
-                        <CoreEditor contentBlocks={this.state.contentBlocks} saveUrl={this.state.saveUrl}/>
+                        <CoreEditor contentBlocks={this.state.contentBlocks} saveUrl={this.state.saveUrl} author={this.formatAuthor(this.state.wrioID)}/>
                     </div>) : null;
     }
 }
