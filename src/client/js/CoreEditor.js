@@ -19,7 +19,8 @@ class CoreEditor extends React.Component {
         this.state = {
             editorState: contentBlocks.length > 0 ? EditorState.createWithContent(ContentState.createFromBlockArray(contentBlocks)) : EditorState.createEmpty(),
             showURLInput: false,
-            urlValue: ''
+            urlValue: '',
+            saveUrl: props.saveUrl
         };
         this.focus = () => this.refs.editor.focus();
         this.onChange = (editorState) => this.setState({
@@ -134,7 +135,7 @@ class CoreEditor extends React.Component {
     }
 
     _toggleCustomAction(action) {
-        CustomActions.toggleCustomAction(this.state.editorState, action);
+        CustomActions.toggleCustomAction(this.state.editorState, action, this.state.saveUrl);
     }
 
     render() {

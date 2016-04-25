@@ -406,7 +406,7 @@ class Client extends React.Component {
                 }
             }
         }
-        this.disableSave();
+        //this.disableSave();
     }
 
     initHeight() {
@@ -588,7 +588,7 @@ class Client extends React.Component {
 
     render() {
         return this.state.render ? (<div className="container" cssStyles={{width: '100%'}}>
-                        <CoreEditor contentBlocks={this.state.contentBlocks}/>
+                        <CoreEditor contentBlocks={this.state.contentBlocks} saveUrl={this.state.saveUrl}/>
                     </div>) : null;
     }
 }

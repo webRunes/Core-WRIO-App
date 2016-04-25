@@ -1,9 +1,9 @@
 export default class CustomActions {
 
-    static toggleCustomAction(editorState, action) {
+    static toggleCustomAction(editorState, action, saveUrl) {
         switch (action) {
             case 'save':
-                saveAction(editorState);
+                saveAction(editorState, saveUrl);
                 break;
             case 'saveas':
                 saveAsAction(editorState);
@@ -15,7 +15,9 @@ export default class CustomActions {
 
 };
 
-const saveAction = (editorState) => {
+var domain = process.env.DOMAIN;
+
+const saveAction = (editorStat, saveUrl) => {
     console.log('save_action');
     toJSON(editorState.getCurrentContent()).then(res => {
         let {
@@ -28,7 +30,7 @@ const saveAction = (editorState) => {
                 type: 'post',
                 'dataType': 'json',
                 data: {
-                    'url': url,
+                    'url': saveUrl,
                     'bodyData': html
                 }
             })
@@ -36,7 +38,6 @@ const saveAction = (editorState) => {
                 parent.postMessage(JSON.stringify({
                     "coreSaved": true
                 }), "*");
-                // window.location = res.url;
             }).error(err => {
                 console.log(err);
             });
