@@ -7,8 +7,7 @@ import {
     EditorState,
     Entity,
     RichUtils
-}
-from 'draft-js';
+} from 'draft-js';
 import CustomActions from './customActions';
 
 class CoreEditor extends React.Component {

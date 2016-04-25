@@ -1,20 +1,11 @@
 import React from 'react';
 import ReactDom from 'react-dom';
-import {
-    scripts
-}
-from './mentions/scripts';
+import {scripts} from './mentions/scripts';
 import request from 'superagent';
-import {
-    applyMentions
-}
-from './mixins/mentions';
+import {applyMentions} from './mixins/mentions';
 import getHttp from './getHttp';
 import CoreEditor from './CoreEditor';
-import {
-    ContentBlock, CharacterMetadata
-}
-from 'draft-js';
+import {ContentBlock, CharacterMetadata} from 'draft-js';
 import Immutable from 'immutable';
 
 var domain = process.env.DOMAIN;
@@ -42,20 +33,20 @@ class Client extends React.Component {
         };
     }
 
-    /*    getLocation(href) {
-            var match = href.match(/^(https?\:)\/\/(([^:\/?#]*)(?:\:([0-9]+))?)(\/[^?#]*)(\?[^#]*|)(#.*|)$/);
-            return match && {
-                protocol: match[1],
-                host: match[2],
-                hostname: match[3],
-                port: match[4],
-                pathname: match[5],
-                search: match[6],
-                hash: match[7]
-            };
-        }
+    getLocation(href) {
+        var match = href.match(/^(https?\:)\/\/(([^:\/?#]*)(?:\:([0-9]+))?)(\/[^?#]*)(\?[^#]*|)(#.*|)$/);
+        return match && {
+            protocol: match[1],
+            host: match[2],
+            hostname: match[3],
+            port: match[4],
+            pathname: match[5],
+            search: match[6],
+            hash: match[7]
+        };
+    }
 
-        replaceLineFeed(someText) {
+    /*    replaceLineFeed(someText) {
             var re = /\r\n|\n\r|\n|\r/g;
             return someText.replace(re, "");
         }
@@ -498,7 +489,7 @@ class Client extends React.Component {
             render: 1
         }));
         $.ajax({
-            url: "https://login." + domain + "/api/get_profile",
+            url: "//login." + domain + "/api/get_profile",
             type: 'get',
             'dataType': 'json',
             data: {}
