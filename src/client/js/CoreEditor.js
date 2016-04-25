@@ -184,7 +184,8 @@ class CoreEditor extends React.Component {
 }
 
 CoreEditor.propTypes = {
-    contentBlocks: React.PropTypes.array.isRequired
+    contentBlocks: React.PropTypes.array.isRequired,
+    saveUrl: React.PropTypes.string
 };
 
 function getBlockStyle(block) {
