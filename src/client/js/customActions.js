@@ -17,7 +17,7 @@ export default class CustomActions {
 
 var domain = process.env.DOMAIN;
 
-const saveAction = (editorStat, saveUrl) => {
+const saveAction = (editorState, saveUrl) => {
     console.log('save_action');
     toJSON(editorState.getCurrentContent()).then(res => {
         let {
