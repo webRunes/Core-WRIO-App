@@ -518,7 +518,8 @@ class Client extends React.Component {
 
         if (window.location.pathname === "/create") {
             cb({
-                contentBlocks: []
+                contentBlocks: [],
+                mentions: []
             });
             return;
         }
@@ -574,7 +575,8 @@ class Client extends React.Component {
             } else {
                 console.log("Unable to download source article");
                 cb({
-                    contentBlocks: []
+                    contentBlocks: [],
+                    mentions: []
                 });
             }
         });
