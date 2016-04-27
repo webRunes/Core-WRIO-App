@@ -16,7 +16,7 @@ describe('mention test', () => {
             "url": "https://webrunes.com/blog.htm?'dolor sit amet':3,104"
         })
         mention.start.should.be.equal(104);
-        mention.order.should.be.equal(3);
+        mention.block.should.be.equal(3);
 
     })
 });
