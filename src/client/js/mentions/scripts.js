@@ -18,8 +18,8 @@ export function scripts(scripts) {
             }
         }
     }
-    data.forEach((jsn) => {
+/*    data.forEach((jsn) => {
         check(jsn);
     });
-    return data;
+*/    return data;
 };
