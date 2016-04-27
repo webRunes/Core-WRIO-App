@@ -1,24 +1,12 @@
 import React from 'react';
 import ReactDom from 'react-dom';
-import {
-    scripts
-}
-from './mentions/scripts';
-import {
-    extractMentions
-}
-from './mentions/mention';
+import {scripts} from './mentions/scripts';
+import {extractMentions} from './mentions/mention';
 import request from 'superagent';
-import {
-    applyMentions
-}
-from './mixins/mentions';
+import {applyMentions} from './mixins/mentions';
 import getHttp from './getHttp';
 import CoreEditor from './CoreEditor';
-import {
-    ContentBlock, CharacterMetadata
-}
-from 'draft-js';
+import {ContentBlock, CharacterMetadata} from 'draft-js';
 import Immutable from 'immutable';
 
 var domain = process.env.DOMAIN;

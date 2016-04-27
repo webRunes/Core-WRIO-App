@@ -20,10 +20,7 @@ var domain = process.env.DOMAIN;
 const saveAction = (editorState, author, saveUrl) => {
     console.log('save_action');
     toJSON(editorState.getCurrentContent(), author).then(res => {
-        let {
-            json,
-            html
-        } = res;
+        let {json, html} = res;
 
         $.ajax({
                 url: "https://storage." + domain + "/api/save",
@@ -48,10 +45,7 @@ const saveAction = (editorState, author, saveUrl) => {
 const saveAsAction = (editorState, author) => {
     console.log('save_as_action');
     toJSON(editorState.getCurrentContent(), author).then(res => {
-        let {
-            json,
-            html
-        } = res,
+        let {json, html} = res,
         ie = navigator.userAgent.match(/MSIE\s([\d.]+)/),
             ie11 = navigator.userAgent.match(/Trident\/7.0/) && navigator.userAgent.match(/rv:11/),
             ieEDGE = navigator.userAgent.match(/Edge/g),

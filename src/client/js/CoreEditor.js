@@ -1,15 +1,5 @@
 import React from 'react';
-import {
-    convertToRaw,
-    CompositeDecorator,
-    ContentState,
-    SelectionState,
-    Editor,
-    EditorState,
-    Entity,
-    RichUtils
-}
-from 'draft-js';
+import {convertToRaw, CompositeDecorator, ContentState, SelectionState, Editor, EditorState, Entity, RichUtils} from 'draft-js';
 import CustomActions from './customActions';
 
 class CoreEditor extends React.Component {
@@ -21,9 +11,7 @@ class CoreEditor extends React.Component {
             component: Link
         }]);
 
-        let {
-            contentBlocks, mentions
-        } = props,
+        let {contentBlocks, mentions} = props,
         editorState = contentBlocks.length > 0 ? EditorState.createWithContent(ContentState.createFromBlockArray(contentBlocks), decorator) : EditorState.createEmpty(decorator);
 
 
@@ -76,9 +64,7 @@ class CoreEditor extends React.Component {
 
     _promptForLink(e) {
         e.preventDefault();
-        const {
-            editorState
-        } = this.state;
+        const {editorState} = this.state;
         const selection = editorState.getSelection();
         if (!selection.isCollapsed()) {
             this.setState({
@@ -92,9 +78,7 @@ class CoreEditor extends React.Component {
 
     _confirmLink(e) {
         e.preventDefault();
-        const {
-            editorState, urlValue
-        } = this.state;
+        const {editorState, urlValue} = this.state;
         const entityKey = Entity.create('LINK', 'MUTABLE', {
             url: urlValue
         });
@@ -119,9 +103,7 @@ class CoreEditor extends React.Component {
 
     _removeLink(e) {
         e.preventDefault();
-        const {
-            editorState
-        } = this.state;
+        const {editorState} = this.state;
         const selection = editorState.getSelection();
         if (!selection.isCollapsed()) {
             this.setState({
@@ -131,9 +113,7 @@ class CoreEditor extends React.Component {
     }
 
     _handleKeyCommand(command) {
-        const {
-            editorState
-        } = this.state;
+        const {editorState} = this.state;
         const newState = RichUtils.handleKeyCommand(editorState, command);
         if (newState) {
             this.onChange(newState);
@@ -165,9 +145,7 @@ class CoreEditor extends React.Component {
     }
 
     render() {
-        const {
-            editorState
-        } = this.state;
+        const {editorState} = this.state;
 
         // If the user changes block type before entering any text, we can
         // either style the placeholder or hide it. Let's just hide it now.
@@ -273,9 +251,7 @@ const BLOCK_TYPES = [{
 }];
 
 const BlockStyleControls = (props) => {
-    const {
-        editorState
-    } = props;
+    const {editorState} = props;
     const selection = editorState.getSelection();
     const blockType = editorState
         .getCurrentContent()
@@ -327,9 +303,7 @@ var INLINE_STYLES = [{
 }, ];
 
 const InlineStyleControls = (props) => {
-    let {
-        editorState
-    } = props;
+    let {editorState} = props;
     var currentStyle = editorState.getCurrentInlineStyle();
     return (
         <div className="RichEditor-controls">
@@ -507,9 +481,7 @@ function findLinkEntities(contentBlock, callback) {
 }
 
 const Link = (props) => {
-    const {
-        url
-    } = Entity.get(props.entityKey).getData();
+    const {url} = Entity.get(props.entityKey).getData();
     return (
         <a href={url}>
             {props.children}
