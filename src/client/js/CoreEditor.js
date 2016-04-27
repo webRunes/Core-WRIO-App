@@ -3,42 +3,67 @@ import {
     convertToRaw,
     CompositeDecorator,
     ContentState,
+    SelectionState,
     Editor,
     EditorState,
     Entity,
     RichUtils
-} from 'draft-js';
+}
+from 'draft-js';
 import CustomActions from './customActions';
 
 class CoreEditor extends React.Component {
     constructor(props) {
         super(props);
+
+        const decorator = new CompositeDecorator([{
+            strategy: findLinkEntities,
+            component: Link
+        }]);
+
         let {
-            contentBlocks
-        } = props;
+            contentBlocks, mentions
+        } = props,
+        editorState = contentBlocks.length > 0 ? EditorState.createWithContent(ContentState.createFromBlockArray(contentBlocks), decorator) : EditorState.createEmpty(decorator);
+
+
+        mentions.forEach(mention => {
+            const entityKey = Entity.create('LINK', 'MUTABLE', {
+                url: mention.url
+            });
+
+            let key = contentBlocks[mention.block].getKey(),
+                selection = SelectionState.createEmpty(key).merge({
+                    anchorOffset: mention.start,
+                    focusKey: key,
+                    focusOffset: mention.end
+                });
+
+            editorState = RichUtils.toggleLink(
+                editorState,
+                selection,
+                entityKey
+            );
+        });
+
         this.state = {
-            editorState: contentBlocks.length > 0 ? EditorState.createWithContent(ContentState.createFromBlockArray(contentBlocks)) : EditorState.createEmpty(),
+            editorState: editorState,
             showURLInput: false,
             urlValue: '',
             saveUrl: props.saveUrl,
             author: props.author
         };
         this.focus = () => this.refs.editor.focus();
-        this.onChange = (editorState) => this.setState({
-            editorState
-        });
+        this.onChange = (editorState) => {
+            this.setState({
+                editorState
+            });
+        };
 
         this.handleKeyCommand = (command) => this._handleKeyCommand(command);
         this.toggleBlockType = (type) => this._toggleBlockType(type);
         this.toggleInlineStyle = (style) => this._toggleInlineStyle(style);
         this.toggleCustomAction = (action) => this._toggleCustomAction(action);
-
-        const decorator = new CompositeDecorator([{
-            strategy: findLinkEntities,
-            component: Link,
-        }, ]);
-
-        this.focus = () => this.refs.editor.focus();
 
         this.promptForLink = this._promptForLink.bind(this);
         this.onURLChange = (e) => this.setState({
@@ -185,7 +210,8 @@ class CoreEditor extends React.Component {
 }
 
 CoreEditor.propTypes = {
-    contentBlocks: React.PropTypes.array.isRequired,
+    contentBlocks: React.PropTypes.array,
+    mentions: React.PropTypes.array,
     saveUrl: React.PropTypes.string,
     author: React.PropTypes.string
 };
@@ -244,7 +270,7 @@ const BLOCK_TYPES = [{
 }, {
     label: 'Link',
     style: 'link'
-}, ];
+}];
 
 const BlockStyleControls = (props) => {
     const {
@@ -260,7 +286,13 @@ const BlockStyleControls = (props) => {
         <div className="RichEditor-controls">
             {BLOCK_TYPES.map((type) => {           
                 if (type.style === 'link') {
-
+                    return (<StyleButton
+                        key={type.label}
+                        active={type.style === blockType}
+                        label={type.label}
+                        onToggle={props.onToggle}
+                        style={type.style}
+                    />);
                 } else {
                     return (<StyleButton
                         key={type.label}
@@ -295,7 +327,9 @@ var INLINE_STYLES = [{
 }, ];
 
 const InlineStyleControls = (props) => {
-    let {editorState} = props;
+    let {
+        editorState
+    } = props;
     var currentStyle = editorState.getCurrentInlineStyle();
     return (
         <div className="RichEditor-controls">
@@ -477,15 +511,15 @@ const Link = (props) => {
         url
     } = Entity.get(props.entityKey).getData();
     return (
-        <a href={url} style={styles.link}>
+        <a href={url}>
             {props.children}
           </a>
     );
 };
 
 Link.propTypes = {
-    entityKey: React.PropTypes.object,
-    children: React.PropTypes.object
+    entityKey: React.PropTypes.string,
+    children: React.PropTypes.array
 };
 
 const styles = {
@@ -514,12 +548,7 @@ const styles = {
     button: {
         marginTop: 10,
         textAlign: 'center',
-    },
-    link: {
-        color: '#3b5998',
-        textDecoration: 'underline',
-        cursor: 'pointer'
-    },
+    }
 };
 
 export default CoreEditor;

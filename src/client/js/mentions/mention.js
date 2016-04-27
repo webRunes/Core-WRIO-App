@@ -2,18 +2,20 @@ import sortBy from 'lodash.sortby';
 
 export class Mention {
 
-    constructor(opts) {
-        this.name = opts.name;
-        this.url = opts.url;
-        var cutUrl = this.url.split('\''),
+    constructor(mention) {
+        let {name, url} = mention,
+            cutUrl = url.split('\''),
             positions = cutUrl[2].replace(':', '').split(',');
         this.linkWord = cutUrl[1];
-        this.newUrl = cutUrl[0] + this.name.replace(/\s/g, '-');
-        this.order = Number(positions[0]);
+        this.url = cutUrl[0] + name.replace(/\s/g, '-');
+        this.block = Number(positions[0]);
         this.start = Number(positions[1]);
+        this.end = this.start + this.linkWord.length;
     }
 
-    warn(text) {
+
+
+/*    warn(text) {
         text = text || 'Wrong mention: ' + this.url;
     }
 
@@ -34,7 +36,7 @@ export class Mention {
         this.warn();
         return null;
     }
-}
+*/}
 
 export function merge(mentions) {
     return sortBy(mentions, (m) => {
@@ -42,3 +44,9 @@ export function merge(mentions) {
         return mention.order;
     });
 }
+
+export const extractMentions = (mentions) => {
+    return mentions.map(mention => {
+        return new Mention(mention);
+    });
+};

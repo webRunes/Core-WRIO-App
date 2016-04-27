@@ -1,11 +1,24 @@
 import React from 'react';
 import ReactDom from 'react-dom';
-import {scripts} from './mentions/scripts';
+import {
+    scripts
+}
+from './mentions/scripts';
+import {
+    extractMentions
+}
+from './mentions/mention';
 import request from 'superagent';
-import {applyMentions} from './mixins/mentions';
+import {
+    applyMentions
+}
+from './mixins/mentions';
 import getHttp from './getHttp';
 import CoreEditor from './CoreEditor';
-import {ContentBlock, CharacterMetadata} from 'draft-js';
+import {
+    ContentBlock, CharacterMetadata
+}
+from 'draft-js';
 import Immutable from 'immutable';
 
 var domain = process.env.DOMAIN;
@@ -22,13 +35,14 @@ class Client extends React.Component {
                 '<meta name="description" content=""><meta name="author" content=""><meta name="keywords" content="">' +
                 '<title>|TITLE|</title><script type="application/ld+json">|BODY|</script>' +
                 '</head><body><script type="text/javascript" src="//wrioos.com/start.js"></script></body></html>',
-            wrioID: false,
-            saveUrl: false,
+            wrioID: '',
+            saveUrl: '',
             saveDisabled: 0,
             STORAGE_DOMAIN: "wr.io",
             editUrl: false,
             coreAdditionalHeight: 200,
             contentBlocks: [],
+            mentions: [],
             render: 0
         };
     }
@@ -381,7 +395,7 @@ class Client extends React.Component {
     */
     formatAuthor(id) {
         if (id) {
-            return "https://wr.io/"+id+'/?wr.io='+id;
+            return "https://wr.io/" + id + '/?wr.io=' + id;
         } else {
             return "unknown";
         }
@@ -486,10 +500,7 @@ class Client extends React.Component {
     */
     componentWillMount() {
         this.parseEditingUrl();
-        this.parseArticleCore(res => this.setState({
-            contentBlocks: res,
-            render: 1
-        }));
+        let wrioID = '';
         $.ajax({
             url: "//login." + domain + "/api/get_profile",
             type: 'get',
@@ -497,48 +508,46 @@ class Client extends React.Component {
             data: {}
         }).success((profile) => {
             console.log("Get_profile finish", profile);
-            // this.state.wrioID = profile.id;
-            this.setState({
-                wrioID: profile.id
-            });
+            wrioID = profile.id;
         }).fail((e) => {
             //this.disableSave();
+        }).always(() => {
+            this.parseArticleCore(res => this.setState({
+                contentBlocks: res.contentBlocks,
+                mentions: res.mentions,
+                wrioID,
+                render: 1
+            }));
         });
     }
 
     parseArticleCore(cb) {
         var cb = cb || function() {};
-        let key = 0;
+
         const keyGen = () => {
-            return key++;
+            return (new Date()).getTime().toString(32) + Math.random().toString(32);
         };
 
         if (window.location.pathname === "/create") {
-            cb([]);
+            cb({
+                contentBlocks: []
+            });
             return;
         }
         getHttp(this.state.editUrl, (article) => {
             if (article && article.length !== 0) {
                 article = article.filter((json) => json['@type'] == 'Article')[0];
-                let headerText = ((article.m && article.m.name && article.m.name.filter(e => {
-                        if (e) {
-                            return e;
-                        };
-                    }).length) ? applyMentions(article.m.name) : article.name),
-                    articleText = '',
-                    contentBlocks = new Array();
+                let articleText = '',
+                    contentBlocks = new Array(),
+                    mentions = extractMentions(article.mentions);
                 contentBlocks.push(new ContentBlock([
-                    ['text', headerText],
+                    ['text', article.name],
                     ['key', keyGen()],
-                    ['characterList', Immutable.List(headerText.split('').map(e => CharacterMetadata.create()))],
+                    ['characterList', Immutable.List(article.name.split('').map(e => CharacterMetadata.create()))],
                     ['type', 'header-two']
                 ]));
                 article.articleBody.forEach((paragraph, i) => {
-                    articleText += ((article.m && article.m.articleBody && article.m.articleBody[i] && article.m.articleBody[i].filter(e => {
-                        if (e) {
-                            return e;
-                        };
-                    }).length) ? applyMentions(article.m.articleBody[i]) : paragraph);
+                    articleText += paragraph;
                 });
                 contentBlocks.push(new ContentBlock([
                     ['text', articleText],
@@ -547,25 +556,16 @@ class Client extends React.Component {
                     ['type', 'unstyled']
                 ]));
                 article.hasPart.forEach((subArticle) => {
-                    headerText = ((subArticle.m && subArticle.m.name && subArticle.m.name.filter(e => {
-                        if (e) {
-                            return e;
-                        };
-                    }).length) ? applyMentions(subArticle.m.name) : subArticle.name);
                     articleText = '';
                     contentBlocks.push(new ContentBlock([
-                        ['text', headerText],
+                        ['text', subArticle.name],
                         ['key', keyGen()],
-                        ['characterList', Immutable.List(headerText.split('').map(e => CharacterMetadata.create()))],
+                        ['characterList', Immutable.List(subArticle.name.split('').map(e => CharacterMetadata.create()))],
                         ['type', 'header-two']
                     ]));
                     if (subArticle.articleBody) {
                         subArticle.articleBody.forEach((paragraph, i) => {
-                            articleText += ((subArticle.m && subArticle.m.articleBody && subArticle.m.articleBody[i] && subArticle.m.articleBody[i].filter(e => {
-                                if (e) {
-                                    return e;
-                                };
-                            }).length) ? applyMentions(subArticle.m.articleBody[i]) : paragraph);
+                            articleText += paragraph;
                         });
                     }
                     if (subArticle.url) {
@@ -580,17 +580,21 @@ class Client extends React.Component {
                         ]));
                     }
                 });
-                cb(contentBlocks);
+                cb({
+                    contentBlocks, mentions
+                });
             } else {
                 console.log("Unable to download source article");
-                cb([]);
+                cb({
+                    contentBlocks: []
+                });
             }
         });
     }
 
     render() {
         return this.state.render ? (<div className="container" cssStyles={{width: '100%'}}>
-                        <CoreEditor contentBlocks={this.state.contentBlocks} saveUrl={this.state.saveUrl} author={this.formatAuthor(this.state.wrioID)}/>
+                        <CoreEditor contentBlocks={this.state.contentBlocks} mentions={this.state.mentions} saveUrl={this.state.saveUrl} author={this.formatAuthor(this.state.wrioID)}/>
                     </div>) : null;
     }
 }
