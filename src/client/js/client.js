@@ -65,7 +65,7 @@ class Client extends React.Component {
         if (fileName) {
             out = fileName[1];
             if (out === "" || !out) {
-                out = "index.htm"; // if no file specified, let's assume this is index.htm
+                out = "index.html"; // if no file specified, let's assume this is index.htm
             }
             return out;
         }

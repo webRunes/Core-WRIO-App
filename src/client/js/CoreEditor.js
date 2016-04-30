@@ -204,6 +204,7 @@ CoreEditor.propTypes = {
     contentBlocks: React.PropTypes.array,
     mentions: React.PropTypes.array,
     saveRelativePath: React.PropTypes.string,
+    editUrl: React.PropTypes.string,
     author: React.PropTypes.string,
     commentID: React.PropTypes.string
 };
