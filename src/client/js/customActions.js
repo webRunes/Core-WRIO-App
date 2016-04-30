@@ -1,12 +1,12 @@
 export default class CustomActions {
 
-    static toggleCustomAction(editorState, action, saveUrl, author) {
+    static toggleCustomAction(editorState, action, saveRelativePath, author,commentID) {
         switch (action) {
             case 'save':
-                saveAction(editorState, author, saveUrl);
+                saveAction(editorState, author, saveRelativePath,commentID);
                 break;
             case 'saveas':
-                saveAsAction(editorState, author);
+                saveAsAction(editorState, author,commentID);
                 break;
             default:
                 console.log('Invalid action');
@@ -17,9 +17,9 @@ export default class CustomActions {
 
 var domain = process.env.DOMAIN;
 
-const saveAction = (editorState, author, saveUrl) => {
+const saveAction = (editorState, author, saveRelativePath, commentID) => {
     console.log('save_action');
-    toJSON(editorState.getCurrentContent(), author).then(res => {
+    toJSON(editorState.getCurrentContent(), author,commentID).then(res => {
         let {json, html} = res;
 
         $.ajax({
@@ -27,7 +27,7 @@ const saveAction = (editorState, author, saveUrl) => {
                 type: 'post',
                 'dataType': 'json',
                 data: {
-                    'url': saveUrl,
+                    'url': saveRelativePath,
                     'bodyData': html
                 }
             })
@@ -42,9 +42,9 @@ const saveAction = (editorState, author, saveUrl) => {
     });
 };
 
-const saveAsAction = (editorState, author) => {
+const saveAsAction = (editorState, author,commentID) => {
     console.log('save_as_action');
-    toJSON(editorState.getCurrentContent(), author).then(res => {
+    toJSON(editorState.getCurrentContent(), author, commentID).then(res => {
         let {json, html} = res,
         ie = navigator.userAgent.match(/MSIE\s([\d.]+)/),
             ie11 = navigator.userAgent.match(/Trident\/7.0/) && navigator.userAgent.match(/rv:11/),
@@ -82,10 +82,10 @@ const saveAsAction = (editorState, author) => {
     });
 };
 
-const toJSON = (contentState, author) => {
+const toJSON = (contentState, author,commentID) => {
     return new Promise((resolve, reject) => {
         contentState = contentState || {};
-        let json = getArticle("en-US", "", author, ""),
+        let json = getArticle("en-US", "", author, commentID),
             blockMap = contentState.getBlockMap(),
             firstBlock = blockMap.first(),
             lastBlock = blockMap.last(),
