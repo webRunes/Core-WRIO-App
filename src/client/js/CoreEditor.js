@@ -4,6 +4,7 @@ import {
 }
 from 'draft-js';
 import CustomActions from './customActions';
+import CommentEnabler from './CommentEnabler.js';
 
 class CoreEditor extends React.Component {
     constructor(props) {
@@ -56,8 +57,10 @@ class CoreEditor extends React.Component {
             isEditLink: false,
             linkEntityKey: 0,
             urlValue: '',
-            saveUrl: props.saveUrl,
-            author: props.author
+            saveRelativePath: props.saveRelativePath,
+            editUrl: props.editUrl,
+            author: props.author,
+            commentID: this.props.commentID
         };
         this.focus = () => this.refs.editor.focus();
         this.onChange = (editorState) => {
@@ -227,7 +230,14 @@ class CoreEditor extends React.Component {
     }
 
     _toggleCustomAction(action) {
-        CustomActions.toggleCustomAction(this.state.editorState, action, this.state.saveUrl, this.state.author);
+        // this is the place where to pass arguments to custom actions
+        CustomActions.toggleCustomAction(this.state.editorState, action, this.state.saveRelativePath, this.state.author,this.state.commentID);
+    }
+
+    gotCommentID (id) {
+        this.setState({
+            commentID:id
+        });
     }
 
     render() {
@@ -246,32 +256,35 @@ class CoreEditor extends React.Component {
         }
 
         return (
-            <div className="RichEditor-root">
-              <BlockStyleControls
-                editorState={editorState}
-                onToggle={this.toggleBlockType}
-                onLinkToggle={this.promptForLink}
-              />
-              <InlineStyleControls
-                editorState={editorState}
-                onToggle={this.toggleInlineStyle}
-              />
-              <CustomActionControls
-                editorState={editorState}
-                onToggle={this.toggleCustomAction}
-              />
-              {this.state.showURLInput ? <LinkUrlControls isEditLink={this.state.isEditLink}  urlValue={this.state.urlValue} onCancelLink={this.cancelLink} onRemoveLink={this.removeLink} onEditLink={this.editLink} onConfirmLink={this.confirmLink} onLinkInputKeyDown={this.onLinkInputKeyDown} onURLChange={this.onURLChange}  /> : !!0}
-              <div className={className} onClick={this.focus}>
-                <Editor
-                  blockStyleFn={getBlockStyle}
-                  editorState={editorState}
-                  handleKeyCommand={this.handleKeyCommand}
-                  onChange={this.onChange}
-                  placeholder="Enter text..."
-                  ref="editor"
-                  spellCheck={true}
-                />
-              </div>
+            <div>
+                <div className="RichEditor-root">
+                  <BlockStyleControls
+                    editorState={editorState}
+                    onToggle={this.toggleBlockType}
+                    onLinkToggle={this.promptForLink}
+                  />
+                  <InlineStyleControls
+                    editorState={editorState}
+                    onToggle={this.toggleInlineStyle}
+                  />
+                  <CustomActionControls
+                    editorState={editorState}
+                    onToggle={this.toggleCustomAction}
+                  />
+                  {this.state.showURLInput ? <LinkUrlControls isEditLink={this.state.isEditLink}  urlValue={this.state.urlValue} onCancelLink={this.cancelLink} onRemoveLink={this.removeLink} onEditLink={this.editLink} onConfirmLink={this.confirmLink} onLinkInputKeyDown={this.onLinkInputKeyDown} onURLChange={this.onURLChange}  /> : !!0}
+                  <div className={className} onClick={this.focus}>
+                    <Editor
+                      blockStyleFn={getBlockStyle}
+                      editorState={editorState}
+                      handleKeyCommand={this.handleKeyCommand}
+                      onChange={this.onChange}
+                      placeholder="Enter text..."
+                      ref="editor"
+                      spellCheck={true}
+                    />
+                  </div>
+                </div>
+                <CommentEnabler commentID={this.state.commentID} author={this.props.author} editUrl={this.state.editUrl} gotCommentID={this.gotCommentID.bind(this)}/>
             </div>
         );
     }
@@ -280,8 +293,10 @@ class CoreEditor extends React.Component {
 CoreEditor.propTypes = {
     contentBlocks: React.PropTypes.array,
     mentions: React.PropTypes.array,
-    saveUrl: React.PropTypes.string,
-    author: React.PropTypes.string
+    saveRelativePath: React.PropTypes.string,
+    editUrl: React.PropTypes.string,
+    author: React.PropTypes.string,
+    commentID: React.PropTypes.string
 };
 
 function getBlockStyle(block) {
