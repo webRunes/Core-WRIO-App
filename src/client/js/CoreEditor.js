@@ -358,11 +358,11 @@ class LinkUrlControls extends React.Component {
         this.onCancelLink = (e) => {
             e.preventDefault();
             this.props.onCancelLink(e);
-        }
+        };
         this.onRemoveLink = (e) => {
             e.preventDefault();
             this.props.onRemoveLink(e);
-        }
+        };
     }
 
     render() {
@@ -388,6 +388,17 @@ class LinkUrlControls extends React.Component {
             </div>
         );
     }
+};
+
+LinkUrlControls.propTypes = {
+    onEditLink: React.PropTypes.func,
+    onConfirmLink: React.PropTypes.func,
+    onURLChange: React.PropTypes.func,
+    onLinkInputKeyDown: React.PropTypes.func,
+    onCancelLink: React.PropTypes.func,
+    onRemoveLink: React.PropTypes.func,
+    isEditLink: React.PropTypes.bool,
+    urlValue: React.PropTypes.string
 };
 
 const BLOCK_TYPES = [{
@@ -567,7 +578,7 @@ class Link extends React.Component {
         this.onLinkEdit = (e) => {
             e.preventDefault();
             onLinkEdit(this.url, props.entityKey);
-        }
+        };
 
     }
 
@@ -579,7 +590,7 @@ class Link extends React.Component {
         this.onLinkEdit = (e) => {
             e.preventDefault();
             onLinkEdit(this.url, props.entityKey);
-        }
+        };
     }
 
     render() {
