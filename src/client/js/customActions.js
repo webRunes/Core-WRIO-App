@@ -105,7 +105,7 @@ const toJSON = (contentState, author,commentID) => {
         json.name = firstBlock.getText();
         let isPart;
         blockMap.forEach((e, i) => {
-            if (i) {
+            if (i !== firstBlock.getKey()) {
                 if (isPart) {
                     if (e.getType() !== 'header-two') {
                         part.articleBody.push(e.getText());
