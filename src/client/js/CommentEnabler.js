@@ -58,6 +58,8 @@ export default class CommentEnabler extends React.Component {
 
     render() {
 
+
+
         var commentStatus = this._hasCommentID() ?
             <div className="col-sm-12">Widget id is correct and equals to {this.state.commentID}</div> :
             <div className="col-sm-12">
@@ -84,6 +86,10 @@ export default class CommentEnabler extends React.Component {
                         <img src="https://wrioos.com/Default-WRIO-Theme/img/loading.gif"/>Obtaining widget id....
                     </div> : ""}
             </div>);
+    }
+
+    componentDidUpdate () {
+        window.frameReady();
     }
 }
 
