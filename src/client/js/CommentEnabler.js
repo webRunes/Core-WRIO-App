@@ -32,17 +32,15 @@ export default class CommentEnabler extends React.Component {
         $.ajax({
             url: "//titter." + domain + "/obtain_widget_id?query=" + this.props.editUrl,
             type: 'get',
-            'dataType': 'json',
-            data: {},
             xhrFields: {
                 withCredentials: true
             }
-        }).success((id) => {
+        }).done((id,ts,jq) => {
             console.log("Get widget id succeded", id);
             this.setState({
                 commentID: id
             });
-            this.props.gotCommentID(id.toString());
+            this.props.gotCommentID(id);
         }).fail((e) => {
             console.log("Failed to obtain widget ID");
         }).always(() => {
