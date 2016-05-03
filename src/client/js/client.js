@@ -91,13 +91,7 @@ class Client extends React.Component {
         //this.disableSave();
     }
 
-    initHeight() {
-        var $body = $('body');
-        var heightInit = $body.height();
-        parent.postMessage(JSON.stringify({
-            "coreHeight": heightInit
-        }), "*");
-    }
+
 
     componentWillMount() {
         this.parseEditingUrl();
@@ -119,6 +113,7 @@ class Client extends React.Component {
                 wrioID,
                 render: 1
             }));
+
         });
     }
 
@@ -137,6 +132,11 @@ class Client extends React.Component {
             return;
         }
         getHttp(this.state.editUrl, (article) => {
+
+            setTimeout(window.frameReady,300);
+
+            document.getElementById("loadingInd").style = 'display:none;';
+
             if (article && article.length !== 0) {
                 article = article.filter((json) => json['@type'] == 'Article')[0];
                 let articleText = '',
@@ -223,6 +223,22 @@ class Client extends React.Component {
 }
 
 ReactDom.render( < Client /> , document.getElementById('clientholder'));
+
+
+var oldHeight = 0;
+window.frameReady = () => {
+
+    var $body = $('.container');
+    var heightInit = $body.height()+30;
+
+    if (heightInit == oldHeight) return;
+    oldHeight = heightInit;
+    console.log("Height ready");
+
+    parent.postMessage(JSON.stringify({
+        "coreHeight": heightInit
+    }), "*");
+};
 
 
 /*    replaceLineFeed(someText) {

@@ -240,6 +240,10 @@ class CoreEditor extends React.Component {
         });
     }
 
+    componentDidUpdate () {
+        window.frameReady();
+    }
+
     render() {
         const {
             editorState
