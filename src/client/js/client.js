@@ -28,7 +28,7 @@ class Client extends React.Component {
             saveUrl: '',
             saveDisabled: 0,
             STORAGE_DOMAIN: "wr.io",
-            editUrl: false,
+            editUrl:'',
             coreAdditionalHeight: 200,
             contentBlocks: [],
             mentions: [],

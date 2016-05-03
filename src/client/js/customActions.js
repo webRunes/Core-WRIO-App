@@ -1,3 +1,5 @@
+import {Entity} from 'draft-js';
+
 export default class CustomActions {
 
     static toggleCustomAction(editorState, action, saveRelativePath, author,commentID) {
@@ -125,6 +127,25 @@ const toJSON = (contentState, author,commentID) => {
             }
         });
 
+        blockMap.toArray().forEach((block, i) => {
+            let entity;
+            block.findEntityRanges(char => {
+                let entityKey = char.getEntity();
+                entity = !!entityKey ? Entity.get(entityKey) : null;
+                return !!entity && entity.getType() === 'LINK';
+            }, (anchorOffset, focusOffset) => {
+                if (entity) {
+                    let _url = entity.getData().url.split('?'),
+                        url = _url[0],
+                        name = _url[1] || '';
+
+                    json.mentions.push(
+                        getMention(name, "", `${url}?'${block.getText().substring(anchorOffset, focusOffset)}':${i},${anchorOffset}`)
+                    );
+                }
+            });
+        });
+
         resolve({
             html: cleshe.replace('|BODY|', JSON.stringify(json)).replace('|TITLE|', json.name),
             json: json
@@ -154,6 +175,15 @@ const getPart = (name) => {
         "@type": "Article",
         "name": name,
         "articleBody": []
+    };
+};
+
+const getMention = (name, about, link) => {
+    return {
+        "@type": "Article",
+        "name": name,
+        "about": about,
+        "link": link
     };
 };
 

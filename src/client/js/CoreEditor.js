@@ -1,8 +1,5 @@
 import React from 'react';
-import {
-    CompositeDecorator, ContentState, SelectionState, Editor, EditorState, Entity, RichUtils, CharacterMetadata
-}
-from 'draft-js';
+import {CompositeDecorator, ContentState, SelectionState, Editor, EditorState, Entity, RichUtils, CharacterMetadata} from 'draft-js';
 import CustomActions from './customActions';
 import CommentEnabler from './CommentEnabler.js';
 
