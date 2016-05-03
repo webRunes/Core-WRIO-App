@@ -29,7 +29,10 @@ const saveAction = (editorState, author, saveRelativePath, commentID) => {
                 data: {
                     'url': saveRelativePath,
                     'bodyData': html
-                }
+                },
+            xhrFields: {
+                withCredentials: true
+            }
             })
             .success((res) => {
                 parent.postMessage(JSON.stringify({
