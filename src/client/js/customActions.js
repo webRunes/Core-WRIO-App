@@ -126,15 +126,18 @@ const toJSON = (contentState, author,commentID) => {
 
         blockMap.toArray().forEach((block, i) => {
             let entity;
-            console.log(i);
             block.findEntityRanges(char => {
                 let entityKey = char.getEntity();
                 entity = !!entityKey ? Entity.get(entityKey) : null;
                 return !!entity && entity.getType() === 'LINK';
             }, (anchorOffset, focusOffset) => {
                 if (entity) {
+                    let _url = entity.getData().url.split('?'),
+                        url = _url[0],
+                        name = _url[1] || '';
+
                     json.mentions.push(
-                        getMention("", "", `${entity.getData().url}?'${block.getText().substring(anchorOffset, focusOffset)}':${i},${anchorOffset}`)
+                        getMention(name, "", `${url}?'${block.getText().substring(anchorOffset, focusOffset)}':${i},${anchorOffset}`)
                     );
                 }
             });
