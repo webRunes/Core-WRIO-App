@@ -56,8 +56,6 @@ export default class CommentEnabler extends React.Component {
 
     render() {
 
-
-
         var commentStatus = this._hasCommentID() ?
             <div className="col-sm-12">Widget id is correct and equals to {this.state.commentID}</div> :
             <div className="col-sm-12">
