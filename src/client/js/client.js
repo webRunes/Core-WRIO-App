@@ -1,13 +1,13 @@
 import React from 'react';
 import ReactDom from 'react-dom';
 import {scripts} from './mentions/scripts';
-import {extractMentions} from './mentions/mention';
 import request from 'superagent';
 import {applyMentions} from './mixins/mentions';
 import getHttp from './getHttp';
 import CoreEditor from './CoreEditor';
 import {ContentBlock, CharacterMetadata} from 'draft-js';
 import Immutable from 'immutable';
+import JSONDocument from './JSONDocument.js';
 
 
 var domain = process.env.DOMAIN;
@@ -18,12 +18,6 @@ class Client extends React.Component {
         this.state = {
             startHeader: '<h2>',
             endHeader: '</h2>',
-            cleshe: '<!DOCTYPE html><html lang="en-US"><head><meta charset="utf-8">' +
-                '<meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0">' +
-                '<noscript><meta http-equiv="refresh" content="0; URL=//wrioos.com/no_jscript.htm"></noscript>' +
-                '<meta name="description" content=""><meta name="author" content=""><meta name="keywords" content="">' +
-                '<title>|TITLE|</title><script type="application/ld+json">|BODY|</script>' +
-                '</head><body><script type="text/javascript" src="//wrioos.com/start.js"></script></body></html>',
             wrioID: '',
             saveUrl: '',
             saveDisabled: 0,
@@ -120,9 +114,7 @@ class Client extends React.Component {
     parseArticleCore(cb) {
         var cb = cb || function() {};
 
-        const keyGen = () => {
-            return (new Date()).getTime().toString(32) + Math.random().toString(32);
-        };
+
 
         if (window.location.pathname === "/create") {
             cb({
@@ -133,72 +125,27 @@ class Client extends React.Component {
         }
         getHttp(this.state.editUrl, (article) => {
 
-            setTimeout(window.frameReady,300);
-
-            document.getElementById("loadingInd").style = 'display:none;';
+            setTimeout(window.frameReady, 300);
 
             if (article && article.length !== 0) {
-                article = article.filter((json) => json['@type'] == 'Article')[0];
-                let articleText = '',
-                    contentBlocks = new Array(),
-                    mentions;
 
+                document.getElementById("loadingInd").style = 'display:none;';
 
-                if (article.mentions) {
-                    mentions = extractMentions(article.mentions);
-                } else {
-                    mentions = [];
-                }
+                var doc = new JSONDocument(article);
+                doc.toDraft();
 
-                if (article.comment) {
+                if (doc.comment) {
                     this.setState({
-                        commentID: article.comment
+                        commentID: doc.comment
                     });
                 }
 
-                contentBlocks.push(new ContentBlock([
-                    ['text', article.name],
-                    ['key', keyGen()],
-                    ['characterList', Immutable.List(article.name.split('').map(e => CharacterMetadata.create()))],
-                    ['type', 'header-two']
-                ]));
-                article.articleBody.forEach((paragraph, i) => {
-                    articleText += paragraph;
-                });
-                contentBlocks.push(new ContentBlock([
-                    ['text', articleText],
-                    ['key', keyGen()],
-                    ['characterList', Immutable.List(articleText.split('').map(e => CharacterMetadata.create()))],
-                    ['type', 'unstyled']
-                ]));
-                article.hasPart.forEach((subArticle) => {
-                    articleText = '';
-                    contentBlocks.push(new ContentBlock([
-                        ['text', subArticle.name],
-                        ['key', keyGen()],
-                        ['characterList', Immutable.List(subArticle.name.split('').map(e => CharacterMetadata.create()))],
-                        ['type', 'header-two']
-                    ]));
-                    if (subArticle.articleBody) {
-                        subArticle.articleBody.forEach((paragraph, i) => {
-                            articleText += paragraph;
-                        });
-                    }
-                    if (subArticle.url) {
-                        articleText += subArticle.url;
-                    }
-                    if (articleText !== '') {
-                        contentBlocks.push(new ContentBlock([
-                            ['text', articleText],
-                            ['key', keyGen()],
-                            ['characterList', Immutable.List(articleText.split('').map(e => CharacterMetadata.create()))],
-                            ['type', 'unstyled']
-                        ]));
-                    }
-                });
                 cb({
-                    contentBlocks, mentions
+                    contentBlocks: doc.contentBlocks,
+                    mentions: doc.mentions
                 });
+
+
             } else {
                 console.log("Unable to download source article");
                 cb({
