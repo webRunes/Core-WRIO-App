@@ -164,7 +164,7 @@ export default class JSONDocument {
         return {
             html: cleshe.replace('|BODY|', JSON.stringify(this.json)).replace('|TITLE|', this.json.name),
             json: this.json
-        }
+        };
     }
 
     getArticle (lang, keywords, author, widgetData) {
