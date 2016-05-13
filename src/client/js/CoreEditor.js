@@ -12,9 +12,20 @@ class CoreEditor extends React.Component {
             component: Link
         }]);
 
-        let {
-            contentBlocks, mentions
-        } = props;
+
+        var contentBlocks,mentions;
+
+        var doc = this.props.doc;
+        if (doc) {
+            doc.toDraft();
+            contentBlocks = doc.contentBlocks;
+            mentions = doc.mentions;
+        } else {
+            contentBlocks = [];
+            mentions = [];
+        }
+
+
         let editorState = contentBlocks.length > 0 ? EditorState.createWithContent(ContentState.createFromBlockArray(contentBlocks), decorator) : EditorState.createEmpty(decorator);
 
 
@@ -57,7 +68,8 @@ class CoreEditor extends React.Component {
             saveRelativePath: props.saveRelativePath,
             editUrl: props.editUrl,
             author: props.author,
-            commentID: this.props.commentID
+            commentID: this.props.commentID,
+            doc:doc
         };
         this.focus = () => this.refs.editor.focus();
         this.onChange = (editorState) => {
@@ -228,7 +240,7 @@ class CoreEditor extends React.Component {
 
     _toggleCustomAction(action) {
         // this is the place where to pass arguments to custom actions
-        CustomActions.toggleCustomAction(this.state.editorState, action, this.state.saveRelativePath, this.state.author,this.state.commentID);
+        CustomActions.toggleCustomAction(this.state.editorState, action, this.state.saveRelativePath, this.state.author,this.state.commentID,this.state.doc);
     }
 
     gotCommentID (id) {
@@ -292,8 +304,7 @@ class CoreEditor extends React.Component {
 }
 
 CoreEditor.propTypes = {
-    contentBlocks: React.PropTypes.array,
-    mentions: React.PropTypes.array,
+    doc: React.PropTypes.object,
     saveRelativePath: React.PropTypes.string,
     editUrl: React.PropTypes.string,
     author: React.PropTypes.string,

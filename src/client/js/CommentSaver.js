@@ -1,0 +1,97 @@
+/**
+ * Created by michbil on 10.05.16.
+ */
+
+import JSONDocument from './JSONDocument.js';
+import {saveToS3,getWidgetID} from './webrunesAPI.js';
+import React from 'react';
+import getHttp from './getHttp.js';
+import {extractFileName, parseUrl} from './webrunesAPI.js';
+
+export function urlMatch () {
+    return window.location.search.match(/\?comment_article=([\.0-9a-zA-Z%:\/?]*)/);
+}
+
+
+
+export default class CommentSaver extends React.Component {
+    constructor(props) {
+        super(props);
+        var editUrl = urlMatch();
+        if (editUrl) {
+            editUrl = editUrl[1];
+
+        }
+
+        var editUrlParsed = parseUrl(editUrl);
+        if (editUrlParsed) {
+            var saveUrl = extractFileName(editUrlParsed.pathname);
+        }
+        this.state = {
+            busy: false,
+            url: editUrl,
+            saveUrl: saveUrl,
+            msg: "Downloading page..."
+        };
+    }
+
+    componentDidMount() {
+        document.getElementById("loadingInd").style = 'display:none;';
+    }
+
+    saveComment(url) {
+        this.setState({
+            busy:true
+        });
+        getHttp(url, (article) => {
+
+            setTimeout(window.frameReady, 300);
+
+            if (article && article.length !== 0) {
+
+                this.setState({msg:"Receiving comment id...."});
+                getWidgetID(url).then((id)=>{
+                    var doc = new JSONDocument(article);
+                    doc.setCommentID(id);
+                    var html = doc.toHtml();
+                    this.setState({msg:"Saving page to S3...."});
+                    return saveToS3(this.state.saveUrl,html);
+                })
+                .then((res) => {
+                        this.setState({msg:"Success!",busy:false});
+                }).catch((err) => {
+                    console.log(err);
+                    this.setState({msg:"Oops... something went wrong"});
+                });
+            } else {
+                this.setState({
+                    msg:"Failed to download page"
+                });
+                setTimeout(()=> this.setState({busy:false}),2000);
+
+            }
+        });
+    }
+
+    doSave() {
+        this.saveComment(this.state.url);
+    }
+
+
+    render() {
+
+        var buttonStyle = "btn btn-sm btn-primary" + (this.state.busy?" disabled":"");
+
+        return (<div className="well enable-comment text-left">
+            <h4>Comments disabled</h4>
+
+            <p>Comments haven't been enabled by author</p>
+            <br />
+            <a className={buttonStyle} href="#" role="button" onClick={this.doSave.bind(this)}>
+                <span className="glyphicon glyphicon-comment"></span>
+                {this.state.busy ? <span><img src="https://wrioos.com/Default-WRIO-Theme/img/loading.gif"/>{this.state.msg}</span>:"Enable comments"}
+
+            </a>
+        </div>);
+    }
+}
