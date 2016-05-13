@@ -10,6 +10,7 @@ import Immutable from 'immutable';
 import JSONDocument from './JSONDocument.js';
 import CommentSaver from './CommentSaver.js';
 import {urlMatch as CommentSaverUrlMatch} from './CommentSaver.js';
+import {extractFileName, parseUrl} from './webrunesAPI.js';
 
 var domain = process.env.DOMAIN;
 
@@ -28,22 +29,11 @@ class Client extends React.Component {
             contentBlocks: [],
             mentions: [],
             commentID: "",
-            render: 0
+            render: 0,
+            doc: null
         };
     }
 
-    parseUrl(href) {
-        var match = href.match(/^(https?\:)\/\/(([^:\/?#]*)(?:\:([0-9]+))?)(\/[^?#]*)(\?[^#]*|)(#.*|)$/);
-        return match && {
-            protocol: match[1],
-            host: match[2],
-            hostname: match[3],
-            port: match[4],
-            pathname: match[5],
-            search: match[6],
-            hash: match[7]
-        };
-    }
 
   formatAuthor(id) {
         if (id) {
@@ -54,17 +44,7 @@ class Client extends React.Component {
 
     }
 
-    extractFileName(pathname) {
-        var fileName = pathname.match(/\/[0-9]+\/(.*)/);
-        var out;
-        if (fileName) {
-            out = fileName[1];
-            if (out === "" || !out) {
-                out = "index.html"; // if no file specified, let's assume this is index.htm
-            }
-            return out;
-        }
-    }
+
 
     parseEditingUrl() {
         var editUrl = window.location.search.match(/\?article=([\.0-9a-zA-Z%:\/?]*)/);
@@ -75,11 +55,11 @@ class Client extends React.Component {
                 editUrl: editUrl
             });
 
-            var editUrlParsed = this.parseUrl(editUrl);
+            var editUrlParsed = parseUrl(editUrl);
             console.log("Page edit link received", editUrl);
             if (editUrlParsed) {
                 if (editUrlParsed.host == this.state.STORAGE_DOMAIN) {
-                    this.state.saveRelativePath = this.extractFileName(editUrlParsed.pathname);
+                    this.state.saveRelativePath = extractFileName(editUrlParsed.pathname);
                 }
             }
         }
@@ -102,9 +82,7 @@ class Client extends React.Component {
         }).fail((e) => {
             //this.disableSave();
         }).always(() => {
-            this.parseArticleCore(res => this.setState({
-                contentBlocks: res.contentBlocks,
-                mentions: res.mentions,
+            this.parseArticleCore(wrioID, res => this.setState({
                 wrioID,
                 render: 1
             }));
@@ -112,55 +90,43 @@ class Client extends React.Component {
         });
     }
 
-    parseArticleCore(cb) {
+    parseArticleCore(author,cb) {
         var cb = cb || function() {};
 
-
-
         if (window.location.pathname === "/create") {
-            cb({
-                contentBlocks: [],
-                mentions: []
+
+            var doc = new JSONDocument();
+            doc.createArticle(author, "");
+
+            this.setState({
+                doc: doc
             });
-            return;
+            return cb();
+
         }
         getHttp(this.state.editUrl, (article) => {
 
             setTimeout(window.frameReady, 300);
+            document.getElementById("loadingInd").style = 'display:none;';
 
             if (article && article.length !== 0) {
 
-                document.getElementById("loadingInd").style = 'display:none;';
-
                 var doc = new JSONDocument(article);
-                doc.toDraft();
-
-                if (doc.comment) {
-                    this.setState({
-                        commentID: doc.comment
-                    });
-                }
-
-                cb({
-                    contentBlocks: doc.contentBlocks,
-                    mentions: doc.mentions
+                this.setState({
+                   doc: doc,
+                   commentID: doc.getCommentID()
                 });
-
 
             } else {
                 console.log("Unable to download source article");
-                cb({
-                    contentBlocks: [],
-                    mentions: []
-                });
             }
+            cb();
         });
     }
 
     render() {
         return this.state.render ? (<div className="container" cssStyles={{width: '100%'}}>
-                        <CoreEditor contentBlocks={this.state.contentBlocks}
-                                    mentions={this.state.mentions}
+                        <CoreEditor doc={this.state.doc}
                                     saveRelativePath={this.state.saveRelativePath}
                                     editUrl={this.state.editUrl}
                                     author={this.formatAuthor(this.state.wrioID)}

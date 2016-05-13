@@ -10,13 +10,12 @@ var cleshe = '<!DOCTYPE html><html lang="en-US"><head><meta charset="utf-8">' +
     '<meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0">' +
     '<noscript><meta http-equiv="refresh" content="0; URL=//wrioos.com/no_jscript.html"></noscript>' +
     '<meta name="description" content=""><meta name="author" content=""><meta name="keywords" content="">' +
-    '<title>|TITLE|</title><script type="application/ld+json">|BODY|</script>' +
+    '<title>|TITLE|</title>|BODY|' +
     '</head><body><script type="text/javascript" src="//wrioos.com/start.js"></script></body></html>';
 
 const keyGen = () => {
     return (new Date()).getTime().toString(32) + Math.random().toString(32);
 };
-
 
 
 const getPart = (name) => {
@@ -37,17 +36,74 @@ const getMention = (name, about, link) => {
 };
 
 
-
-export default class JSONDocument {
+class GenericLDJsonDocument {
 
     constructor(article) {
+        this.jsonBlocks = article || [];
+    }
+
+    getElementOfType(type) {
+        var rv;
+        this.jsonBlocks.forEach((element) => {
+            if (element["@type"] === type) {
+                rv = element;
+            }
+        });
+        return rv;
+    }
+
+    makeArticle (lang, keywords, author, widgetData) {
+        return {
+            "@context": "http://schema.org",
+            "@type": "Article",
+            "inLanguage": lang,
+            "keywords": keywords,
+            "author": author,
+            "editor": "",
+            "name": "",
+            "about": "",
+            "articleBody": [],
+            "hasPart": [],
+            "mentions": [],
+            "comment": widgetData
+        };
+    };
+
+    createArticle(author,commentID) {
+        if (this.getElementOfType("Article")) {
+            console.log("Failed to create article, it already exists");
+        } else {
+            var newArt = this.makeArticle("en-US", "", author, commentID);
+            this.jsonBlocks.push(newArt);
+        }
+    }
+
+    getCommentID() {
+        return this.getElementOfType("Article").comment;
+
+    }
+
+    setCommentID (cid) {
+        this.getElementOfType("Article").comment = cid;
+    }
+
+
+
+}
+
+
+export default class JSONDocument extends GenericLDJsonDocument {
+
+    constructor(article) {
+
+        super(article);
 
         this.contentBlocks = new Array();
         this.mentions = [];
         this.comment = '';
-        this.json = article || {};
 
     }
+    
 
 
     _createMetadata(name) {
@@ -82,7 +138,7 @@ export default class JSONDocument {
 
     toDraft() {
 
-        var article = this.json.filter((json) => json['@type'] == 'Article')[0];
+        var article = this.getElementOfType("Article");
 
         if (article.mentions) {
             this.mentions = extractMentions(article.mentions);
@@ -102,8 +158,13 @@ export default class JSONDocument {
             lastBlock = blockMap.last(),
             part;
 
+        let article = this.getElementOfType('Article');
+        article.articleBody = [];
+        article.hasPart = [];
+        article.mentions = [];
 
-        this.json.name = firstBlock.getText();
+
+        article.name = firstBlock.getText();
         let isPart = false;
         blockMap.forEach((e, i) => {
             if (i !== firstBlock.getKey()) {
@@ -111,15 +172,15 @@ export default class JSONDocument {
                     if (e.getType() !== 'header-two') {
                         part.articleBody.push(e.getText());
                         if (i === lastBlock.getKey()) {
-                            this.json.hasPart.push(part);
+                            article.hasPart.push(part);
                         }
                     } else {
-                        this.json.hasPart.push(part);
+                        article.hasPart.push(part);
                         part = getPart(e.getText());
                     }
                 } else {
                     if (e.getType() !== 'header-two') {
-                        this.json.articleBody.push(e.getText());
+                        article.articleBody.push(e.getText());
                     } else {
                         isPart = true;
                         part = getPart(e.getText());
@@ -140,7 +201,7 @@ export default class JSONDocument {
                         url = _url[0],
                         name = _url[1] || '';
 
-                    this.json.mentions.push(
+                    article.mentions.push(
                         getMention(name, "", `${url}?'${block.getText().substring(anchorOffset, focusOffset)}':${i},${anchorOffset}`)
                     );
                 }
@@ -153,37 +214,34 @@ export default class JSONDocument {
     draftToHtml(contentState, author, commentID) {
         return new Promise((resolve, reject) => {
             contentState = contentState || {};
-            this.json = this.getArticle("en-US", "", author, commentID);
+
             this.draftToJson(contentState);
+
+            var article = this.getElementOfType("Article");
+            article.comment = commentID;
 
             resolve({
                     html: this.toHtml(),
-                    json: this.json
+                    json: this.jsonBlocks
                 });
 
         });
     }
 
     toHtml() {
-        return cleshe.replace('|BODY|', JSON.stringify(this.json)).replace('|TITLE|', this.json.name);
+
+        var scrStart = '<script type="application/ld+json">';
+        var scrEnd = '</script>';
+
+        var scripts = "";
+
+        this.jsonBlocks.forEach((item) => {
+            scripts +=  scrStart + JSON.stringify(item) + scrEnd + '\n';
+        });
+
+        return cleshe.replace('|BODY|',scripts).replace('|TITLE|', this.jsonBlocks.name);
     }
 
-    getArticle (lang, keywords, author, widgetData) {
-        return {
-            "@context": "http://schema.org",
-            "@type": "Article",
-            "inLanguage": lang,
-            "keywords": keywords,
-            "author": author,
-            "editor": "",
-            "name": "",
-            "about": "",
-            "articleBody": [],
-            "hasPart": [],
-            "mentions": [],
-            "comment": widgetData
-        };
-    };
 
 
 
