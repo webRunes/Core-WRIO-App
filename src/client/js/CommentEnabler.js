@@ -2,6 +2,7 @@
  * Created by michbil on 29.04.16.
  */
 import React from 'react';
+import {getWidgetID} from './webrunesAPI.js';
 
 var domain = process.env.DOMAIN;
 
@@ -29,25 +30,25 @@ export default class CommentEnabler extends React.Component {
         this.setState({
             busy: true
         });
-        $.ajax({
-            url: "//titter." + domain + "/obtain_widget_id?query=" + this.props.editUrl,
-            type: 'get',
-            xhrFields: {
-                withCredentials: true
-            }
-        }).done((id,ts,jq) => {
+
+        getWidgetID(this.props.editUrl).then((id)=> {
+
             console.log("Get widget id succeded", id);
             this.setState({
                 commentID: id
             });
             this.props.gotCommentID(id);
-        }).fail((e) => {
+            this.setState({
+                busy: false
+            });
+
+        }).catch((e) => {
             console.log("Failed to obtain widget ID");
-        }).always(() => {
             this.setState({
                 busy: false
             });
         });
+
     }
 
     _hasCommentID() {

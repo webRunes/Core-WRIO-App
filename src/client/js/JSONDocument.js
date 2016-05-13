@@ -156,15 +156,16 @@ export default class JSONDocument {
             this.json = this.getArticle("en-US", "", author, commentID);
             this.draftToJson(contentState);
 
-            resolve(this.toHtml());
+            resolve({
+                    html: this.toHtml(),
+                    json: this.json
+                });
+
         });
     }
 
     toHtml() {
-        return {
-            html: cleshe.replace('|BODY|', JSON.stringify(this.json)).replace('|TITLE|', this.json.name),
-            json: this.json
-        };
+        return cleshe.replace('|BODY|', JSON.stringify(this.json)).replace('|TITLE|', this.json.name);
     }
 
     getArticle (lang, keywords, author, widgetData) {

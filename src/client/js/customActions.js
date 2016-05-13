@@ -1,6 +1,6 @@
 import {Entity} from 'draft-js';
 import JSONDocument from './JSONDocument.js';
-
+import {saveToS3} from './webrunesAPI.js';
 var doc = new JSONDocument();
 
 
@@ -27,27 +27,13 @@ const saveAction = (editorState, author, saveRelativePath, commentID) => {
     console.log('save_action');
     doc.draftToHtml(editorState.getCurrentContent(), author,commentID).then(res => {
         let {json, html} = res;
-
-        $.ajax({
-                url: "https://storage." + domain + "/api/save",
-                type: 'post',
-                'dataType': 'json',
-                data: {
-                    'url': saveRelativePath,
-                    'bodyData': html
-                },
-                xhrFields: {
-                    withCredentials: true
-                }
-            })
-            .success((res) => {
-                parent.postMessage(JSON.stringify({
-                    "coreSaved": true
-                }), "*");
-            }).error(err => {
-                console.log(err);
-            });
-
+        return saveToS3(saveRelativePath,html);
+    }).then((res) => {
+        parent.postMessage(JSON.stringify({
+            "coreSaved": true
+        }), "*");
+    }).catch((err)=> {
+        console.log(err);
     });
 };
 

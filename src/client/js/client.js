@@ -8,7 +8,8 @@ import CoreEditor from './CoreEditor';
 import {ContentBlock, CharacterMetadata} from 'draft-js';
 import Immutable from 'immutable';
 import JSONDocument from './JSONDocument.js';
-
+import CommentSaver from './CommentSaver.js';
+import {urlMatch as CommentSaverUrlMatch} from './CommentSaver.js';
 
 var domain = process.env.DOMAIN;
 
@@ -169,7 +170,12 @@ class Client extends React.Component {
     }
 }
 
-ReactDom.render( < Client /> , document.getElementById('clientholder'));
+// TODO switch to full routing there
+if (CommentSaverUrlMatch()) {
+    ReactDom.render( < CommentSaver /> , document.getElementById('clientholder'));
+} else {
+    ReactDom.render( < Client /> , document.getElementById('clientholder'));
+}
 
 
 var oldHeight = 0;
