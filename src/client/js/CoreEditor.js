@@ -304,6 +304,7 @@ class CoreEditor extends React.Component {
 }
 
 CoreEditor.propTypes = {
+    doc: React.PropTypes.object,
     saveRelativePath: React.PropTypes.string,
     editUrl: React.PropTypes.string,
     author: React.PropTypes.string,
