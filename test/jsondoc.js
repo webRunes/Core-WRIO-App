@@ -18,7 +18,7 @@ describe('LS+JSON tests test', () => {
         var json = JSON.parse(file);
         doc = new JSONDocument(json);
     });
-    it("Shoud be able to compile document to draft and decompile back to json", () => {
+    it("Should be able to compile document to draft and decompile back to json", () => {
         doc.toDraft();
 
       /*  let core = <CoreEditor doc={doc} />;

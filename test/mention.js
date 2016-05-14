@@ -14,7 +14,7 @@ describe('mention test', () => {
     before(() => {
 
     });
-    it("Shoud determine correct mention start and order", () => {
+    it("Should determine correct mention start and order", () => {
         var mention = new Mention({
             "@type": "Article",
             "name": "First url title",
