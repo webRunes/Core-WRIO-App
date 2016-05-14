@@ -56,7 +56,7 @@ export function getRegistredUser() {
             resolve(profile.id);
         }).fail((e) => {
            reject(e);
-        })
+        });
     });
 }
 
