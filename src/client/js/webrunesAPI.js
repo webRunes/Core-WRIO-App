@@ -42,6 +42,25 @@ export function getWidgetID(url) {
     });
 };
 
+export function getRegistredUser() {
+    return new Promise((resolve,reject) => {
+        $.ajax({
+            url: "//login." + domain + "/api/get_profile",
+            type: 'get',
+            'dataType': 'json',
+            xhrFields: {
+                withCredentials: true
+            }
+        }).success((profile) => {
+            console.log("Get_profile finish", profile);
+            resolve(profile.id);
+        }).fail((e) => {
+           reject(e);
+        });
+    });
+}
+
+
 export function extractFileName(pathname) {
 
     var fileName = pathname.match(/\/[0-9]+\/(.*)/);

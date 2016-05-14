@@ -4,14 +4,10 @@ import CustomActions from './customActions';
 import CommentEnabler from './CommentEnabler.js';
 
 class CoreEditor extends React.Component {
+
+
     constructor(props) {
         super(props);
-
-        const decorator = new CompositeDecorator([{
-            strategy: findLinkEntities,
-            component: Link
-        }]);
-
 
         var contentBlocks,mentions;
 
@@ -26,9 +22,6 @@ class CoreEditor extends React.Component {
         }
 
 
-        let editorState = contentBlocks.length > 0 ? EditorState.createWithContent(ContentState.createFromBlockArray(contentBlocks), decorator) : EditorState.createEmpty(decorator);
-
-
         this.handleKeyCommand = (command) => this._handleKeyCommand(command);
         this.toggleBlockType = (type) => this._toggleBlockType(type);
         this.toggleInlineStyle = (style) => this._toggleInlineStyle(style);
@@ -40,27 +33,8 @@ class CoreEditor extends React.Component {
             urlValue: e.target.value
         });
 
-        mentions.forEach((mention, i) => {
-            const entityKey = Entity.create('LINK', 'MUTABLE', {
-                url: mention.url,
-                onLinkEdit: this.promptForEdit.bind(this)
-            });
-
-            const key = contentBlocks[mention.block].getKey();
-
-            editorState = RichUtils.toggleLink(
-                editorState,
-                SelectionState.createEmpty(key).merge({
-                    anchorOffset: mention.start,
-                    focusKey: key,
-                    focusOffset: mention.end
-                }),
-                entityKey
-            );
-        });
-
         this.state = {
-            editorState: editorState,
+            editorState: this.getEditorState(contentBlocks,mentions),
             showURLInput: false,
             isEditLink: false,
             linkEntityKey: 0,
@@ -84,6 +58,36 @@ class CoreEditor extends React.Component {
         this.removeLink = this._removeLink.bind(this);
         this.onLinkInputKeyDown = this._onLinkInputKeyDown.bind(this);
     }
+
+    getEditorState(contentBlocks, mentions) {
+
+        const decorator = new CompositeDecorator([{
+            strategy: findLinkEntities,
+            component: Link
+        }]);
+
+        let editorState = contentBlocks.length > 0 ? EditorState.createWithContent(ContentState.createFromBlockArray(contentBlocks), decorator) : EditorState.createEmpty(decorator);
+        mentions.forEach((mention, i) => {
+            const entityKey = Entity.create('LINK', 'MUTABLE', {
+                url: mention.url,
+                onLinkEdit: this.promptForEdit.bind(this)
+            });
+
+            const key = contentBlocks[mention.block].getKey();
+
+            editorState = RichUtils.toggleLink(
+                editorState,
+                SelectionState.createEmpty(key).merge({
+                    anchorOffset: mention.start,
+                    focusKey: key,
+                    focusOffset: mention.end
+                }),
+                entityKey
+            );
+        });
+        return editorState;
+    }
+
 
     _promptForLink() {
         const {

@@ -10,7 +10,7 @@ import Immutable from 'immutable';
 import JSONDocument from './JSONDocument.js';
 import CommentSaver from './CommentSaver.js';
 import {urlMatch as CommentSaverUrlMatch} from './CommentSaver.js';
-import {extractFileName, parseUrl} from './webrunesAPI.js';
+import {extractFileName, parseUrl, getRegistredUser} from './webrunesAPI.js';
 
 var domain = process.env.DOMAIN;
 
@@ -70,22 +70,13 @@ class Client extends React.Component {
 
     componentWillMount() {
         this.parseEditingUrl();
-        let wrioID = '';
-        $.ajax({
-            url: "//login." + domain + "/api/get_profile",
-            type: 'get',
-            'dataType': 'json',
-            data: {}
-        }).success((profile) => {
-            console.log("Get_profile finish", profile);
-            wrioID = profile.id;
-        }).fail((e) => {
-            //this.disableSave();
-        }).always(() => {
+
+        getRegistredUser().then((wrioID)=>{
             this.parseArticleCore(wrioID, res => this.setState({
                 wrioID,
                 render: 1
             }));
+        }).catch((e)=>{
 
         });
     }
