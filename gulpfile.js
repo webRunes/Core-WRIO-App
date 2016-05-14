@@ -29,7 +29,8 @@ gulp.task('test', function() {
             reporter: 'dot',
             timeout: 20000
         }))
-        .once('error', function () {
+        .once('error', function (e) {
+            console.log(e);
             process.exit(1);
         })
         .once('end', function () {
