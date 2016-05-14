@@ -4,10 +4,16 @@ import should from 'should';
 import {Mention,merge} from '../src/client/js/mentions/mention.js';
 
 
-describe('mention test', () => {
-   before(() => {
+var stdout_write = process.stdout._write,
+    stderr_write = process.stderr._write;
 
-   });
+process.stdout._write = stdout_write;
+process.stderr._write = stderr_write;
+
+describe('mention test', () => {
+    before(() => {
+
+    });
     it("Shoud determine correct mention start and order", () => {
         var mention = new Mention({
             "@type": "Article",

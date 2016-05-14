@@ -12,8 +12,6 @@ export function urlMatch () {
     return window.location.search.match(/\?comment_article=([\.0-9a-zA-Z%:\/?]*)/);
 }
 
-
-
 export default class CommentSaver extends React.Component {
     constructor(props) {
         super(props);
@@ -37,6 +35,7 @@ export default class CommentSaver extends React.Component {
 
     componentDidMount() {
         document.getElementById("loadingInd").style = 'display:none;';
+
     }
 
     saveComment(url) {
