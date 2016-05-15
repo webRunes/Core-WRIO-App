@@ -10,7 +10,7 @@ import Immutable from 'immutable';
 import JSONDocument from './JSONDocument.js';
 import CommentSaver from './CommentSaver.js';
 import {urlMatch as CommentSaverUrlMatch} from './CommentSaver.js';
-import {extractFileName, parseUrl, getRegistredUser} from './webrunesAPI.js';
+import {extractFileName, parseUrl, getRegistredUser,appendIndex} from './webrunesAPI.js';
 
 var domain = process.env.DOMAIN;
 
@@ -50,7 +50,7 @@ class Client extends React.Component {
         var editUrl = window.location.search.match(/\?article=([\.0-9a-zA-Z%:\/?]*)/);
         if (editUrl) {
 
-            editUrl = editUrl[1];
+            editUrl = appendIndex(editUrl[1]);
             this.setState({
                 editUrl: editUrl
             });
