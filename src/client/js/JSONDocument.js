@@ -239,7 +239,7 @@ export default class JSONDocument extends GenericLDJsonDocument {
             scripts +=  scrStart + JSON.stringify(item) + scrEnd + '\n';
         });
 
-        return cleshe.replace('|BODY|',scripts).replace('|TITLE|', this.jsonBlocks.name);
+        return cleshe.replace('|BODY|',scripts).replace('|TITLE|', this.getElementOfType('Article').name);
     }
 
 

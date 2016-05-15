@@ -86,3 +86,13 @@ export function parseUrl(href) {
             hash: match[7]
         };
 }
+
+export function appendIndex(url) {
+    var parsedUrl = parseUrl(url);
+    var posturl = parsedUrl.pathname;
+    var filename = posturl.substring(posturl.lastIndexOf('/')+1);
+    if (filename == "") {
+        return url + "index.html";
+    }
+    return url;
+}
