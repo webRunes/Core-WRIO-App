@@ -6,19 +6,21 @@ import JSONDocument from './JSONDocument.js';
 import {saveToS3,getWidgetID} from './webrunesAPI.js';
 import React from 'react';
 import getHttp from './getHttp.js';
-import {extractFileName, parseUrl} from './webrunesAPI.js';
+import {extractFileName, parseUrl,appendIndex} from './webrunesAPI.js';
 
 export function urlMatch () {
     return window.location.search.match(/\?comment_article=([\.0-9a-zA-Z%:\/?]*)/);
 }
+
+
 
 export default class CommentSaver extends React.Component {
     constructor(props) {
         super(props);
         var editUrl = urlMatch();
         if (editUrl) {
-            editUrl = editUrl[1];
-
+            editUrl = appndIndex(editUrl[1]);
+            console.log(editUrl);
         }
 
         var editUrlParsed = parseUrl(editUrl);
