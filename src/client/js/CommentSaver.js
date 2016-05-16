@@ -19,7 +19,7 @@ export default class CommentSaver extends React.Component {
         super(props);
         var editUrl = urlMatch();
         if (editUrl) {
-            editUrl = appndIndex(editUrl[1]);
+            editUrl = appendIndex(editUrl[1]);
             console.log(editUrl);
         }
 
