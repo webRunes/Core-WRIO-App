@@ -105,7 +105,7 @@ gulp.task('views', function() {
     gulp.src('src/client/views/**/*.*')
         .pipe(gulp.dest('app/client/views'));
 
-    gulp.src('hub/index.htm')
+    gulp.src('hub/index.html')
         .pipe(gulp.dest('app/hub'));
 });
 

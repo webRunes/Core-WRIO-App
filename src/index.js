@@ -54,17 +54,17 @@ var server_setup = (db) => {
     }));
     app.get('/', (request, response) => {
         response.sendFile(__dirname +
-            '/hub/index.htm');
+            '/hub/index.html');
     });
 
     app.get('/create', (request, response) => {
         response.sendFile(__dirname +
-            '/client/views/core.htm');
+            '/client/views/core.html');
     });
 
     app.get('/edit', (request, response) => {
         response.sendFile(__dirname +
-            '/client/views/core.htm');
+            '/client/views/core.html');
     });
 
 };
