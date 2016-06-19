@@ -280,7 +280,7 @@ window.frameReady = () => {
 
  var i = !blocks[0] ? 1 : 0;
  var j = i;
- var article = this.getArticle("en-US", "", this.formatAuthor(this.state.wrioID), widgetData);
+ var article = this.getArticle("En", "", this.formatAuthor(this.state.wrioID), widgetData);
  var num = 1;
  for (; i < blocks.length; i++) {
  if (i == j) {
@@ -291,7 +291,7 @@ window.frameReady = () => {
 
  var i = !blocks[0] ? 1 : 0;
  var j = i;
- var article = this.getArticle("en-US", "", "", widgetData);
+ var article = this.getArticle("En", "", "", widgetData);
  var num = 1;
  for (; i < blocks.length; i++) {
  if (i == j) {
