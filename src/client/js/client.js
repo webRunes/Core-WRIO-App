@@ -455,7 +455,7 @@ window.frameReady = () => {
  var ieEDGE = navigator.userAgent.match(/Edge/g);
  var ieVer = (ie ? parseInt(ie[1]) : (ie11 ? 11 : -1));
 
- var fileName = (json.name === '' ? 'untitled' : json.name.split(' ').join('_')) + '.htm';
+ var fileName = (json.name === '' ? 'untitled' : json.name.split(' ').join('_')) + '.html';
  if (ie || ie11 || ieEDGE) {
  if (ieVer > 9 || ieEDGE) {
  var textFileAsBlob = new Blob([textToWrite], {
