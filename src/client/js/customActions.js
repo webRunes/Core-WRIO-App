@@ -42,7 +42,7 @@ const saveAsAction = (editorState, author,commentID,doc) => {
     doc.draftToHtml(editorState.getCurrentContent(), author, commentID).then(res => {
         let json = doc.getElementOfType('Article');
         let html = res.html;
-        let fileName = (json.name === '' ? 'untitled' : json.name.split(' ').join('_')) + '.htm';
+        let fileName = (json.name === '' ? 'untitled' : json.name.split(' ').join('_')) + '.html';
         saveAs(fileName,html);
 
     });
