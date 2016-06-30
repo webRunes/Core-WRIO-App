@@ -19,7 +19,7 @@ describe('mention test', () => {
             "@type": "Article",
             "name": "First url title",
             "about": "Text inside the ticket popup.",
-            "url": "https://webrunes.com/blog.htm?'dolor sit amet':3,104"
+            "url": "https://webrunes.com/blog/?'dolor sit amet':3,104"
         })
         mention.start.should.be.equal(104);
         mention.block.should.be.equal(3);

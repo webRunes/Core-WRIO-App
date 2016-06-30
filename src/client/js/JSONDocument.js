@@ -6,12 +6,12 @@ import {extractMentions} from './mentions/mention';
 import Immutable from 'immutable';
 import {ContentBlock, CharacterMetadata, Entity} from 'draft-js';
 
-var cleshe = '<!DOCTYPE html><html lang="en-US"><head><meta charset="utf-8">' +
+var cleshe = '<!DOCTYPE html><html><head><meta charset="utf-8">' +
     '<meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0">' +
-    '<noscript><meta http-equiv="refresh" content="0; URL=//wrioos.com/no_jscript.html"></noscript>' +
+    '<noscript><meta http-equiv="refresh" content="0; URL=https://wrioos.com/no_jscript.html"></noscript>' +
     '<meta name="description" content=""><meta name="author" content=""><meta name="keywords" content="">' +
     '<title>|TITLE|</title>|BODY|' +
-    '</head><body><script type="text/javascript" src="//wrioos.com/start.js"></script></body></html>';
+    '</head><body><script type="text/javascript" src="https://wrioos.com/start.js"></script></body></html>';
 
 const keyGen = () => {
     return (new Date()).getTime().toString(32) + Math.random().toString(32);
@@ -73,7 +73,7 @@ class GenericLDJsonDocument {
         if (this.getElementOfType("Article")) {
             console.log("Failed to create article, it already exists");
         } else {
-            var newArt = this.makeArticle("en-US", "", author, commentID);
+            var newArt = this.makeArticle("En", "", author, commentID);
             this.jsonBlocks.push(newArt);
         }
     }
