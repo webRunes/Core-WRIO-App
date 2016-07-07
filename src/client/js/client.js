@@ -92,8 +92,6 @@ class Client extends React.Component {
             this.setState({
                 doc: doc
             });
-            setTimeout(window.frameReady, 300);
-            document.getElementById("loadingInd").style = 'display:none;';
             return cb();
 
         }
@@ -117,7 +115,6 @@ class Client extends React.Component {
         });
     }
 
-    componentDid
 
     render() {
         return this.state.render ? (<div cssStyles={{width: '100%'}}>
