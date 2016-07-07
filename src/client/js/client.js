@@ -115,7 +115,6 @@ class Client extends React.Component {
         });
     }
 
-
     render() {
         return this.state.render ? (<div cssStyles={{width: '100%'}}>
                         <CoreEditor doc={this.state.doc}
