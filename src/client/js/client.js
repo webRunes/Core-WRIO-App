@@ -120,7 +120,7 @@ class Client extends React.Component {
     componentDid
 
     render() {
-        return this.state.render ? (<div className="container" cssStyles={{width: '100%'}}>
+        return this.state.render ? (<div cssStyles={{width: '100%'}}>
                         <CoreEditor doc={this.state.doc}
                                     saveRelativePath={this.state.saveRelativePath}
                                     editUrl={this.state.editUrl}
