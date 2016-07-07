@@ -52,10 +52,7 @@ var server_setup = (db) => {
         },
         key: 'sid'
     }));
-    app.get('/', (request, response) => {
-        response.sendFile(__dirname +
-            '/hub/index.html');
-    });
+    app.use('/', express.static(path.join(__dirname, '/hub')));
 
     app.get('/create', (request, response) => {
         response.sendFile(__dirname +
