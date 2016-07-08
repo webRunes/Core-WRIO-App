@@ -1,5 +1,5 @@
 import React from 'react';
-import {CompositeDecorator, ContentState, SelectionState, Editor, EditorState, Entity, RichUtils, CharacterMetadata} from 'draft-js';
+import {CompositeDecorator, ContentState, SelectionState, Editor, EditorState, Entity, RichUtils, CharacterMetadata, getDefaultKeyBinding} from 'draft-js';
 import CustomActions from './customActions';
 import CommentEnabler from './CommentEnabler.js';
 
@@ -257,6 +257,13 @@ class CoreEditor extends React.Component {
         window.frameReady();
     }
 
+    myKeyBindingFn(e) {
+      if (e.keyCode === 13) {
+        window.frameReady();
+      }
+      return getDefaultKeyBinding(e);
+    }
+
     render() {
         const {
             editorState
@@ -298,6 +305,7 @@ class CoreEditor extends React.Component {
                       placeholder="Enter text..."
                       ref="editor"
                       spellCheck={true}
+                      keyBindingFn={this.myKeyBindingFn}
                     />
                   </div>
                 </div>
@@ -446,7 +454,7 @@ const BlockStyleControls = (props) => {
 
     return (
         <div className="RichEditor-controls">
-            {BLOCK_TYPES.map((type) => {           
+            {BLOCK_TYPES.map((type) => {
                 if (type.style === 'link') {
                     return (<StyleButton
                         key={type.label}
