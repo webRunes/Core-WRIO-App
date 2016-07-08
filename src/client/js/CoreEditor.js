@@ -213,7 +213,6 @@ class CoreEditor extends React.Component {
     }
 
     _handleKeyCommand(command) {
-        console.log('cnsncksufha');
         const {
             editorState
         } = this.state;
