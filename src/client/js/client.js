@@ -138,8 +138,8 @@ if (CommentSaverUrlMatch()) {
 var oldHeight = 0;
 window.frameReady = () => {
 
-    var $body = $('.container');
-    var heightInit = $body.height()+30;
+    var $body = $('.RichEditor-root');
+    var heightInit = $body.height();
 
     if (heightInit == oldHeight) return;
     oldHeight = heightInit;
@@ -149,4 +149,3 @@ window.frameReady = () => {
         "coreHeight": heightInit
     }), "*");
 };
-
