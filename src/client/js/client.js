@@ -98,7 +98,6 @@ class Client extends React.Component {
         getHttp(this.state.editUrl, (article) => {
 
             setTimeout(window.frameReady, 300);
-            document.getElementById("loadingInd").style = 'display:none;';
 
             if (article && article.length !== 0) {
 
