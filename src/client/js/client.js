@@ -138,7 +138,7 @@ var oldHeight = 0;
 window.frameReady = () => {
 
     var $body = $('#clientholder');
-    var heightInit = $body.height()+50;
+    var heightInit = $body.height()+10;
 
     if (heightInit == oldHeight) return;
     oldHeight = heightInit;
