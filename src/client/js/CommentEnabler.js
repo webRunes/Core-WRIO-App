@@ -66,6 +66,8 @@ export default class CommentEnabler extends React.Component {
             </button>
         </div> ;
 
+        var clearfix = {"clear":"both"};
+
         return (
             <div className="text-left">
                 <div className="checkbox col-sm-2">
@@ -82,6 +84,7 @@ export default class CommentEnabler extends React.Component {
                     <div className="col-sm-12">
                         <img src="https://wrioos.com/Default-WRIO-Theme/img/loading.gif"/>Obtaining widget id....
                     </div> : ""}
+                <div style={clearfix}></div>
             </div>);
     }
 
