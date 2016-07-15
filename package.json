@@ -12,6 +12,7 @@
     "draft-js": "^0.5.0",
     "ejs": "^1.0.0",
     "envify": "^3.4.0",
+    "es6-shim": "^0.35.1",
     "express": "^4.10.1",
     "express-session": "1.12.1",
     "gulp": "^3.9.0",
