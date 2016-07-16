@@ -1,20 +1,16 @@
 import sortBy from 'lodash.sortby';
 
-export class Mention {
-
+class Mention {
     constructor(mention) {
         let {name, url} = mention,
             cutUrl = url.split('\''),
             positions = cutUrl[2].replace(':', '').split(',');
         this.linkWord = cutUrl[1];
-        this.url = cutUrl[0] + name.replace(/\s/g, '-');
+        this.url = `${cutUrl[0]}${name.replace(/\s/g, '-')}`;
         this.block = Number(positions[0]);
         this.start = Number(positions[1]);
         this.end = this.start + this.linkWord.length;
     }
-
-
-
 /*    warn(text) {
         text = text || 'Wrong mention: ' + this.url;
     }
@@ -36,17 +32,18 @@ export class Mention {
         this.warn();
         return null;
     }
-*/}
-
-export function merge(mentions) {
-    return sortBy(mentions, (m) => {
-        var mention = new Mention(m);
-        return mention.order;
-    });
+*/
 }
 
-export const extractMentions = (mentions) => {
-    return mentions.map(mention => {
-        return new Mention(mention);
-    });
-};
+const merge = (mentions)=>
+    sortBy(mentions, (m)=>
+        (new Mention(m)).order
+    );
+
+
+const extractMentions = (mentions) =>
+    mentions.map(mention => 
+        new Mention(mention)
+    );
+
+export {merge, extractMentions, Mention};

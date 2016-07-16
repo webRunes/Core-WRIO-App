@@ -44,33 +44,30 @@ export default class CommentSaver extends React.Component {
         this.setState({
             busy:true
         });
-        getHttp(url, (article) => {
-
+        getHttp(url).then((article) => {
             setTimeout(window.frameReady, 300);
-
-            if (article && article.length !== 0) {
-
-                this.setState({msg:"Receiving comment id...."});
-                getWidgetID(url).then((id)=>{
-                    var doc = new JSONDocument(article);
-                    doc.setCommentID(id);
-                    var html = doc.toHtml();
-                    this.setState({msg:"Saving page to S3...."});
-                    return saveToS3(this.state.saveUrl,html);
-                })
-                .then((res) => {
-                        this.setState({msg:"Success!",busy:false});
-                }).catch((err) => {
-                    console.log(err);
-                    this.setState({msg:"Oops... something went wrong"});
-                });
-            } else {
+            this.setState({
+                msg:"Receiving comment id...."
+            });
+            getWidgetID(url).then((id)=> {
+                var doc = new JSONDocument(article);
+                doc.setCommentID(id);
+                var html = doc.toHtml();
                 this.setState({
-                    msg:"Failed to download page"
+                    msg:"Saving page to S3...."
                 });
-                setTimeout(()=> this.setState({busy:false}),2000);
-
-            }
+                return saveToS3(this.state.saveUrl,html);
+            }).then((res) => {
+                    this.setState({msg:"Success!",busy:false});
+            }).catch((err) => {
+                console.log(err);
+                this.setState({msg:"Oops... something went wrong"});
+            });
+        }).catch(error=> {
+            this.setState({
+                msg:"Failed to download page"
+            });
+            setTimeout(()=> this.setState({busy:false}),2000);
         });
     }
 
