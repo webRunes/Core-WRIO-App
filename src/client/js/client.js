@@ -106,14 +106,12 @@ ReactDom.render( CommentSaverUrlMatch() ? <CommentSaver /> : <Client /> , docume
 
 var oldHeight = 0;
 window.frameReady = () => {
-    var $body = $('#clientholder');
-    var heightInit = $body.height()+10;
-    if (heightInit == oldHeight) {
-        return;
+    let height = document.querySelector('#clientholder').clientHeight + 10;
+    if (height != oldHeight) {
+        oldHeight = height;
+        console.log("Height ready");
+        parent.postMessage(JSON.stringify({
+            "coreHeight": height
+        }), "*");
     }
-    oldHeight = heightInit;
-    console.log("Height ready");
-    parent.postMessage(JSON.stringify({
-        "coreHeight": heightInit
-    }), "*");
 };

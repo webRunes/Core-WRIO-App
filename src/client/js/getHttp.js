@@ -92,11 +92,7 @@ let getDifferentProtocol = (url)=>
                 (err, result = [])=> {
                     if (!err && (typeof result === 'object')) {
                         result = getScript(result);
-                        if(result instanceof Array && result.length == 0) {
-                            resolve(result);
-                        } else {
-                            reject('empty');
-                        }
+                        resolve(result);
                     } else {
                         tryCors(url).then(resolve).catch(reject);
                     }
