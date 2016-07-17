@@ -291,10 +291,6 @@ class CoreEditor extends React.Component {
                     editorState={editorState}
                     onToggle={this.toggleInlineStyle}
                   />
-                  <CustomActionControls
-                    editorState={editorState}
-                    onToggle={this.toggleCustomAction}
-                  />
                   {this.state.showURLInput ? <LinkUrlControls isEditLink={this.state.isEditLink}  urlValue={this.state.urlValue} onCancelLink={this.cancelLink} onRemoveLink={this.removeLink} onEditLink={this.editLink} onConfirmLink={this.confirmLink} onLinkInputKeyDown={this.onLinkInputKeyDown} onURLChange={this.onURLChange}  /> : !!0}
                   <div className={className} onClick={this.focus}>
                     <Editor
@@ -310,6 +306,12 @@ class CoreEditor extends React.Component {
                   </div>
                 </div>
                 <CommentEnabler commentID={this.state.commentID} author={this.props.author} editUrl={this.state.editUrl} gotCommentID={this.gotCommentID.bind(this)}/>
+                <button type="button" className="btn btn-default btn-sm" onClick={() => this._toggleCustomAction('saveas')}>
+                    Save
+                </button>
+                <button type="button" className="btn btn-default btn-sm" onClick={() => this._toggleCustomAction('save')}>
+                    Save as
+                </button>
             </div>
         );
     }
