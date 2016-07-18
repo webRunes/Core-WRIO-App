@@ -1,7 +1,6 @@
 import 'es6-shim';
-import React from 'react';
+import React, {Component} from 'react';
 import ReactDom from 'react-dom';
-import {scripts} from './mentions/scripts';
 import request from 'superagent';
 import {applyMentions} from './mixins/mentions';
 import getHttp from './getHttp';
@@ -15,7 +14,7 @@ import {extractFileName, parseUrl, getRegistredUser,appendIndex} from './webrune
 
 var domain = process.env.DOMAIN;
 
-class Client extends React.Component {
+class Client extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -33,119 +32,86 @@ class Client extends React.Component {
             render: 0,
             doc: null
         };
+        this.parseEditingUrl = this.parseEditingUrl.bind(this);
+        this.parseArticleCore = this.parseArticleCore.bind(this);
     }
-
-
-  formatAuthor(id) {
-        if (id) {
-            return "https://wr.io/" + id + '/?wr.io=' + id;
-        } else {
-            return "unknown";
-        }
-
+    formatAuthor(id) {
+        return id ? `https://wr.io/${id}/?wr.io=${id}` : 'unknown';
     }
-
-
-
     parseEditingUrl() {
-        var editUrl = window.location.search.match(/\?article=([\.0-9a-zA-Z%:\/?]*)/);
+        let editUrl = window.location.search.match(/\?article=([\.0-9a-zA-Z%:\/?]*)/);
         if (editUrl) {
-
             editUrl = appendIndex(editUrl[1]);
             this.setState({
                 editUrl: editUrl
             });
-
-            var editUrlParsed = parseUrl(editUrl);
+            let editUrlParsed = parseUrl(editUrl);
             console.log("Page edit link received", editUrl);
-            if (editUrlParsed) {
-                if (editUrlParsed.host == this.state.STORAGE_DOMAIN) {
-                    this.state.saveRelativePath = extractFileName(editUrlParsed.pathname);
-                }
+            if (editUrlParsed && editUrlParsed.host == this.state.STORAGE_DOMAIN) {
+                this.state.saveRelativePath = extractFileName(editUrlParsed.pathname);
             }
         }
-        //this.disableSave();
     }
-
-
-
     componentWillMount() {
         this.parseEditingUrl();
-
-        getRegistredUser().then((wrioID)=>{
-            this.parseArticleCore(wrioID, res => this.setState({
+        let wrioID = null;
+        getRegistredUser().then((data)=> 
+            this.parseArticleCore(wrioID = data)
+        ).then((res)=> 
+            this.setState({
                 wrioID,
                 render: 1
-            }));
-        }).catch((e)=>{
-
-        });
+            })
+        ).catch((e)=> console.error(e.stack));
     }
-
-    parseArticleCore(author,cb) {
-        var cb = cb || function() {};
-
-        if (window.location.pathname === "/create") {
-
-            var doc = new JSONDocument();
-            doc.createArticle(author, "");
-
-            this.setState({
-                doc: doc
-            });
-            return cb();
-
-        }
-        getHttp(this.state.editUrl, (article) => {
-
-            setTimeout(window.frameReady, 300);
-
-            if (article && article.length !== 0) {
-
-                var doc = new JSONDocument(article);
+    parseArticleCore(author) {
+        return new Promise((resolve, reject)=> {
+            if (window.location.pathname === "/create") {
+                var doc = new JSONDocument();
+                doc.createArticle(author, "");
                 this.setState({
-                   doc: doc,
-                   commentID: doc.getCommentID()
+                    doc: doc
                 });
-
+                resolve();
             } else {
-                console.log("Unable to download source article");
+                getHttp(this.state.editUrl).then((article) => {
+                    setTimeout(window.frameReady, 300);
+                    var doc = new JSONDocument(article);
+                    this.setState({
+                       doc: doc,
+                       commentID: doc.getCommentID()
+                    });
+                    resolve();
+                }).catch(error=> {
+                    console.log("Unable to download source article");
+                });
             }
-            cb();
         });
     }
-
     render() {
-        return this.state.render ? (<div cssStyles={{width: '100%'}}>
-                        <CoreEditor doc={this.state.doc}
-                                    saveRelativePath={this.state.saveRelativePath}
-                                    editUrl={this.state.editUrl}
-                                    author={this.formatAuthor(this.state.wrioID)}
-                                    commentID={this.state.commentID}
-                            />
-                    </div>) : null;
+        return !this.state.render ? null : (
+            <div cssStyles={{width: '100%'}}>
+                <CoreEditor doc={this.state.doc}
+                            saveRelativePath={this.state.saveRelativePath}
+                            editUrl={this.state.editUrl}
+                            author={this.formatAuthor(this.state.wrioID)}
+                            commentID={this.state.commentID} />
+            </div>
+        );
     }
 }
-
 
 // TODO switch to full routing there
-if (CommentSaverUrlMatch()) {
-    ReactDom.render( < CommentSaver /> , document.getElementById('clientholder'));
-} else {
-    ReactDom.render( < Client /> , document.getElementById('clientholder'));
-}
+ReactDom.render( CommentSaverUrlMatch() ? <CommentSaver /> : <Client /> , document.getElementById('clientholder'));
 
 var oldHeight = 0;
 window.frameReady = () => {
-
-    var $body = $('#clientholder');
-    var heightInit = $body.height()+10;
-
-    if (heightInit == oldHeight) return;
-    oldHeight = heightInit;
-    console.log("Height ready");
-
-    parent.postMessage(JSON.stringify({
-        "coreHeight": heightInit
-    }), "*");
+    let height = document.querySelector('#clientholder').clientHeight + 10;
+    if (height != oldHeight) {
+        oldHeight = height;
+        console.log("Height ready");
+        parent.postMessage(JSON.stringify({
+            "coreHeight": height
+        }), "*");
+    }
 };

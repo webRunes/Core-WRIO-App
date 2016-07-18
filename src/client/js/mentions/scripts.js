@@ -1,7 +1,7 @@
 import {check} from './mentions';
 
-export function scripts(scripts) {
-    var i,
+let scripts = (scripts)=> {
+    let i,
         json,
         data = [];
     for (i = 0; i < scripts.length; i += 1) {
@@ -23,3 +23,5 @@ export function scripts(scripts) {
     });
 */    return data;
 };
+
+export {scripts};

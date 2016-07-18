@@ -2,25 +2,22 @@
  * Created by michbil on 10.05.16.
  */
 
+import request from 'superagent';
 var domain = process.env.DOMAIN;
 
 export function saveToS3(path,html) {
     return new Promise((resolve,reject) => {
-        $.ajax({
-            url: "//storage." + domain + "/api/save",
-            type: 'post',
-            'dataType': 'json',
-            data: {
+        request
+            .post(`//storage.${domain}/api/save`)
+            .withCredentials()
+            .set('Accept', 'application/json')
+            .send({
                 'url': path,
                 'bodyData': html
-            },
-            xhrFields: {
-                withCredentials: true
-            }
-        })
-            .success((res) => {
-                resolve(res);
-            }).error(err => {
+            })
+            .then(({body})=> {
+                resolve(body);
+            }, (err)=> {
                 reject(err);
             });
     });
@@ -28,41 +25,32 @@ export function saveToS3(path,html) {
 
 export function getWidgetID(url) {
     return new Promise((resolve,reject) => {
-        $.ajax({
-            url: "//titter." + domain + "/obtain_widget_id?query=" + url,
-            type: 'get',
-            xhrFields: {
-                withCredentials: true
-            }
-        }).done((id, ts, jq) => {
-            resolve(id);
-        }).fail((e) => {
-           reject(e);
-        });
+        request
+            .get(`//titter.${domain}/obtain_widget_id?query=${url}`)
+            .withCredentials()
+            .then(({body})=> {
+                resolve(body);
+            }, (err)=> {
+                reject(err);
+            });
     });
 };
 
 export function getRegistredUser() {
     return new Promise((resolve,reject) => {
-        $.ajax({
-            url: "//login." + domain + "/api/get_profile",
-            type: 'get',
-            'dataType': 'json',
-            xhrFields: {
-                withCredentials: true
-            }
-        }).success((profile) => {
-            console.log("Get_profile finish", profile);
-            resolve(profile.id);
-        }).fail((e) => {
-           reject(e);
-        });
+        request
+            .get(`//login.${domain}/api/get_profile`)
+            .withCredentials()
+            .then(({body})=> {
+                console.log("Get_profile finish", body);
+                resolve(body.id);
+            }, (err)=> {
+                reject(err);
+            });
     });
 }
 
-
 export function extractFileName(pathname) {
-
     var fileName = pathname.match(/\/[0-9]+\/(.*)/);
     var out;
     if (fileName) {
