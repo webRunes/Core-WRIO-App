@@ -13,35 +13,28 @@ var cleshe = '<!DOCTYPE html><html><head><meta charset="utf-8">' +
     '<title>|TITLE|</title>|BODY|' +
     '</head><body><script type="text/javascript" src="https://wrioos.com/start.js"></script></body></html>';
 
-const keyGen = () => {
-    return (new Date()).getTime().toString(32) + Math.random().toString(32);
-};
+const keyGen = () => 
+    (new Date()).getTime().toString(32) + Math.random().toString(32);
 
 
-const getPart = (name) => {
-    return {
+const getPart = (name) => ({
         "@type": "Article",
         "name": name,
         "articleBody": []
-    };
-};
+    });
 
-const getMention = (name, about, link) => {
-    return {
+const getMention = (name, about, link) => ({
         "@type": "Article",
         "name": name,
         "about": about,
         "link": link
-    };
-};
+    });
 
 
 class GenericLDJsonDocument {
-
-    constructor(article) {
-        this.jsonBlocks = article || [];
+    constructor(article = []) {
+        this.jsonBlocks = article;
     }
-
     getElementOfType(type) {
         var rv;
         this.jsonBlocks.forEach((element) => {
@@ -51,8 +44,7 @@ class GenericLDJsonDocument {
         });
         return rv;
     }
-
-    makeArticle (lang, keywords, author, widgetData) {
+    makeArticle(lang, keywords, author, widgetData) {
         return {
             "@context": "http://schema.org",
             "@type": "Article",
@@ -68,50 +60,34 @@ class GenericLDJsonDocument {
             "comment": widgetData
         };
     };
-
     createArticle(author,commentID) {
         if (this.getElementOfType("Article")) {
             console.log("Failed to create article, it already exists");
         } else {
-            var newArt = this.makeArticle("En", "", author, commentID);
-            this.jsonBlocks.push(newArt);
+            this.jsonBlocks.push(this.makeArticle("En", "", author, commentID));
         }
     }
-
     getCommentID() {
         return this.getElementOfType("Article").comment;
-
     }
-
-    setCommentID (cid) {
+    setCommentID(cid) {
         this.getElementOfType("Article").comment = cid;
     }
-
-
-
 }
 
 
 export default class JSONDocument extends GenericLDJsonDocument {
-
     constructor(article) {
-
         super(article);
-
-        this.contentBlocks = new Array();
+        this.contentBlocks = [];
         this.mentions = [];
         this.comment = '';
-
     }
-    
-
-
     _createMetadata(name) {
         return Immutable.List(name.split('').map(e => CharacterMetadata.create()));
     }
-
     _parseSubArticle(subArticle, processUrl) {
-        var articleText = '';
+        let articleText = '';
         this.contentBlocks.push(new ContentBlock([
             ['text', subArticle.name],
             ['key', keyGen()],
@@ -135,35 +111,22 @@ export default class JSONDocument extends GenericLDJsonDocument {
             ]));
         }
     }
-
     toDraft() {
-
         var article = this.getElementOfType("Article");
-
-        if (article.mentions) {
-            this.mentions = extractMentions(article.mentions);
-        } else {
-            this.mentions = [];
-        }
-
+        this.mentions = article.mentions ? extractMentions(article.mentions) : [];
         this.comment = article.comment;
-
         this._parseSubArticle(article,false);
         article.hasPart.forEach(subarticle => this._parseSubArticle(subarticle, true));
     }
-
     draftToJson(contentState) {
         let blockMap = contentState.getBlockMap(),
             firstBlock = blockMap.first(),
             lastBlock = blockMap.last(),
             part;
-
         let article = this.getElementOfType('Article');
         article.articleBody = [];
         article.hasPart = [];
         article.mentions = [];
-
-
         article.name = firstBlock.getText();
         let isPart = false;
         blockMap.forEach((e, i) => {
@@ -188,7 +151,6 @@ export default class JSONDocument extends GenericLDJsonDocument {
                 }
             }
         });
-
         blockMap.toArray().forEach((block, i) => {
             let entity;
             block.findEntityRanges(char => {
@@ -200,49 +162,32 @@ export default class JSONDocument extends GenericLDJsonDocument {
                     let _url = entity.getData().url.split('?'),
                         url = _url[0],
                         name = _url[1] || '';
-
                     article.mentions.push(
                         getMention(name, "", `${url}?'${block.getText().substring(anchorOffset, focusOffset)}':${i},${anchorOffset}`)
                     );
                 }
             });
         });
-
     }
-
-
     draftToHtml(contentState, author, commentID) {
         return new Promise((resolve, reject) => {
             contentState = contentState || {};
-
             this.draftToJson(contentState);
-
             var article = this.getElementOfType("Article");
             article.comment = commentID;
-
             resolve({
                     html: this.toHtml(),
                     json: this.jsonBlocks
                 });
-
         });
     }
-
     toHtml() {
-
         var scrStart = '<script type="application/ld+json">';
         var scrEnd = '</script>';
-
         var scripts = "";
-
         this.jsonBlocks.forEach((item) => {
             scripts +=  scrStart + JSON.stringify(item) + scrEnd + '\n';
         });
-
         return cleshe.replace('|BODY|',scripts).replace('|TITLE|', this.getElementOfType('Article').name);
     }
-
-
-
-
 }

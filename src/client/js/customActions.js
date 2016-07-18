@@ -4,7 +4,6 @@ import {saveToS3} from './webrunesAPI.js';
 
 
 export default class CustomActions {
-
     static toggleCustomAction(editorState, action, saveRelativePath, author,commentID, doc) {
         switch (action) {
             case 'save':
@@ -16,8 +15,7 @@ export default class CustomActions {
             default:
                 console.log('Invalid action');
         }
-    };
-
+    }
 };
 
 var domain = process.env.DOMAIN;
@@ -38,27 +36,23 @@ const saveAction = (editorState, author, saveRelativePath, commentID,doc) => {
 
 const saveAsAction = (editorState, author,commentID,doc) => {
     console.log('save_as_action');
-
     doc.draftToHtml(editorState.getCurrentContent(), author, commentID).then(res => {
         let json = doc.getElementOfType('Article');
         let html = res.html;
         let fileName = (json.name === '' ? 'untitled' : json.name.split(' ').join('_')) + '.html';
         saveAs(fileName,html);
-
     });
 };
+
 const destroyClickedLink = (event) => {
     document.body.removeChild(event.target);
 };
 
-
 function saveAs(fileName,html) {
-
     let ie = navigator.userAgent.match(/MSIE\s([\d.]+)/),
         ie11 = navigator.userAgent.match(/Trident\/7.0/) && navigator.userAgent.match(/rv:11/),
         ieEDGE = navigator.userAgent.match(/Edge/g),
         ieVer = (ie ? parseInt(ie[1]) : (ie11 ? 11 : -1));
-
     if (ie || ie11 || ieEDGE) {
         if (ieVer > 9 || ieEDGE) {
             var textFileAsBlob = new Blob([html], {
@@ -73,7 +67,6 @@ function saveAs(fileName,html) {
         var downloadLink = document.createElement("a");
         downloadLink.download = fileName;
         downloadLink.innerHTML = "My Hidden Link";
-
         window.URL = window.URL || window.webkitURL;
         textFileAsBlob = new Blob([html], {
             type: 'text/plain'
@@ -82,7 +75,6 @@ function saveAs(fileName,html) {
         downloadLink.onclick = destroyClickedLink.bind(this);
         downloadLink.style.display = "none";
         document.body.appendChild(downloadLink);
-
         downloadLink.click();
     }
 }

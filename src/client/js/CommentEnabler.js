@@ -7,7 +7,6 @@ import {getWidgetID} from './webrunesAPI.js';
 var domain = process.env.DOMAIN;
 
 export default class CommentEnabler extends React.Component {
-
     constructor(props) {
         super(props);
         this.state = {
@@ -15,24 +14,18 @@ export default class CommentEnabler extends React.Component {
         };
         this.state.commentID = this.props.commentID;
         this.state.isChecked = this._hasCommentID();
-
     }
-
     onChange(state) {
         this.setState({
             isChecked: !this.state.isChecked
         });
-
     }
-
     getCommentID() {
         console.log("getCommentid started");
         this.setState({
             busy: true
         });
-
         getWidgetID(this.props.editUrl).then((id)=> {
-
             console.log("Get widget id succeded", id);
             this.setState({
                 commentID: id
@@ -41,22 +34,17 @@ export default class CommentEnabler extends React.Component {
             this.setState({
                 busy: false
             });
-
         }).catch((e) => {
             console.log("Failed to obtain widget ID");
             this.setState({
                 busy: false
             });
         });
-
     }
-
     _hasCommentID() {
         return this.state.commentID !== "";
     }
-
     render() {
-
         var commentStatus = this._hasCommentID() ?
             <div className="col-sm-12">Widget id is correct and equals to {this.state.commentID}</div> :
             <div className="col-sm-12">
