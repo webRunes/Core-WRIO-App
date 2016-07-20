@@ -81,16 +81,10 @@ class CoreEditor extends React.Component {
         return editorState;
     }
     promptForLink() {
-        const {
-            editorState
-        } = this.state;
-        const selection = editorState.getSelection();
-        if (!selection.isCollapsed()) {
-            this.setState({
-                showURLInput: 1,
-                urlValue: ''
-            });
-            }
+        this.setState({
+            showURLInput: 1,
+            urlValue: ''
+        }); 
     }
     promptForEdit(urlValue, linkEntityKey) {
         const {
