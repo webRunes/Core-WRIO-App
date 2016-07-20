@@ -81,10 +81,38 @@ class CoreEditor extends React.Component {
         return editorState;
     }
     promptForLink() {
+        const {
+            editorState
+        } = this.state;
+        var title = '';
+        const selectionState = editorState.getSelection();
+        const blockKey = selectionState.getAnchorKey();
+        const contentBlocks = editorState.getCurrentContent().getBlocksAsArray();
+        var start = selectionState.getStartOffset();
+        var end = selectionState.getEndOffset();
+
+        for (var i = contentBlocks.length - 1; i >= 0; i--) {
+         
+
+            var mapIter = contentBlocks[i].values();
+            var key = mapIter.next().value;
+            var type = mapIter.next().value;
+            var text = mapIter.next().value;
+
+            if(key === blockKey){
+                title = text.slice(start, end);
+                console.log(title);
+            }
+
+        };
+
+        
+        
         this.setState({
             showURLInput: 1,
-            urlValue: ''
-        }); 
+            urlValue: title
+        });
+            
     }
     promptForEdit(urlValue, linkEntityKey) {
         const {
