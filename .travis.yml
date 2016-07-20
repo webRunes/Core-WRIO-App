@@ -1,25 +1,25 @@
-language: node_js
-sudo: false
+language: ruby
 
+services:
+  - docker
 
-node_js:
-  - 0.12
-
-install: 
-  - npm install
-  - npm install -g gulp
-
-services: mongodb
+before_install:
+  - docker pull mongo:latest
+  - docker run --name mongo -p 27017:27017 -d mongo mongod --smallfiles
+  - docker build --tag core .
+  - docker ps -a
+  - docker run --link mongo:mongo -v `pwd`:/srv/host сщку /bin/sh -c "cp /srv/host/config.json.travis /srv/www/config.json && gulp test"
 
 script:
-  - cp config.json.travis config.json
-  - gulp
-  - gulp test
-  - npm start
+  - docker ps -a
 
-before_deploy:
-  - gem install mime-types -v 2.6.2
+branches:
+  only:
+    - master
+    - production
 
+notifications:
+  slack: wrioos:XDZWFBrf9TDtoEOcw5YGBM4a
 
 deploy:
   - provider: s3
@@ -30,9 +30,3 @@ deploy:
     bucket: wrioos.com
     upload-dir: Core-WRIO-App
     acl: public_read
-  - provider: opsworks
-    access_key_id:
-      secure: rV/Q5DTtUntw6fGacEnliXXM3f8X2OqAVibEQv5iSo/9ND1wt9dIOyzs5bvwPy4477a8pzVB/b3b9lDmSJir4fLyHXtOcfrfi4k2CXVlhYqwY5g1GyLFf07mfZM3ZqR3qZZb7D/MbQwdOQyA0EgglGGdYhu0zs0Cd8TEaoScPQg=
-    secret_access_key:
-      secure: K7gZSEIrNpySChU15C5LIgzxLnCylOMXPwHJIj4YxW0dX9pHbT4CfNNywoIhzvbngpkvfnrCSFmmxw2s/KUpgV1LWnN9RqDBLvec/cBlEsFgS+t+8X+NB1PYdVITGIFrhXmU766F4DUItUyOdRtdti3OHIp92BPLiH/CWfqDby8=
-    app-id: d2c52b21-65f4-4079-9f4e-6474046f7d97
