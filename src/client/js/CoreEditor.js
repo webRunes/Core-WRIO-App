@@ -82,6 +82,16 @@ class CoreEditor extends React.Component {
         return editorState;
     }
     promptForLink() {
+
+        var title = this.getSelectedText();
+        
+        this.setState({
+            showURLInput: 1,
+            titleValue: title
+        });
+            
+    }
+    getSelectedText() {
         const {
             editorState
         } = this.state;
@@ -92,28 +102,12 @@ class CoreEditor extends React.Component {
         var start = selectionState.getStartOffset();
         var end = selectionState.getEndOffset();
 
-        for (var i = contentBlocks.length - 1; i >= 0; i--) {
-         
-
-            var mapIter = contentBlocks[i].values();
-            var key = mapIter.next().value;
-            var type = mapIter.next().value;
-            var text = mapIter.next().value;
-
-            if(key === blockKey){
-                title = text.slice(start, end);
-                console.log(title);
-            }
-
-        };
-
-        
-        
-        this.setState({
-            showURLInput: 1,
-            titleValue: title
-        });
-            
+         contentBlocks.forEach((block) => {
+                if(block.key === blockKey){
+                    title = block.text.slice(start, end);
+                }
+            });
+         return title;
     }
     promptForEdit(titleValue, linkEntityKey) {
         const {
