@@ -30,3 +30,5 @@ deploy:
     bucket: wrioos.com
     upload-dir: Core-WRIO-App
     acl: public_read
+    on:
+      branch: production
