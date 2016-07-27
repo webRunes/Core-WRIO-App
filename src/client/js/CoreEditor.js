@@ -1,5 +1,5 @@
 import React from 'react';
-import {CompositeDecorator, ContentState, SelectionState, Editor, EditorState, Entity, RichUtils, CharacterMetadata, getDefaultKeyBinding} from 'draft-js';
+import {CompositeDecorator, ContentState, SelectionState, Editor, EditorState, Entity, RichUtils, CharacterMetadata, getDefaultKeyBinding,  Modifier} from 'draft-js';
 import CustomActions from './customActions';
 import CommentEnabler from './CommentEnabler.js';
 import Modal from 'react-modal';
@@ -96,7 +96,7 @@ class CoreEditor extends React.Component {
                 }),
                 entityKey
             );
-        });
+        }); 
         return editorState;
     }
     promptForLink() {
@@ -221,6 +221,59 @@ class CoreEditor extends React.Component {
             linkDesc: descValue,
             onLinkEdit: this.promptForEdit
         });
+
+
+
+      
+        // const content = editorState.getCurrentContent();
+        // const selection = editorState.getSelection();
+        // const start = selection.getStartOffset();
+        // const end = selection.getEndOffset();
+
+        // const block = content.getBlockForKey(selection.getAnchorKey());
+        // const word = block.getText();
+        // const result = word.slice(this.state.lastOffset, selection.getEndOffset());
+        // const newSelection = new SelectionState({
+        //   anchorKey: block.getKey(),
+        //   anchorOffset: start,
+        //   focusKey: block.getKey(),
+        //   focusOffset: end
+        // });
+        // const contentReplaced = Modifier.replaceText(
+        //         content,
+        //         newSelection,
+        //         titleValue);
+        // const editorStateModified = EditorState.push(
+        //  editorState,
+        //  contentReplaced,
+        //  'replace-text'
+        // );
+
+        // this.setState({lastOffset: selection.getEndOffset(), editorState:editorStateModified});
+
+
+
+
+
+
+        // const contentInserted = Modifier.insertText(
+        //   editorState.getCurrentContent(),
+        //   editorState.getSelection(),
+        //   titleValue
+        // );
+
+        // const editorStateModified = EditorState.push(
+        //  editorState,
+        //  contentInserted,
+        //  'insert-text'
+        // );
+
+        // this.setState({editorState:editorStateModified});
+
+
+
+
+
         let _editorState = RichUtils.toggleLink(
             editorState,
             editorState.getSelection(),
@@ -751,7 +804,7 @@ class Link extends React.Component {
     render() {
         return (
             <a href={this.linkUrl} onClick={this.onLinkEdit}>
-                {this.props.children}
+                {this.linkTitle}
             </a>
         );
     }
