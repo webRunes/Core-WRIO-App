@@ -1,6 +1,9 @@
 import React from 'react';
 import Modal from 'react-modal';
 
+import {Entity} from 'draft-js';
+
+
 
 export default class LinkUrlDialog extends React.Component {
     constructor(props) {
@@ -9,12 +12,16 @@ export default class LinkUrlDialog extends React.Component {
         this.onConfirmLink = this.onConfirmLink.bind(this);
         this.onTitleChange = this.onTitleChange.bind(this);
         this.onUrlChange = this.onUrlChange.bind(this);
-        this.onDescChange = this.onDescChange.bind(this);
-        this.onTitleInputKeyDown = this.onTitleInputKeyDown.bind(this);
-        this.onUrlInputKeyDown = this.onUrlInputKeyDown.bind(this);
-        this.onDescInputKeyDown = this.onDescInputKeyDown.bind(this);    
+        this.onDescChange = this.onDescChange.bind(this);  
         this.onCancelLink = this.onCancelLink.bind(this);
         this.onRemoveLink = this.onRemoveLink.bind(this);
+
+        this.state = {
+            titleValue: this.props.titleValue,
+            urlValue: '',
+            descValue: ''
+        };
+
     }
     onEditLink(e) {
         e.preventDefault();
@@ -22,25 +29,31 @@ export default class LinkUrlDialog extends React.Component {
     }
     onConfirmLink(e) {
         e.preventDefault();
-        this.props.onConfirmLink(e);
+        const {
+            titleValue, urlValue, descValue
+        } = this.state;
+        const entityKey = Entity.create('LINK', 'MUTABLE', {
+            linkTitle: titleValue,
+            linkUrl: urlValue,
+            linkDesc: descValue,
+            onLinkEdit: this.promptForEdit
+        });
+        this.props.onConfirmLink(entityKey);
     }
     onTitleChange(e) {
-        this.props.onTitleChange(e);
+        this.setState({
+            titleValue: e.target.value
+        });
     }
     onUrlChange(e) {
-        this.props.onUrlChange(e);
+        this.setState({
+            urlValue: e.target.value
+        });
     }
     onDescChange(e) {
-        this.props.onDescChange(e);
-    }
-    onTitleInputKeyDown(e) {
-        this.props.onTitleInputKeyDown(e);
-    }
-    onUrlInputKeyDown(e) {
-        this.props.onUrlInputKeyDown(e);
-    }
-    onDescInputKeyDown(e) {
-        this.props.onDescInputKeyDown(e);
+        this.setState({
+            descValue: e.target.value
+        });
     }
     onCancelLink(e) {
         e.preventDefault();
@@ -82,7 +95,6 @@ export default class LinkUrlDialog extends React.Component {
                           style={styles.linkTitleInput}
                           type="text"
                           value={this.props.titleValue}
-                          onClick={this.onTitleInputKeyDown}
                           className="form-control"
                         />
                     </div>
@@ -94,7 +106,6 @@ export default class LinkUrlDialog extends React.Component {
                           ref="linkUrl"
                           type="text"
                           value={this.props.urlValue}
-                          onClick={this.onUrlInputKeyDown}
                           className="form-control"
                         />
                     </div>
@@ -106,7 +117,6 @@ export default class LinkUrlDialog extends React.Component {
                           ref="linkDesc"
                           type="text"
                           value={this.props.descValue}
-                          onClick={this.onDescInputKeyDown}
                           className="form-control"
                         />
                     </div>
@@ -130,18 +140,10 @@ export default class LinkUrlDialog extends React.Component {
 LinkUrlDialog.propTypes = {
     onEditLink: React.PropTypes.func,
     onConfirmLink: React.PropTypes.func,
-    onTitleChange: React.PropTypes.func,
-    onUrlChange: React.PropTypes.func,
-    onDescChange: React.PropTypes.func,
-    onTitleInputKeyDown: React.PropTypes.func,
-    onUrlInputKeyDown: React.PropTypes.func,
-    onDescInputKeyDown: React.PropTypes.func,
     onCancelLink: React.PropTypes.func,
     onRemoveLink: React.PropTypes.func,
     isEditLink: React.PropTypes.bool,
-    titleValue: React.PropTypes.string,
-    urlValue: React.PropTypes.string,
-    descValue: React.PropTypes.string
+    titleValue: React.PropTypes.string
 };
 
 const styles = {

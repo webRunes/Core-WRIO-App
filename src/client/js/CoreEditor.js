@@ -38,18 +38,12 @@ class CoreEditor extends React.Component {
         this.toggleCustomAction = this.toggleCustomAction.bind(this);
         this.promptForLink      = this.promptForLink.bind(this);
         this.promptForEdit      = this.promptForEdit.bind(this);
-        this.onTitleChange      = this.onTitleChange.bind(this);
-        this.onUrlChange        = this.onUrlChange.bind(this);
-        this.onDescChange       = this.onDescChange.bind(this);
         this.focus              = this.focus.bind(this);
         this.onChange           = this.onChange.bind(this);
         this.confirmLink        = this.confirmLink.bind(this);
         this.editLink           = this.editLink.bind(this);
         this.cancelLink         = this.cancelLink.bind(this);
         this.removeLink         = this.removeLink.bind(this);
-        this.onTitleInputKeyDown = this.onTitleInputKeyDown.bind(this);
-        this.onUrlInputKeyDown = this.onUrlInputKeyDown.bind(this);
-        this.onDescInputKeyDown = this.onDescInputKeyDown.bind(this);
     }
     onChange(editorState) {
         this.setState({
@@ -58,21 +52,6 @@ class CoreEditor extends React.Component {
     }
     focus() {
         this.refs.editor.focus();
-    }
-    onTitleChange(e) {
-        this.setState({
-            titleValue: e.target.value
-        });
-    }
-    onUrlChange(e) {
-        this.setState({
-            urlValue: e.target.value
-        });
-    }
-    onDescChange(e) {
-        this.setState({
-            descValue: e.target.value
-        });
     }
     getEditorState(contentBlocks, mentions) {
         const decorator = new CompositeDecorator([{
@@ -136,8 +115,6 @@ class CoreEditor extends React.Component {
             showURLInput: 1,
             isEditLink: 1,
             titleValue,
-            urlValue,
-            descValue,
             linkEntityKey
         });
     }
@@ -210,19 +187,12 @@ class CoreEditor extends React.Component {
             setTimeout(() => this.refs.editor.focus(), 0);
         });
     }
-    confirmLink(e) {
-        e.preventDefault();
+    confirmLink(entityKey) {
 
+        
         const {
-            editorState, titleValue, urlValue, descValue
+            editorState
         } = this.state;
-        const entityKey = Entity.create('LINK', 'MUTABLE', {
-            linkTitle: titleValue,
-            linkUrl: urlValue,
-            linkDesc: descValue,
-            onLinkEdit: this.promptForEdit
-        });
-
 
 
       
@@ -283,27 +253,9 @@ class CoreEditor extends React.Component {
         this.setState({
             editorState: _editorState,
             showURLInput: false,
-            titleValue: '',
-            urlValue: '',
-            descValue: ''
         }, () => {
             setTimeout(() => this.refs.editor.focus(), 0);
         });
-    }
-    onTitleInputKeyDown(e) {
-        if (e.which === 13) {
-            this.state.isEditLink ? this.editLink(e) : this.confirmLink(e);
-        }
-    }
-    onUrlInputKeyDown(e) {
-        if (e.which === 13) {
-            this.state.isEditLink ? this.editLink(e) : this.confirmLink(e);
-        }
-    }
-    onDescInputKeyDown(e) {
-        if (e.which === 13) {
-            this.state.isEditLink ? this.editLink(e) : this.confirmLink(e);
-        }
     }
     handleKeyCommand(command) {
         const {
@@ -381,19 +333,11 @@ class CoreEditor extends React.Component {
                   
                     <LinkUrlDialog
                         isEditLink={this.state.isEditLink} 
-                        titleValue={this.state.titleValue} 
-                        urlValue={this.state.urlValue}
-                        descValue={this.state.descValue}
                         onCancelLink={this.cancelLink} 
                         onRemoveLink={this.removeLink} 
                         onEditLink={this.editLink} 
-                        onConfirmLink={this.confirmLink} 
-                        onTitleInputKeyDown={this.onTitleInputKeyDown} 
-                        onUrlInputKeyDown={this.onUrlInputKeyDown}
-                        onDescInputKeyDown={this.onDescInputKeyDown}
-                        onTitleChange={this.onTitleChange}
-                        onUrlChange={this.onUrlChange}
-                        onDescChange={this.onDescChange}/> 
+                        onConfirmLink={this.confirmLink}
+                        titleValue={this.titleValue}/> 
                    }
                   <div className={className} onClick={this.focus}>
                     <Editor
