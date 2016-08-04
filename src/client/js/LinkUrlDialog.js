@@ -145,6 +145,7 @@ LinkUrlDialog.propTypes = {
     onConfirmLink: React.PropTypes.func,
     onCancelLink: React.PropTypes.func,
     onRemoveLink: React.PropTypes.func,
+    promptForEdit: React.PropTypes.func,
     isEditLink: React.PropTypes.bool,
     titleValue: React.PropTypes.string,
     urlValue: React.PropTypes.string,
