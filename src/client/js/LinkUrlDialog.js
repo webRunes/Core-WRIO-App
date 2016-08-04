@@ -16,6 +16,9 @@ export default class LinkUrlDialog extends React.Component {
         this.onCancelLink = this.onCancelLink.bind(this);
         this.onRemoveLink = this.onRemoveLink.bind(this);
 
+
+        console.log(this.props.titleValue);
+
         this.state = {
             titleValue: this.props.titleValue,
             urlValue: '',
@@ -143,7 +146,9 @@ LinkUrlDialog.propTypes = {
     onCancelLink: React.PropTypes.func,
     onRemoveLink: React.PropTypes.func,
     isEditLink: React.PropTypes.bool,
-    titleValue: React.PropTypes.string
+    titleValue: React.PropTypes.string,
+    urlValue: React.PropTypes.string,
+    descValue: React.PropTypes.string
 };
 
 const styles = {
