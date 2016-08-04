@@ -340,6 +340,7 @@ class CoreEditor extends React.Component {
                         onCancelLink={this.cancelLink} 
                         onRemoveLink={this.removeLink} 
                         onEditLink={this.editLink} 
+                        promptForEdit={this.promptForEdit}
                         onConfirmLink={this.confirmLink}
                         titleValue={this.state.titleValue}/> 
                    }

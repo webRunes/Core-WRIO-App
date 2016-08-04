@@ -39,7 +39,7 @@ export default class LinkUrlDialog extends React.Component {
             linkTitle: titleValue,
             linkUrl: urlValue,
             linkDesc: descValue,
-            onLinkEdit: this.promptForEdit
+            onLinkEdit: this.props.promptForEdit
         });
         this.props.onConfirmLink(entityKey);
     }
