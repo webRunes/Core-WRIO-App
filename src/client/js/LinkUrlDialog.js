@@ -28,21 +28,37 @@ export default class LinkUrlDialog extends React.Component {
     }
     onEditLink(e) {
         e.preventDefault();
-        this.props.onEditLink(e);
+        const {titleValue, urlValue, descValue, linkEntityKey} = this.state;
+        this.props.onEditLink(titleValue,urlValue,descValue);
     }
     onConfirmLink(e) {
+      e.preventDefault(e);
+      const {titleValue, urlValue, descValue} = this.state;
+      this.props.onConfirmLink(titleValue,urlValue,descValue);
+    }
+
+    editLink(e) {
         e.preventDefault();
         const {
-            titleValue, urlValue, descValue
-        } = this.state;
-        const entityKey = Entity.create('LINK', 'MUTABLE', {
+            titleValue, urlValue, descValue, linkEntityKey
+            } = this.state;
+        Entity.mergeData(linkEntityKey, {
             linkTitle: titleValue,
             linkUrl: urlValue,
-            linkDesc: descValue,
-            onLinkEdit: this.props.promptForEdit
+            linkDesc: descValue
         });
-        this.props.onConfirmLink(entityKey);
+        this.setState({
+            showURLInput: 0,
+            isEditLink: 0,
+            linkEntityKey: 0,
+            titleValue: '',
+            urlValue: '',
+            descValue: ''
+        }, () => {
+            setTimeout(() => this.refs.editor.focus(), 0);
+        });
     }
+
     onTitleChange(e) {
         this.setState({
             titleValue: e.target.value

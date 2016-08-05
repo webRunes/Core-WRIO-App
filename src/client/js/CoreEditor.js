@@ -64,7 +64,7 @@ class CoreEditor extends React.Component {
                 linkTitle: mention.linkTitle,
                 linkUrl: mention.linkUrl,
                 linkDesc: mention.linkDesc,
-                onLinkEdit: this.promptForEdit.bind(this)
+                onLinkEdit: this.promptForEdit
             });
             const key = contentBlocks[mention.block].getKey();
             editorState = RichUtils.toggleLink(
@@ -122,12 +122,10 @@ class CoreEditor extends React.Component {
             linkEntityKey
         });
     }
-    editLink(e) {
-        e.preventDefault();
-        const {
-            titleValue, urlValue, descValue, linkEntityKey
-        } = this.state;
-        Entity.mergeData(linkEntityKey, {
+    editLink(titleValue,urlValue,descValue) {
+
+        const {linkEntityKey} = this.state;
+        Entity.mergeData(entityKey, {
             linkTitle: titleValue,
             linkUrl: urlValue,
             linkDesc: descValue
@@ -143,6 +141,34 @@ class CoreEditor extends React.Component {
             setTimeout(() => this.refs.editor.focus(), 0);
         });
     }
+
+    confirmLink(titleValue,urlValue,descValue) {
+
+        const entityKey = Entity.create('LINK', 'MUTABLE', {
+            linkTitle: titleValue,
+            linkUrl: urlValue,
+            linkDesc: descValue,
+            onLinkEdit: this.promptForEdit
+        });
+
+        const {
+            editorState
+            } = this.state;
+
+        let _editorState = RichUtils.toggleLink(
+            editorState,
+            editorState.getSelection(),
+            entityKey
+        );
+        this.setState({
+            editorState: _editorState,
+            showURLInput: false,
+        }, () => {
+            setTimeout(() => this.refs.editor.focus(), 0);
+        });
+    }
+
+
     cancelLink(e) {
         e.preventDefault();
         this.setState({
@@ -187,76 +213,6 @@ class CoreEditor extends React.Component {
             titleValue: '',
             urlValue: '',
             descValue: ''
-        }, () => {
-            setTimeout(() => this.refs.editor.focus(), 0);
-        });
-    }
-    confirmLink(entityKey) {
-
-        
-        const {
-            editorState
-        } = this.state;
-
-
-      
-        // const content = editorState.getCurrentContent();
-        // const selection = editorState.getSelection();
-        // const start = selection.getStartOffset();
-        // const end = selection.getEndOffset();
-
-        // const block = content.getBlockForKey(selection.getAnchorKey());
-        // const word = block.getText();
-        // const result = word.slice(this.state.lastOffset, selection.getEndOffset());
-        // const newSelection = new SelectionState({
-        //   anchorKey: block.getKey(),
-        //   anchorOffset: start,
-        //   focusKey: block.getKey(),
-        //   focusOffset: end
-        // });
-        // const contentReplaced = Modifier.replaceText(
-        //         content,
-        //         newSelection,
-        //         titleValue);
-        // const editorStateModified = EditorState.push(
-        //  editorState,
-        //  contentReplaced,
-        //  'replace-text'
-        // );
-
-        // this.setState({lastOffset: selection.getEndOffset(), editorState:editorStateModified});
-
-
-
-
-
-
-        // const contentInserted = Modifier.insertText(
-        //   editorState.getCurrentContent(),
-        //   editorState.getSelection(),
-        //   titleValue
-        // );
-
-        // const editorStateModified = EditorState.push(
-        //  editorState,
-        //  contentInserted,
-        //  'insert-text'
-        // );
-
-        // this.setState({editorState:editorStateModified});
-
-
-
-
-
-        let _editorState = RichUtils.toggleLink(
-            editorState,
-            editorState.getSelection(),
-            entityKey
-        );
-        this.setState({
-            editorState: _editorState,
-            showURLInput: false,
         }, () => {
             setTimeout(() => this.refs.editor.focus(), 0);
         });
@@ -600,14 +556,14 @@ class Link extends React.Component {
     }
     componentWillReceiveProps(props) {
         const {
-            linkTitle, linkUrl, linkDesc, onLinkEdit
+            linkTitle, linkUrl, linkDesc, editCallback
         } = Entity.get(props.entityKey).getData();
         this.linkTitle = linkTitle;
         this.linkUrl = linkUrl;
         this.linkDesc = linkDesc;
         this.onLinkEdit = (e) => {
             e.preventDefault();
-            onLinkEdit(this.linkTitle, this.linkUrl, this.linkDesc, props.entityKey);
+            editCallback(this.linkTitle, this.linkUrl, this.linkDesc, props.entityKey);
         };
     }
     render() {
