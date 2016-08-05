@@ -125,10 +125,12 @@ class CoreEditor extends React.Component {
             linkEntityKey
         });
     }
+
+    // edit link callback, called when user confirms editing link
     editLink(titleValue,urlValue,descValue) {
 
         const {linkEntityKey} = this.state;
-        Entity.mergeData(entityKey, {
+        Entity.mergeData(linkEntityKey, {
             linkTitle: titleValue,
             linkUrl: urlValue,
             linkDesc: descValue
@@ -136,7 +138,7 @@ class CoreEditor extends React.Component {
         this.setState({
             showURLInput: 0,
             isEditLink: false,
-            linkEntityKey: linkEntityKey,
+            linkEntityKey: 0,
             titleValue: '',
             urlValue: '',
             descValue: ''
@@ -144,6 +146,8 @@ class CoreEditor extends React.Component {
             setTimeout(() => this.refs.editor.focus(), 0);
         });
     }
+
+    // new link callback, called when user clicks confirm in LinkUrDialog
 
     createNewLink(titleValue,urlValue,descValue) {
 
