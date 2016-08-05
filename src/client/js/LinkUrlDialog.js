@@ -21,8 +21,8 @@ export default class LinkUrlDialog extends React.Component {
 
         this.state = {
             titleValue: this.props.titleValue,
-            urlValue: '',
-            descValue: ''
+            urlValue: this.props.url,
+            descValue: this.props.descValue
         };
 
     }
@@ -139,7 +139,7 @@ export default class LinkUrlDialog extends React.Component {
                           className="form-control"
                         />
                     </div>
-                    <div class="form-group">
+                    <div className="form-group">
                         <button onClick={this.props.isEditLink ? this.onEditLink : this.onConfirmLink} className="btn btn-primary">
                             Confirm
                         </button>
