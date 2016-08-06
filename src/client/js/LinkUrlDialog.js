@@ -16,33 +16,34 @@ export default class LinkUrlDialog extends React.Component {
         this.onCancelLink = this.onCancelLink.bind(this);
         this.onRemoveLink = this.onRemoveLink.bind(this);
 
-
-        console.log(this.props.titleValue);
-
         this.state = {
             titleValue: this.props.titleValue,
-            urlValue: '',
-            descValue: ''
+            urlValue: this.props.urlValue,
+            descValue: this.props.descValue
         };
+        console.log(this.props.titleValue);
 
     }
+
+    componentWillReceiveProps() {
+        this.state = {
+            titleValue: props.titleValue,
+            urlValue: props.url,
+            descValue: props.descValue
+        };
+    }
+
     onEditLink(e) {
         e.preventDefault();
-        this.props.onEditLink(e);
+        const {titleValue, urlValue, descValue} = this.state;
+        this.props.onEditLink(titleValue,urlValue,descValue);
     }
     onConfirmLink(e) {
-        e.preventDefault();
-        const {
-            titleValue, urlValue, descValue
-        } = this.state;
-        const entityKey = Entity.create('LINK', 'MUTABLE', {
-            linkTitle: titleValue,
-            linkUrl: urlValue,
-            linkDesc: descValue,
-            onLinkEdit: this.props.promptForEdit
-        });
-        this.props.onConfirmLink(entityKey);
+      e.preventDefault(e);
+      const {titleValue, urlValue, descValue} = this.state;
+      this.props.onConfirmLink(titleValue,urlValue,descValue);
     }
+
     onTitleChange(e) {
         this.setState({
             titleValue: e.target.value
@@ -97,7 +98,7 @@ export default class LinkUrlDialog extends React.Component {
                           id="linkTitle"
                           style={styles.linkTitleInput}
                           type="text"
-                          value={this.props.titleValue}
+                          value={this.state.titleValue}
                           className="form-control"
                         />
                     </div>
@@ -108,7 +109,7 @@ export default class LinkUrlDialog extends React.Component {
                           id="linkUrl"
                           ref="linkUrl"
                           type="text"
-                          value={this.props.urlValue}
+                          value={this.state.urlValue}
                           className="form-control"
                         />
                     </div>
@@ -119,11 +120,11 @@ export default class LinkUrlDialog extends React.Component {
                           id="linkDesc"
                           ref="linkDesc"
                           type="text"
-                          value={this.props.descValue}
+                          value={this.state.descValue}
                           className="form-control"
                         />
                     </div>
-                    <div class="form-group">
+                    <div className="form-group">
                         <button onClick={this.props.isEditLink ? this.onEditLink : this.onConfirmLink} className="btn btn-primary">
                             Confirm
                         </button>
