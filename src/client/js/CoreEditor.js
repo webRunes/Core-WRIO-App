@@ -3,7 +3,7 @@ import {CompositeDecorator, ContentState, SelectionState, Editor, EditorState, E
 import CustomActions from './customActions';
 import CommentEnabler from './CommentEnabler.js';
 
-import LinkUrlDialog from './LinkUrlDialog.js';
+import LinkUrlDialog from './components/LinkUrlDialog.js';
 
 class CoreEditor extends React.Component {
     constructor(props) {
@@ -316,10 +316,10 @@ class CoreEditor extends React.Component {
                   </div>
                 </div>
                 <CommentEnabler commentID={this.state.commentID} author={this.props.author} editUrl={this.state.editUrl} gotCommentID={this.gotCommentID.bind(this)}/>
-                <button type="button" className="btn btn-default btn-sm" onClick={() => this._toggleCustomAction('saveas')}>
+                <button type="button" className="btn btn-default btn-sm" onClick={() => this.toggleCustomAction('save')}>
                     Save
                 </button>
-                <button type="button" className="btn btn-default btn-sm" onClick={() => this._toggleCustomAction('save')}>
+                <button type="button" className="btn btn-default btn-sm" onClick={() => this.toggleCustomAction('saveas')}>
                     Save as
                 </button>
             </div>
