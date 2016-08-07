@@ -3,7 +3,7 @@ import {CompositeDecorator, ContentState, SelectionState, Editor, EditorState, E
 import CustomActions from './customActions';
 import CommentEnabler from './CommentEnabler.js';
 
-import LinkUrlDialog from './LinkUrlDialog.js';
+import LinkUrlDialog from './components/LinkUrlDialog.js';
 
 class CoreEditor extends React.Component {
     constructor(props) {
