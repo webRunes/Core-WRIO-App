@@ -1,8 +1,10 @@
 import React from 'react';
 import {CompositeDecorator, ContentState, SelectionState, Editor, EditorState, Entity, RichUtils, CharacterMetadata, getDefaultKeyBinding,  Modifier} from 'draft-js';
+import TextEditorStore from './stores/texteditor.js';
+import TextEditorActions from './actions/texteditor.js';
 import CustomActions from './customActions';
 import CommentEnabler from './CommentEnabler.js';
-
+import StyleButton from './components/StyleButton.js';
 import LinkUrlDialog from './components/LinkUrlDialog.js';
 
 class CoreEditor extends React.Component {
@@ -19,7 +21,7 @@ class CoreEditor extends React.Component {
             mentions = [];
         }
         this.state = {
-            editorState: this.createEditorState(contentBlocks,mentions),
+            editorState: TextEditorStore.createEditorState(contentBlocks,mentions),
             showURLInput: false,
             isEditLink: false,
             linkEntityKey: 0,
@@ -40,10 +42,7 @@ class CoreEditor extends React.Component {
         this.openEditPrompt      = this.openEditPrompt.bind(this);
         this.focus              = this.focus.bind(this);
         this.onChange           = this.onChange.bind(this);
-        this.createNewLink      = this.createNewLink.bind(this);
         this.editLink           = this.editLink.bind(this);
-        this.cancelLink         = this.cancelLink.bind(this);
-        this.removeLink         = this.removeLink.bind(this);
     }
     onChange(editorState) {
         this.setState({
@@ -53,65 +52,17 @@ class CoreEditor extends React.Component {
     focus() {
         this.refs.editor.focus();
     }
-    createLinkEntity(title,url,desc) {
-        return Entity.create('LINK', 'MUTABLE', {
-            linkTitle: title,
-            linkUrl: url,
-            linkDesc: desc,
-            editCallback: this.openEditPrompt.bind(this)
-        });
-    }
-    createEditorState(contentBlocks, mentions) {
-        const decorator = new CompositeDecorator([{
-            strategy: findLinkEntities,
-            component: Link
-        }]);
-        let editorState = contentBlocks.length > 0 ? EditorState.createWithContent(ContentState.createFromBlockArray(contentBlocks), decorator) : EditorState.createEmpty(decorator);
-        mentions.forEach((mention, i) => {
-            const entityKey = this.createLinkEntity(mention.linkTitle,mention.linkUrl,mention.linkDesc);
-            const key = contentBlocks[mention.block].getKey();
-            editorState = RichUtils.toggleLink(
-                editorState,
-                SelectionState.createEmpty(key).merge({
-                    anchorOffset: mention.start,
-                    focusKey: key,
-                    focusOffset: mention.end
-                }),
-                entityKey
-            );
-        }); 
-        return editorState;
-    }
+
     promptForLink() {
-
-        var title = this.getSelectedText();
-
+        var title = TextEditorStore.getSelectedText();
         this.setState({
             showURLInput: 1,
             titleValue: title
         });
-
         console.log(this.state.titleValue);
             
     }
-    getSelectedText() {
-        const {
-            editorState
-        } = this.state;
-        var title = '';
-        const selectionState = editorState.getSelection();
-        const blockKey = selectionState.getAnchorKey();
-        const contentBlocks = editorState.getCurrentContent().getBlocksAsArray();
-        var start = selectionState.getStartOffset();
-        var end = selectionState.getEndOffset();
 
-         contentBlocks.forEach((block) => {
-                if(block.key === blockKey){
-                    title = block.text.slice(start, end);
-                }
-            });
-         return title;
-    }
     openEditPrompt(titleValue, urlValue, descValue, linkEntityKey) {
         const {
             editorState
@@ -149,73 +100,6 @@ class CoreEditor extends React.Component {
 
     // new link callback, called when user clicks confirm in LinkUrDialog
 
-    createNewLink(titleValue,urlValue,descValue) {
-
-        const entityKey = this.createLinkEntity(titleValue,urlValue,descValue);
-        const {editorState} = this.state;
-
-        let _editorState = RichUtils.toggleLink(
-            editorState,
-            editorState.getSelection(),
-            entityKey
-        );
-        this.setState({
-            editorState: _editorState,
-            showURLInput: false,
-        }, () => {
-            setTimeout(() => this.refs.editor.focus(), 0);
-        });
-    }
-
-
-    cancelLink(e) {
-        e.preventDefault();
-        this.setState({
-            showURLInput: 0,
-            isEditLink: false,
-            linkEntityKey: 0,
-            titleValue: '',
-            urlValue: '',
-            descValue: ''
-        }, () => {
-            setTimeout(() => this.refs.editor.focus(), 0);
-        });
-    }
-    removeLink(e) {
-        e.preventDefault();
-        const {
-            linkEntityKey,
-            editorState
-        } = this.state;
-        let _editorState;
-        editorState.getCurrentContent().getBlockMap().map(block => {
-            block.findEntityRanges(char => {
-                let entityKey = char.getEntity();
-                return !!entityKey && entityKey === linkEntityKey && Entity.get(entityKey).getType() === 'LINK';
-            }, (anchorOffset, focusOffset) => {
-                _editorState = RichUtils.toggleLink(
-                    editorState,
-                    SelectionState.createEmpty(block.getKey()).merge({
-                        anchorOffset,
-                        focusKey: block.getKey(),
-                        focusOffset
-                    }),
-                    null
-                );
-            });
-        });
-        this.setState({
-            editorState: _editorState || editorState,
-            showURLInput: 0,
-            isEditLink: false,
-            linkEntityKey: 0,
-            titleValue: '',
-            urlValue: '',
-            descValue: ''
-        }, () => {
-            setTimeout(() => this.refs.editor.focus(), 0);
-        });
-    }
     handleKeyCommand(command) {
         const {
             editorState
@@ -343,35 +227,6 @@ function getBlockStyle(block) {
             return null;
     }
 }
-
-class StyleButton extends React.Component {
-    constructor() {
-        super();
-        this.onToggle = this.onToggle.bind(this);
-    }
-    onToggle(e) {
-        e.preventDefault();
-        this.props.onToggle(this.props.style);
-    }
-    render() {
-        let className = 'RichEditor-styleButton';
-        if (this.props.active) {
-            className += ' RichEditor-activeButton';
-        }
-        return (
-            <span className={className} onMouseDown={this.onToggle}>
-              {this.props.label}
-            </span>
-        );
-    }
-}
-
-StyleButton.propTypes = {
-    onToggle: React.PropTypes.func,
-    style: React.PropTypes.string,
-    active: React.PropTypes.bool,
-    label: React.PropTypes.string
-};
 
 
 const BLOCK_TYPES = [
@@ -528,59 +383,8 @@ CustomActionControls.propTypes = {
     onToggle: React.PropTypes.func
 };
 
-function findLinkEntities(contentBlock, callback) {
-    contentBlock.findEntityRanges(
-        (character) => {
-            const entityKey = character.getEntity();
-            return (
-                !!entityKey &&
-                Entity.get(entityKey).getType() === 'LINK'
-            );
-        },
-        callback
-    );
-}
 
 
-class Link extends React.Component {
-    constructor(props) {
-        super(props);
-        this.getProps(props);
-    }
-
-    getProps(props) {
-        const {
-            linkTitle, linkUrl, linkDesc, editCallback
-            } = Entity.get(props.entityKey).getData();
-        console.log(Entity.get(props.entityKey).getData());
-        this.linkTitle = linkTitle;
-        this.linkUrl = linkUrl;
-        this.linkDesc = linkDesc;
-        this.entityKey = props.entityKey;
-        this.linkCallback = editCallback;
-    }
-
-    onLinkEdit (e) {
-        e.preventDefault();
-        this.linkCallback(this.linkTitle, this.linkUrl, this.linkDesc, this.entityKey);
-    }
-
-    componentWillReceiveProps(props) {
-        this.getProps(props);
-    }
-    render() {
-        return (
-            <a href={this.linkUrl} onClick={this.onLinkEdit.bind(this)}>
-                {this.linkTitle}
-            </a>
-        );
-    }
-}
-
-Link.propTypes = {
-    entityKey: React.PropTypes.string,
-    children: React.PropTypes.array
-};
 
 const styles = {
     root: {
