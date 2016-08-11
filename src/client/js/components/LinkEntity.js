@@ -3,8 +3,12 @@
  */
 
 import React from 'react';
+import {CompositeDecorator, ContentState, SelectionState, Editor, EditorState, Entity, RichUtils, CharacterMetadata, getDefaultKeyBinding,  Modifier} from 'draft-js';
 
-class Link extends React.Component {
+
+// link template component for the editor
+
+export default class Link extends React.Component {
     constructor(props) {
         super(props);
         this.getProps(props);

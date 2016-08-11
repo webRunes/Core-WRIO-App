@@ -1,7 +1,9 @@
 import React from 'react';
+import Reflux from 'reflux';
 import {CompositeDecorator, ContentState, SelectionState, Editor, EditorState, Entity, RichUtils, CharacterMetadata, getDefaultKeyBinding,  Modifier} from 'draft-js';
 import TextEditorStore from './stores/texteditor.js';
 import TextEditorActions from './actions/texteditor.js';
+import LinkDialogActions from './actions/linkdialog.js';
 import CustomActions from './customActions';
 import CommentEnabler from './CommentEnabler.js';
 import StyleButton from './components/StyleButton.js';
@@ -20,99 +22,76 @@ class CoreEditor extends React.Component {
             contentBlocks = [];
             mentions = [];
         }
+
+        TextEditorStore.setLinkEditCallback(this.openEditPrompt.bind(this));
+
         this.state = {
-            editorState: TextEditorStore.createEditorState(contentBlocks,mentions),
-            showURLInput: false,
-            isEditLink: false,
-            linkEntityKey: 0,
-            titleValue: '',
-            urlValue: '',
-            descValue: '',
+            editorState:TextEditorStore.createEditorState(contentBlocks,mentions),
             saveRelativePath: props.saveRelativePath,
             editUrl: props.editUrl,
             author: props.author,
             commentID: this.props.commentID,
             doc:doc
         };
+
+
+
         this.handleKeyCommand   = this.handleKeyCommand.bind(this);
         this.toggleBlockType    = this.toggleBlockType.bind(this);
         this.toggleInlineStyle  = this.toggleInlineStyle.bind(this);
         this.toggleCustomAction = this.toggleCustomAction.bind(this);
-        this.promptForLink      = this.promptForLink.bind(this);
         this.openEditPrompt      = this.openEditPrompt.bind(this);
+        this.onLinkControlClick = this.onLinkControlClick.bind(this);
         this.focus              = this.focus.bind(this);
-        this.onChange           = this.onChange.bind(this);
-        this.editLink           = this.editLink.bind(this);
+
+
+        TextEditorStore.listen(this.onStatusChange.bind(this));
+        Reflux.listenTo(TextEditorStore,"onFocus");
     }
-    onChange(editorState) {
+
+
+    onStatusChange(state) { // When s
         this.setState({
-            editorState
+            editorState:state.editorState
         });
     }
+
+    handleChange (editorState) {
+        this.setState({
+            editorState:editorState
+        });
+        console.log("Action");
+        TextEditorActions.updateEditorState(editorState);
+    }
+
     focus() {
         this.refs.editor.focus();
     }
+    onFocus()
+    {
+        setTimeout(() => this.focus(), 0);
+    }
 
-    promptForLink() {
+    onLinkControlClick() {
         var title = TextEditorStore.getSelectedText();
-        this.setState({
-            showURLInput: 1,
-            titleValue: title
-        });
-        console.log(this.state.titleValue);
-            
+        LinkDialogActions.openToCreate(title,"","");
     }
 
     openEditPrompt(titleValue, urlValue, descValue, linkEntityKey) {
-        const {
-            editorState
-        } = this.state;
-        this.setState({
-            showURLInput: 1,
-            isEditLink: true,
-            titleValue,
-            urlValue,
-            descValue,
-            linkEntityKey
-        });
+        LinkDialogActions.openToEdit(titleValue,urlValue,descValue,linkEntityKey);
     }
-
-    // edit link callback, called when user confirms editing link
-    editLink(titleValue,urlValue,descValue) {
-
-        const {linkEntityKey} = this.state;
-        Entity.mergeData(linkEntityKey, {
-            linkTitle: titleValue,
-            linkUrl: urlValue,
-            linkDesc: descValue
-        });
-        this.setState({
-            showURLInput: 0,
-            isEditLink: false,
-            linkEntityKey: 0,
-            titleValue: '',
-            urlValue: '',
-            descValue: ''
-        }, () => {
-            setTimeout(() => this.refs.editor.focus(), 0);
-        });
-    }
-
-    // new link callback, called when user clicks confirm in LinkUrDialog
 
     handleKeyCommand(command) {
-        const {
-            editorState
-        } = this.state;
+        const {editorState} = this.state;
         const newState = RichUtils.handleKeyCommand(editorState, command);
         if (newState) {
-            this.onChange(newState);
+            TextEditorActions.publishEditorState(newState);
             return true;
         }
         return false;
     }
     toggleBlockType(blockType) {
-        this.onChange(
+        TextEditorActions.publishEditorState(
             RichUtils.toggleBlockType(
                 this.state.editorState,
                 blockType
@@ -120,7 +99,7 @@ class CoreEditor extends React.Component {
         );
     }
     toggleInlineStyle(inlineStyle) {
-        this.onChange(
+        TextEditorActions.publishEditorState(
             RichUtils.toggleInlineStyle(
                 this.state.editorState,
                 inlineStyle
@@ -145,10 +124,12 @@ class CoreEditor extends React.Component {
       }
       return getDefaultKeyBinding(e);
     }
+
+
+
+
     render() {
-        const {
-            editorState
-        } = this.state;
+        const {editorState} = this.state;
         // If the user changes block type before entering any text, we can
         // either style the placeholder or hide it. Let's just hide it now.
         let className = 'RichEditor-editor';
@@ -165,33 +146,19 @@ class CoreEditor extends React.Component {
                   <BlockStyleControls
                     editorState={editorState}
                     onToggle={this.toggleBlockType}
-                    onLinkToggle={this.promptForLink}
+                    onLinkToggle={this.onLinkControlClick}
                   />
                   <InlineStyleControls
                     editorState={editorState}
                     onToggle={this.toggleInlineStyle}
                   />
-                  { !this.state.showURLInput ? null : 
-                  
-                  
-                    <LinkUrlDialog
-                        isEditLink={this.state.isEditLink} 
-                        onCancelLink={this.cancelLink} 
-                        onRemoveLink={this.removeLink} 
-                        onEditLink={this.editLink} 
-                        promptForEdit={this.openEditPrompt}
-                        onConfirmLink={this.createNewLink}
-                        titleValue={this.state.titleValue}
-                        descValue={this.state.descValue}
-                        urlValue={this.state.urlValue}
-                        />
-                   }
+                    <LinkUrlDialog />
                   <div className={className} onClick={this.focus}>
                     <Editor
                       blockStyleFn={getBlockStyle}
                       editorState={editorState}
                       handleKeyCommand={this.handleKeyCommand}
-                      onChange={this.onChange}
+                      onChange={this.handleChange.bind(this)}
                       placeholder="Enter text..."
                       ref="editor"
                       spellCheck={true}
@@ -417,3 +384,14 @@ const styles = {
 
 
 export default CoreEditor;
+
+// hack to supppress warnings
+console.error = (function() {
+    var error = console.error;
+
+    return function(exception) {
+        if ((exception + '').indexOf('Warning: A component is `contentEditable`') != 0) {
+            error.apply(console, arguments);
+        }
+    };
+})();

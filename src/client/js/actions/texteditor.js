@@ -2,8 +2,12 @@ import Reflux from 'reflux';
 
 export default Reflux.createActions([
     'createEditorState',
+    'updateEditorState',
+    'publishEditorState',
+    'newEditorState',
     'createNewLink',
-    'cancelLink',
-    'removeLink'
+    'editLink',
+    'removeLink',
+    'focus'
 
 ]);

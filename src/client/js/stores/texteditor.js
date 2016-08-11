@@ -24,19 +24,27 @@ function findLinkEntities(contentBlock, callback) {
 export default Reflux.createStore({
     listenables:TextActions,
 
+    init() {
+        this.state = {
+            editorState: EditorState.createEmpty()
+        };
+    },
+
+    setLinkEditCallback(cb) {
+        this.state.linkEditCallback = cb;
+    },
+
     createLinkEntity(title,url,desc) {
         return Entity.create('LINK', 'MUTABLE', {
             linkTitle: title,
             linkUrl: url,
             linkDesc: desc,
-            editCallback: this.openEditPrompt.bind(this)
+            editCallback: this.state.linkEditCallback
         });
     },
 
     getSelectedText() {
-        const {
-            editorState
-            } = this.state;
+        const { editorState } = this.state;
         var title = '';
         const selectionState = editorState.getSelection();
         const blockKey = selectionState.getAnchorKey();
@@ -50,6 +58,18 @@ export default Reflux.createStore({
             }
         });
         return title;
+    },
+
+    onUpdateEditorState(state) {
+        this.state.editorState = state;
+        //this.trigger(this.state);
+        ///console.log("reaction",state);
+    },
+
+    onPublishEditorState(state) {
+        this.state.editorState = state;
+        this.trigger(this.state);
+        console.log("reaction",state);
     },
 
     createEditorState(contentBlocks, mentions) {
@@ -72,43 +92,37 @@ export default Reflux.createStore({
             );
         });
         return editorState;
+        //this.onPublishEditorState(editorState);
+
     },
+
     onCreateNewLink(titleValue,urlValue,descValue) {
 
         const entityKey = this.createLinkEntity(titleValue,urlValue,descValue);
         const {editorState} = this.state;
+
+        const e = Entity.get(entityKey).getData();
+        console.log(e);
 
         let _editorState = RichUtils.toggleLink(
             editorState,
             editorState.getSelection(),
             entityKey
         );
-        this.setState({
-            editorState: _editorState,
-            showURLInput: false,
-        }, () => {
-            setTimeout(() => this.refs.editor.focus(), 0);
-        });
+        this.onPublishEditorState(_editorState);
     },
-    onCancelLink(e) {
-        e.preventDefault();
-        this.setState({
-            showURLInput: 0,
-            isEditLink: false,
-            linkEntityKey: 0,
-            titleValue: '',
-            urlValue: '',
-            descValue: ''
-        }, () => {
-            setTimeout(() => this.refs.editor.focus(), 0);
+
+    onEditLink(titleValue,urlValue,descValue,linkEntityKey) {
+        Entity.mergeData(linkEntityKey, {
+            linkTitle: titleValue,
+            linkUrl: urlValue,
+            linkDesc: descValue
         });
+        this.onPublishEditorState(_editorState);
     },
-    onRemoveLink(e) {
-        e.preventDefault();
-        const {
-            linkEntityKey,
-            editorState
-            } = this.state;
+
+    onRemoveLink(linkEntityKey) {
+        const {editorState} = this.state;
         let _editorState;
         editorState.getCurrentContent().getBlockMap().map(block => {
             block.findEntityRanges(char => {
@@ -126,17 +140,7 @@ export default Reflux.createStore({
                 );
             });
         });
-        this.setState({
-            editorState: _editorState || editorState,
-            showURLInput: 0,
-            isEditLink: false,
-            linkEntityKey: 0,
-            titleValue: '',
-            urlValue: '',
-            descValue: ''
-        }, () => {
-            setTimeout(() => this.refs.editor.focus(), 0);
-        });
+       this.onPublishEditorState(_editorState);
     }
 
 
