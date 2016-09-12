@@ -159,9 +159,10 @@ export default class JSONDocument extends GenericLDJsonDocument {
                 return !!entity && entity.getType() === 'LINK';
             }, (anchorOffset, focusOffset) => {
                 if (entity) {
-                    let _url = entity.getData().url.split('?'),
-                        url = _url[0],
-                        name = _url[1] || '';
+                    let data = entity.getData();
+                    let url = data.linkUrl,
+                        name = data.linkTitle || '',
+                        desc = data.linkDesc || '';
                     article.mentions.push(
                         getMention(name, "", `${url}?'${block.getText().substring(anchorOffset, focusOffset)}':${i},${anchorOffset}`)
                     );
