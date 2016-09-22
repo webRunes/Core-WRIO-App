@@ -179,7 +179,6 @@ class CoreEditor extends React.Component {
                         </button>
                     </div>
                 </div>
-                <br>
                 <div className="form-group form-inline has-error">
                     <label htmlFor="id-Description" className="col-sm-4 col-md-3 control-label">Description</label>
                     <div className="col-sm-8 col-md-9">
