@@ -86,7 +86,7 @@ export default Reflux.createStore({
             const block = contentBlocks[mention.block];
             if (!block) {
                 console.warn("Cannot create mention",mention);
-                return
+                return;
             }
             const key = block.getKey();
             try {
