@@ -18,6 +18,7 @@ var cookie_secret = nconf.get("server:cookiesecret");
 app.use(cookieParser(cookie_secret));
 app.use('/assets', express.static(path.join(__dirname, '/client')));
 
+
 db.mongo()
     .then((res) => {
         console.log("A connection was successfully established with the server");

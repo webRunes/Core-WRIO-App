@@ -77,22 +77,34 @@ export default Reflux.createStore({
             strategy: findLinkEntities,
             component: LinkEntity
         }]);
-        let editorState = contentBlocks.length > 0 ? EditorState.createWithContent(ContentState.createFromBlockArray(contentBlocks), decorator) : EditorState.createEmpty(decorator);
+        let editorState = contentBlocks.length > 0 ?
+            EditorState.createWithContent(ContentState.createFromBlockArray(contentBlocks), decorator) :
+            EditorState.createEmpty(decorator);
+
         mentions.forEach((mention, i) => {
-            const entityKey = this.createLinkEntity(mention.linkTitle,mention.linkUrl,mention.linkDesc);
-            const key = contentBlocks[mention.block].getKey();
-            editorState = RichUtils.toggleLink(
-                editorState,
-                SelectionState.createEmpty(key).merge({
-                    anchorOffset: mention.start,
-                    focusKey: key,
-                    focusOffset: mention.end
-                }),
-                entityKey
-            );
+            const entityKey = this.createLinkEntity(mention.linkWord,mention.url,mention.linkDesc);
+            const block = contentBlocks[mention.block];
+            if (!block) {
+                console.warn("Cannot create mention",mention);
+                return
+            }
+            const key = block.getKey();
+            try {
+                editorState = RichUtils.toggleLink(
+                    editorState,
+                    SelectionState.createEmpty(key).merge({
+                        anchorOffset: mention.start,
+                        focusKey: key,
+                        focusOffset: mention.end
+                    }),
+                    entityKey
+                );
+            } catch (e) {
+                console.error("Unable to map mention",e); // lets just skip buggy mention for now
+            }
+
         });
         return editorState;
-        //this.onPublishEditorState(editorState);
 
     },
 

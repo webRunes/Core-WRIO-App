@@ -26,7 +26,6 @@ class Client extends Component {
             STORAGE_DOMAIN: "wr.io",
             editUrl:'',
             coreAdditionalHeight: 200,
-            contentBlocks: [],
             mentions: [],
             commentID: "",
             render: 0,
@@ -83,7 +82,7 @@ class Client extends Component {
                     });
                     resolve();
                 }).catch(error=> {
-                    console.log("Unable to download source article");
+                    console.log("Unable to download source article",error);
                 });
             }
         });
