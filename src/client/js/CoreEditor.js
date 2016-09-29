@@ -34,8 +34,6 @@ class CoreEditor extends React.Component {
             doc:doc
         };
 
-
-
         this.handleKeyCommand   = this.handleKeyCommand.bind(this);
         this.toggleBlockType    = this.toggleBlockType.bind(this);
         this.toggleInlineStyle  = this.toggleInlineStyle.bind(this);
@@ -43,7 +41,6 @@ class CoreEditor extends React.Component {
         this.openEditPrompt      = this.openEditPrompt.bind(this);
         this.onLinkControlClick = this.onLinkControlClick.bind(this);
         this.focus              = this.focus.bind(this);
-
 
         TextEditorStore.listen(this.onStatusChange.bind(this));
         Reflux.listenTo(TextEditorStore,"onFocus");
