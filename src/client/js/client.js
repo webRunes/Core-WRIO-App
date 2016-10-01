@@ -26,7 +26,7 @@ class Loading extends Component {
 class LoadingError extends Component {
     render () {
         return (<div>
-            Oops, something went wrong during downloading of the page, pleas try again
+            Oops, something went wrong during downloading of the page, please try again
         </div>)
     }
 }
