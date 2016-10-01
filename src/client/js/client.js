@@ -19,7 +19,7 @@ class Loading extends Component {
         return (<div>
                 Loading source page....
                 <img src="https://default.wrioos.com/img/loading.gif" id="loadingInd"/>
-            </div>)
+            </div>);
     }
 }
 
@@ -27,7 +27,7 @@ class LoadingError extends Component {
     render () {
         return (<div>
             Oops, something went wrong during downloading of the page, please try again
-        </div>)
+        </div>);
     }
 }
 
@@ -105,7 +105,7 @@ class Client extends Component {
                     resolve();
                 }).catch(error=> {
                     console.log("Unable to download source article",error);
-                    this.setState({error:true})
+                    this.setState({error:true});
                 });
             }
         });
