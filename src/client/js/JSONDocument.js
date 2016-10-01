@@ -89,7 +89,10 @@ export default class JSONDocument extends GenericLDJsonDocument {
     }
     _parseArticlePart(subArticle, processUrl) {
         let articleText = '';
-        const name = subArticle.name || subArticle.headline;  // in case of SocialMediaPosting use headline
+        let name = subArticle.name;
+        if (name === undefined) { // in case of SocialMediaPosting use headline
+            name = subArticle.headline;
+        }
 
         if (this.name) {
             this.order++;
