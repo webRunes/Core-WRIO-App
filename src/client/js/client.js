@@ -14,6 +14,26 @@ import {extractFileName, parseUrl, getRegistredUser,appendIndex} from './webrune
 
 var domain = process.env.DOMAIN;
 
+class Loading extends Component {
+    render () {
+        return (<div>
+                Loading source page....
+                <img src="https://default.wrioos.com/img/loading.gif" id="loadingInd"/>
+            </div>)
+    }
+}
+
+class LoadingError extends Component {
+    render () {
+        return (<div>
+            Oops, something went wrong during downloading of the page, pleas try again
+        </div>)
+    }
+}
+
+
+
+
 class Client extends Component {
     constructor(props) {
         super(props);
@@ -29,7 +49,8 @@ class Client extends Component {
             mentions: [],
             commentID: "",
             render: 0,
-            doc: null
+            doc: null,
+            error: false
         };
         this.parseEditingUrl = this.parseEditingUrl.bind(this);
         this.parseArticleCore = this.parseArticleCore.bind(this);
@@ -52,6 +73,7 @@ class Client extends Component {
         }
     }
     componentWillMount() {
+        document.getElementById("loadingInd").style = 'display:none;';
         this.parseEditingUrl();
         let wrioID = null;
         getRegistredUser().then((data)=> 
@@ -83,18 +105,22 @@ class Client extends Component {
                     resolve();
                 }).catch(error=> {
                     console.log("Unable to download source article",error);
+                    this.setState({error:true})
                 });
             }
         });
     }
     render() {
-        return !this.state.render ? null : (
+        return (
             <div cssStyles={{width: '100%'}}>
-                <CoreEditor doc={this.state.doc}
+                {this.state.error? <LoadingError /> : ""}
+                {this.state.render ? <CoreEditor doc={this.state.doc}
                             saveRelativePath={this.state.saveRelativePath}
                             editUrl={this.state.editUrl}
                             author={this.formatAuthor(this.state.wrioID)}
-                            commentID={this.state.commentID} />
+                            commentID={this.state.commentID} /> :
+                    <Loading /> }
+
             </div>
         );
     }

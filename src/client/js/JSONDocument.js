@@ -6,6 +6,7 @@ import {extractMentions} from './mentions/mention';
 import Immutable from 'immutable';
 import {ContentBlock, CharacterMetadata, Entity} from 'draft-js';
 
+
 var cleshe = '<!DOCTYPE html><html><head><meta charset="utf-8">' +
     '<meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0">' +
     '<noscript><meta http-equiv="refresh" content="0; URL=https://wrioos.com/no_jscript.html"></noscript>' +
@@ -89,7 +90,10 @@ export default class JSONDocument extends GenericLDJsonDocument {
     }
     _parseArticlePart(subArticle, processUrl) {
         let articleText = '';
-        const name = subArticle.name || subArticle.headline;  // in case of SocialMediaPosting use headline
+        let name = subArticle.name;
+        if (name === undefined) { // in case of SocialMediaPosting use headline
+            name = subArticle.headline;
+        }
 
         if (this.name) {
             this.order++;
