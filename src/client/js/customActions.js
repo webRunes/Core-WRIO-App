@@ -35,7 +35,6 @@ const saveAction = (editorState, author, saveRelativePath, commentID,doc) => {
 };
 
 const saveAsAction = (editorState, author,commentID,doc) => {
-    console.log('save_as_action');
     doc.draftToHtml(editorState.getCurrentContent(), author, commentID).then(res => {
         let json = doc.getElementOfType('Article');
         let html = res.html;

@@ -82,16 +82,22 @@ export default class JSONDocument extends GenericLDJsonDocument {
         this.contentBlocks = [];
         this.mentions = [];
         this.comment = '';
+        this.order = 0;
     }
     _createMetadata(name) {
         return Immutable.List(name.split('').map(e => CharacterMetadata.create()));
     }
-    _parseSubArticle(subArticle, processUrl) {
+    _parseArticlePart(subArticle, processUrl) {
         let articleText = '';
+        const name = subArticle.name || subArticle.headline;  // in case of SocialMediaPosting use headline
+
+        if (this.name) {
+            this.order++;
+        }
         this.contentBlocks.push(new ContentBlock([
-            ['text', subArticle.name],
+            ['text', name],
             ['key', keyGen()],
-            ['characterList', this._createMetadata(subArticle.name)],
+            ['characterList', this._createMetadata(name)],
             ['type', 'header-two']
         ]));
         if (subArticle.articleBody) {
@@ -112,11 +118,12 @@ export default class JSONDocument extends GenericLDJsonDocument {
         }
     }
     toDraft() {
-        var article = this.getElementOfType("Article");
+        this.order = 0;
+        let article = this.getElementOfType("Article");
         this.mentions = article.mentions ? extractMentions(article.mentions) : [];
         this.comment = article.comment;
-        this._parseSubArticle(article,false);
-        article.hasPart.forEach(subarticle => this._parseSubArticle(subarticle, true));
+        this._parseArticlePart(article,false);
+        article.hasPart.forEach(subarticle => this._parseArticlePart(subarticle, true));
     }
     draftToJson(contentState) {
         let blockMap = contentState.getBlockMap(),
@@ -159,9 +166,10 @@ export default class JSONDocument extends GenericLDJsonDocument {
                 return !!entity && entity.getType() === 'LINK';
             }, (anchorOffset, focusOffset) => {
                 if (entity) {
-                    let _url = entity.getData().url.split('?'),
-                        url = _url[0],
-                        name = _url[1] || '';
+                    let data = entity.getData();
+                    let url = data.linkUrl,
+                        name = data.linkTitle || '',
+                        desc = data.linkDesc || '';
                     article.mentions.push(
                         getMention(name, "", `${url}?'${block.getText().substring(anchorOffset, focusOffset)}':${i},${anchorOffset}`)
                     );

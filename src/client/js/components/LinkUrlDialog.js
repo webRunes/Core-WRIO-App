@@ -1,5 +1,8 @@
 import React from 'react';
 import Modal from 'react-modal';
+import TextEditorActions from '../actions/texteditor.js';
+import LinkDialogActions from '../actions/linkdialog.js';
+import LinkDialogStore from '../stores/linkDialog.js';
 
 
 export default class LinkUrlDialog extends React.Component {
@@ -9,48 +12,60 @@ export default class LinkUrlDialog extends React.Component {
         this.onConfirmLink = this.onConfirmLink.bind(this);
         this.onTitleChange = this.onTitleChange.bind(this);
         this.onUrlChange = this.onUrlChange.bind(this);
-        this.onDescChange = this.onDescChange.bind(this);
-        this.onTitleInputKeyDown = this.onTitleInputKeyDown.bind(this);
-        this.onUrlInputKeyDown = this.onUrlInputKeyDown.bind(this);
-        this.onDescInputKeyDown = this.onDescInputKeyDown.bind(this);    
+        this.onDescChange = this.onDescChange.bind(this);  
         this.onCancelLink = this.onCancelLink.bind(this);
         this.onRemoveLink = this.onRemoveLink.bind(this);
+
+        this.state = LinkDialogStore.getInitialState();
+
+        LinkDialogStore.listen(this.onStatusChange.bind(this));
     }
-    onEditLink(e) {
-        e.preventDefault();
-        this.props.onEditLink(e);
+
+    onStatusChange(state) { // When s
+        this.setState(state);
     }
-    onConfirmLink(e) {
-        e.preventDefault();
-        this.props.onConfirmLink(e);
-    }
+
     onTitleChange(e) {
-        this.props.onTitleChange(e);
+        LinkDialogActions.titleChange(e.target.value);
     }
     onUrlChange(e) {
-        this.props.onUrlChange(e);
+        LinkDialogActions.urlChange(e.target.value);
     }
     onDescChange(e) {
-        this.props.onDescChange(e);
+        LinkDialogActions.descChange(e.target.value);
     }
-    onTitleInputKeyDown(e) {
-        this.props.onTitleInputKeyDown(e);
+
+    onEditLink(e) {
+        e.preventDefault();
+        const {titleValue, urlValue, descValue,linkEntityKey} = this.state;
+        TextEditorActions.editLink(titleValue,urlValue,descValue,linkEntityKey);
+        LinkDialogActions.closeDialog();
     }
-    onUrlInputKeyDown(e) {
-        this.props.onUrlInputKeyDown(e);
+    onConfirmLink(e) {
+        e.preventDefault(e);
+        const {titleValue, urlValue, descValue} = this.state;
+        TextEditorActions.createNewLink(titleValue,urlValue,descValue);
+        LinkDialogActions.closeDialog();
     }
-    onDescInputKeyDown(e) {
-        this.props.onDescInputKeyDown(e);
-    }
+
     onCancelLink(e) {
         e.preventDefault();
-        this.props.onCancelLink(e);
+        LinkDialogActions.closeDialog();
+
     }
+
     onRemoveLink(e) {
         e.preventDefault();
-        this.props.onRemoveLink(e);
+        const {linkEntityKey} = this.state;
+        TextEditorActions.removeLink(linkEntityKey);
+        LinkDialogActions.closeDialog();
     }
+
+
+
     render() {
+
+        if (!this.state.showURLInput) return (<div></div>);
         const customStyles = {
           overlay : {
             position          : 'fixed',
@@ -81,8 +96,7 @@ export default class LinkUrlDialog extends React.Component {
                           id="linkTitle"
                           style={styles.linkTitleInput}
                           type="text"
-                          value={this.props.titleValue}
-                          onClick={this.onTitleInputKeyDown}
+                          value={this.state.titleValue}
                           className="form-control"
                         />
                     </div>
@@ -93,8 +107,7 @@ export default class LinkUrlDialog extends React.Component {
                           id="linkUrl"
                           ref="linkUrl"
                           type="text"
-                          value={this.props.urlValue}
-                          onClick={this.onUrlInputKeyDown}
+                          value={this.state.urlValue}
                           className="form-control"
                         />
                     </div>
@@ -105,19 +118,18 @@ export default class LinkUrlDialog extends React.Component {
                           id="linkDesc"
                           ref="linkDesc"
                           type="text"
-                          value={this.props.descValue}
-                          onClick={this.onDescInputKeyDown}
+                          value={this.state.descValue}
                           className="form-control"
                         />
                     </div>
-                    <div class="form-group">
-                        <button onClick={this.props.isEditLink ? this.onEditLink : this.onConfirmLink} className="btn btn-primary">
+                    <div className="form-group">
+                        <button onClick={this.state.isEditLink ? this.onEditLink : this.onConfirmLink} className="btn btn-primary">
                             Confirm
                         </button>
                         <button className="btn btn-warning" onClick={this.onCancelLink}>
                             Cancel
                         </button>
-                        {this.props.isEditLink ? (<button className="btn btn-danger" onClick={this.onRemoveLink}>
+                        {this.state.isEditLink ? (<button className="btn btn-danger" onClick={this.onRemoveLink}>
                             Remove
                         </button>) : null}
                     </div>
@@ -128,20 +140,6 @@ export default class LinkUrlDialog extends React.Component {
 };
 
 LinkUrlDialog.propTypes = {
-    onEditLink: React.PropTypes.func,
-    onConfirmLink: React.PropTypes.func,
-    onTitleChange: React.PropTypes.func,
-    onUrlChange: React.PropTypes.func,
-    onDescChange: React.PropTypes.func,
-    onTitleInputKeyDown: React.PropTypes.func,
-    onUrlInputKeyDown: React.PropTypes.func,
-    onDescInputKeyDown: React.PropTypes.func,
-    onCancelLink: React.PropTypes.func,
-    onRemoveLink: React.PropTypes.func,
-    isEditLink: React.PropTypes.bool,
-    titleValue: React.PropTypes.string,
-    urlValue: React.PropTypes.string,
-    descValue: React.PropTypes.string
 };
 
 const styles = {

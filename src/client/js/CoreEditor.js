@@ -1,9 +1,13 @@
 import React from 'react';
+import Reflux from 'reflux';
 import {CompositeDecorator, ContentState, SelectionState, Editor, EditorState, Entity, RichUtils, CharacterMetadata, getDefaultKeyBinding,  Modifier} from 'draft-js';
+import TextEditorStore from './stores/texteditor.js';
+import TextEditorActions from './actions/texteditor.js';
+import LinkDialogActions from './actions/linkdialog.js';
 import CustomActions from './customActions';
 import CommentEnabler from './CommentEnabler.js';
-
-import LinkUrlDialog from './LinkUrlDialog.js';
+import StyleButton from './components/StyleButton.js';
+import LinkUrlDialog from './components/LinkUrlDialog.js';
 
 class CoreEditor extends React.Component {
     constructor(props) {
@@ -18,306 +22,73 @@ class CoreEditor extends React.Component {
             contentBlocks = [];
             mentions = [];
         }
+
+        TextEditorStore.setLinkEditCallback(this.openEditPrompt.bind(this));
+
         this.state = {
-            editorState: this.getEditorState(contentBlocks,mentions),
-            showURLInput: false,
-            isEditLink: false,
-            linkEntityKey: 0,
-            titleValue: '',
-            urlValue: '',
-            descValue: '',
+            editorState:TextEditorStore.createEditorState(contentBlocks,mentions),
             saveRelativePath: props.saveRelativePath,
             editUrl: props.editUrl,
             author: props.author,
             commentID: this.props.commentID,
             doc:doc
         };
+
         this.handleKeyCommand   = this.handleKeyCommand.bind(this);
         this.toggleBlockType    = this.toggleBlockType.bind(this);
         this.toggleInlineStyle  = this.toggleInlineStyle.bind(this);
         this.toggleCustomAction = this.toggleCustomAction.bind(this);
-        this.promptForLink      = this.promptForLink.bind(this);
-        this.promptForEdit      = this.promptForEdit.bind(this);
-        this.onTitleChange      = this.onTitleChange.bind(this);
-        this.onUrlChange        = this.onUrlChange.bind(this);
-        this.onDescChange       = this.onDescChange.bind(this);
+        this.openEditPrompt      = this.openEditPrompt.bind(this);
+        this.onLinkControlClick = this.onLinkControlClick.bind(this);
         this.focus              = this.focus.bind(this);
-        this.onChange           = this.onChange.bind(this);
-        this.confirmLink        = this.confirmLink.bind(this);
-        this.editLink           = this.editLink.bind(this);
-        this.cancelLink         = this.cancelLink.bind(this);
-        this.removeLink         = this.removeLink.bind(this);
-        this.onTitleInputKeyDown = this.onTitleInputKeyDown.bind(this);
-        this.onUrlInputKeyDown = this.onUrlInputKeyDown.bind(this);
-        this.onDescInputKeyDown = this.onDescInputKeyDown.bind(this);
+
+        TextEditorStore.listen(this.onStatusChange.bind(this));
+        Reflux.listenTo(TextEditorStore,"onFocus");
     }
-    onChange(editorState) {
+
+
+    onStatusChange(state) { // When s
         this.setState({
-            editorState
+            editorState:state.editorState
         });
     }
+
+    handleChange (editorState) {
+        this.setState({
+            editorState:editorState
+        });
+        console.log("Action");
+        TextEditorActions.updateEditorState(editorState);
+    }
+
     focus() {
         this.refs.editor.focus();
     }
-    onTitleChange(e) {
-        this.setState({
-            titleValue: e.target.value
-        });
+    onFocus()
+    {
+        setTimeout(() => this.focus(), 0);
     }
-    onUrlChange(e) {
-        this.setState({
-            urlValue: e.target.value
-        });
+
+    onLinkControlClick() {
+        var title = TextEditorStore.getSelectedText();
+        LinkDialogActions.openToCreate(title,"","");
     }
-    onDescChange(e) {
-        this.setState({
-            descValue: e.target.value
-        });
+
+    openEditPrompt(titleValue, urlValue, descValue, linkEntityKey) {
+        LinkDialogActions.openToEdit(titleValue,urlValue,descValue,linkEntityKey);
     }
-    getEditorState(contentBlocks, mentions) {
-        const decorator = new CompositeDecorator([{
-            strategy: findLinkEntities,
-            component: Link
-        }]);
-        let editorState = contentBlocks.length > 0 ? EditorState.createWithContent(ContentState.createFromBlockArray(contentBlocks), decorator) : EditorState.createEmpty(decorator);
-        mentions.forEach((mention, i) => {
-            const entityKey = Entity.create('LINK', 'MUTABLE', {
-                linkTitle: mention.linkTitle,
-                linkUrl: mention.linkUrl,
-                linkDesc: mention.linkDesc,
-                onLinkEdit: this.promptForEdit.bind(this)
-            });
-            const key = contentBlocks[mention.block].getKey();
-            editorState = RichUtils.toggleLink(
-                editorState,
-                SelectionState.createEmpty(key).merge({
-                    anchorOffset: mention.start,
-                    focusKey: key,
-                    focusOffset: mention.end
-                }),
-                entityKey
-            );
-        }); 
-        return editorState;
-    }
-    promptForLink() {
 
-        var title = this.getSelectedText();
-        
-        this.setState({
-            showURLInput: 1,
-            titleValue: title
-        });
-            
-    }
-    getSelectedText() {
-        const {
-            editorState
-        } = this.state;
-        var title = '';
-        const selectionState = editorState.getSelection();
-        const blockKey = selectionState.getAnchorKey();
-        const contentBlocks = editorState.getCurrentContent().getBlocksAsArray();
-        var start = selectionState.getStartOffset();
-        var end = selectionState.getEndOffset();
-
-         contentBlocks.forEach((block) => {
-                if(block.key === blockKey){
-                    title = block.text.slice(start, end);
-                }
-            });
-         return title;
-    }
-    promptForEdit(titleValue, urlValue, descValue, linkEntityKey) {
-        const {
-            editorState
-        } = this.state;
-        this.setState({
-            showURLInput: 1,
-            isEditLink: 1,
-            titleValue,
-            urlValue,
-            descValue,
-            linkEntityKey
-        });
-    }
-    editLink(e) {
-        e.preventDefault();
-        const {
-            titleValue, urlValue, descValue, linkEntityKey
-        } = this.state;
-        Entity.mergeData(linkEntityKey, {
-            linkTitle: titleValue,
-            linkUrl: urlValue,
-            linkDesc: descValue
-        });
-        this.setState({
-            showURLInput: 0,
-            isEditLink: 0,
-            linkEntityKey: 0,
-            titleValue: '',
-            urlValue: '',
-            descValue: ''
-        }, () => {
-            setTimeout(() => this.refs.editor.focus(), 0);
-        });
-    }
-    cancelLink(e) {
-        e.preventDefault();
-        this.setState({
-            showURLInput: 0,
-            isEditLink: 0,
-            linkEntityKey: 0,
-            titleValue: '',
-            urlValue: '',
-            descValue: ''
-        }, () => {
-            setTimeout(() => this.refs.editor.focus(), 0);
-        });
-    }
-    removeLink(e) {
-        e.preventDefault();
-        const {
-            linkEntityKey,
-            editorState
-        } = this.state;
-        let _editorState;
-        editorState.getCurrentContent().getBlockMap().map(block => {
-            block.findEntityRanges(char => {
-                let entityKey = char.getEntity();
-                return !!entityKey && entityKey === linkEntityKey && Entity.get(entityKey).getType() === 'LINK';
-            }, (anchorOffset, focusOffset) => {
-                _editorState = RichUtils.toggleLink(
-                    editorState,
-                    SelectionState.createEmpty(block.getKey()).merge({
-                        anchorOffset,
-                        focusKey: block.getKey(),
-                        focusOffset
-                    }),
-                    null
-                );
-            });
-        });
-        this.setState({
-            editorState: _editorState || editorState,
-            showURLInput: 0,
-            isEditLink: 0,
-            linkEntityKey: 0,
-            titleValue: '',
-            urlValue: '',
-            descValue: ''
-        }, () => {
-            setTimeout(() => this.refs.editor.focus(), 0);
-        });
-    }
-    confirmLink(e) {
-        e.preventDefault();
-
-        const {
-            editorState, titleValue, urlValue, descValue
-        } = this.state;
-        const entityKey = Entity.create('LINK', 'MUTABLE', {
-            linkTitle: titleValue,
-            linkUrl: urlValue,
-            linkDesc: descValue,
-            onLinkEdit: this.promptForEdit
-        });
-
-
-
-      
-        // const content = editorState.getCurrentContent();
-        // const selection = editorState.getSelection();
-        // const start = selection.getStartOffset();
-        // const end = selection.getEndOffset();
-
-        // const block = content.getBlockForKey(selection.getAnchorKey());
-        // const word = block.getText();
-        // const result = word.slice(this.state.lastOffset, selection.getEndOffset());
-        // const newSelection = new SelectionState({
-        //   anchorKey: block.getKey(),
-        //   anchorOffset: start,
-        //   focusKey: block.getKey(),
-        //   focusOffset: end
-        // });
-        // const contentReplaced = Modifier.replaceText(
-        //         content,
-        //         newSelection,
-        //         titleValue);
-        // const editorStateModified = EditorState.push(
-        //  editorState,
-        //  contentReplaced,
-        //  'replace-text'
-        // );
-
-        // this.setState({lastOffset: selection.getEndOffset(), editorState:editorStateModified});
-
-
-
-
-
-
-        // const contentInserted = Modifier.insertText(
-        //   editorState.getCurrentContent(),
-        //   editorState.getSelection(),
-        //   titleValue
-        // );
-
-        // const editorStateModified = EditorState.push(
-        //  editorState,
-        //  contentInserted,
-        //  'insert-text'
-        // );
-
-        // this.setState({editorState:editorStateModified});
-
-
-
-
-
-        let _editorState = RichUtils.toggleLink(
-            editorState,
-            editorState.getSelection(),
-            entityKey
-        );
-        this.setState({
-            editorState: _editorState,
-            showURLInput: false,
-            titleValue: '',
-            urlValue: '',
-            descValue: ''
-        }, () => {
-            setTimeout(() => this.refs.editor.focus(), 0);
-        });
-    }
-    onTitleInputKeyDown(e) {
-        if (e.which === 13) {
-            this.state.isEditLink ? this.editLink(e) : this.confirmLink(e);
-        }
-    }
-    onUrlInputKeyDown(e) {
-        if (e.which === 13) {
-            this.state.isEditLink ? this.editLink(e) : this.confirmLink(e);
-        }
-    }
-    onDescInputKeyDown(e) {
-        if (e.which === 13) {
-            this.state.isEditLink ? this.editLink(e) : this.confirmLink(e);
-        }
-    }
     handleKeyCommand(command) {
-        const {
-            editorState
-        } = this.state;
+        const {editorState} = this.state;
         const newState = RichUtils.handleKeyCommand(editorState, command);
         if (newState) {
-            this.onChange(newState);
+            TextEditorActions.publishEditorState(newState);
             return true;
         }
         return false;
     }
     toggleBlockType(blockType) {
-        this.onChange(
+        TextEditorActions.publishEditorState(
             RichUtils.toggleBlockType(
                 this.state.editorState,
                 blockType
@@ -325,7 +96,7 @@ class CoreEditor extends React.Component {
         );
     }
     toggleInlineStyle(inlineStyle) {
-        this.onChange(
+        TextEditorActions.publishEditorState(
             RichUtils.toggleInlineStyle(
                 this.state.editorState,
                 inlineStyle
@@ -350,10 +121,12 @@ class CoreEditor extends React.Component {
       }
       return getDefaultKeyBinding(e);
     }
+
+
+
+
     render() {
-        const {
-            editorState
-        } = this.state;
+        const {editorState} = this.state;
         // If the user changes block type before entering any text, we can
         // either style the placeholder or hide it. Let's just hide it now.
         let className = 'RichEditor-editor';
@@ -370,37 +143,19 @@ class CoreEditor extends React.Component {
                   <BlockStyleControls
                     editorState={editorState}
                     onToggle={this.toggleBlockType}
-                    onLinkToggle={this.promptForLink}
+                    onLinkToggle={this.onLinkControlClick}
                   />
                   <InlineStyleControls
                     editorState={editorState}
                     onToggle={this.toggleInlineStyle}
                   />
-                  { !this.state.showURLInput ? null : 
-                  
-                  
-                    <LinkUrlDialog
-                        isEditLink={this.state.isEditLink} 
-                        titleValue={this.state.titleValue} 
-                        urlValue={this.state.urlValue}
-                        descValue={this.state.descValue}
-                        onCancelLink={this.cancelLink} 
-                        onRemoveLink={this.removeLink} 
-                        onEditLink={this.editLink} 
-                        onConfirmLink={this.confirmLink} 
-                        onTitleInputKeyDown={this.onTitleInputKeyDown} 
-                        onUrlInputKeyDown={this.onUrlInputKeyDown}
-                        onDescInputKeyDown={this.onDescInputKeyDown}
-                        onTitleChange={this.onTitleChange}
-                        onUrlChange={this.onUrlChange}
-                        onDescChange={this.onDescChange}/> 
-                   }
+                    <LinkUrlDialog />
                   <div className={className} onClick={this.focus}>
                     <Editor
                       blockStyleFn={getBlockStyle}
                       editorState={editorState}
                       handleKeyCommand={this.handleKeyCommand}
-                      onChange={this.onChange}
+                      onChange={this.handleChange.bind(this)}
                       placeholder="Enter text..."
                       ref="editor"
                       spellCheck={true}
@@ -409,10 +164,10 @@ class CoreEditor extends React.Component {
                   </div>
                 </div>
                 <CommentEnabler commentID={this.state.commentID} author={this.props.author} editUrl={this.state.editUrl} gotCommentID={this.gotCommentID.bind(this)}/>
-                <button type="button" className="btn btn-default btn-sm" onClick={() => this._toggleCustomAction('saveas')}>
+                <button type="button" className="btn btn-default btn-sm" onClick={() => this.toggleCustomAction('save')}>
                     Save
                 </button>
-                <button type="button" className="btn btn-default btn-sm" onClick={() => this._toggleCustomAction('save')}>
+                <button type="button" className="btn btn-default btn-sm" onClick={() => this.toggleCustomAction('saveas')}>
                     Save as
                 </button>
             </div>
@@ -436,35 +191,6 @@ function getBlockStyle(block) {
             return null;
     }
 }
-
-class StyleButton extends React.Component {
-    constructor() {
-        super();
-        this.onToggle = this.onToggle.bind(this);
-    }
-    onToggle(e) {
-        e.preventDefault();
-        this.props.onToggle(this.props.style);
-    }
-    render() {
-        let className = 'RichEditor-styleButton';
-        if (this.props.active) {
-            className += ' RichEditor-activeButton';
-        }
-        return (
-            <span className={className} onMouseDown={this.onToggle}>
-              {this.props.label}
-            </span>
-        );
-    }
-}
-
-StyleButton.propTypes = {
-    onToggle: React.PropTypes.func,
-    style: React.PropTypes.string,
-    active: React.PropTypes.bool,
-    label: React.PropTypes.string
-};
 
 
 const BLOCK_TYPES = [
@@ -621,59 +347,8 @@ CustomActionControls.propTypes = {
     onToggle: React.PropTypes.func
 };
 
-function findLinkEntities(contentBlock, callback) {
-    contentBlock.findEntityRanges(
-        (character) => {
-            const entityKey = character.getEntity();
-            return (
-                !!entityKey &&
-                Entity.get(entityKey).getType() === 'LINK'
-            );
-        },
-        callback
-    );
-}
 
 
-class Link extends React.Component {
-    constructor(props) {
-        super(props);
-        const {
-            linkTitle, linkUrl, linkDesc, onLinkEdit
-        } = Entity.get(props.entityKey).getData();
-        this.linkTitle = linkTitle;
-        this.linkUrl = linkUrl;
-        this.linkDesc = linkDesc;
-        this.onLinkEdit = (e) => {
-            e.preventDefault();
-            onLinkEdit(this.linkTitle, this.linkUrl, this.linkDesc, props.entityKey);
-        };
-    }
-    componentWillReceiveProps(props) {
-        const {
-            linkTitle, linkUrl, linkDesc, onLinkEdit
-        } = Entity.get(props.entityKey).getData();
-        this.linkTitle = linkTitle;
-        this.linkUrl = linkUrl;
-        this.linkDesc = linkDesc;
-        this.onLinkEdit = (e) => {
-            e.preventDefault();
-            onLinkEdit(this.linkTitle, this.linkUrl, this.linkDesc, props.entityKey);
-        };
-    }
-    render() {
-        return (
-            <a href={this.linkUrl} onClick={this.onLinkEdit}>
-                {this.linkTitle}
-            </a>
-        );
-    }
-};
-
-Link.propTypes = {
-    entityKey: React.PropTypes.string,
-    children: React.PropTypes.array
-};
 
 const styles = {
     root: {
@@ -706,3 +381,14 @@ const styles = {
 
 
 export default CoreEditor;
+
+// hack to supppress warnings
+console.error = (function() {
+    var error = console.error;
+
+    return function(exception) {
+        if ((exception + '').indexOf('Warning: A component is `contentEditable`') != 0) {
+            error.apply(console, arguments);
+        }
+    };
+})();
