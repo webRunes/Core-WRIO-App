@@ -65,7 +65,7 @@ export default class LinkUrlDialog extends React.Component {
 
     render() {
 
-        if (!this.state.showURLInput) return (<div></div>);
+        if (!this.state.showURLInput){ return (<div></div>);}
         const customStyles = {
           overlay : {
             position          : 'fixed',
