@@ -57,7 +57,7 @@ export default class CommentEnabler extends React.Component {
         var clearfix = {"clear":"both"};
 
         return (
-            <div className="text-left">
+            <div className="text-left clearfix">
                 <div className="checkbox col-sm-2">
                     <label><input type="checkbox" value=""
                                   checked={this.state.isChecked}
@@ -89,8 +89,48 @@ CommentEnabler.propTypes = {
 };
 
 class MethodPicker extends React.Component {
+
+    constructor(props) {
+        super(props);
+        this.state={
+            dropdownSource: 'Disabled'
+        }
+    }
+
+    setSource(source) {
+        this.setState({
+            dropdownSource: source
+        });
+    }
+
+    genDropdownSource(name) {
+        const active = this.state.dropdownSource == name;
+        return (<li>
+            <a href="#" onClick={() => this.setSource(name)}>
+                {active && <span className="glyphicon glyphicon-ok pull-right"></span>}
+                {name}</a>
+        </li>);
+    }
+
     render() {
-        return (<div>
+        return (<div className="clearfix">
+            <div className="form-group">
+                <label htmlFor="id-Storage" className="col-xs-12 col-sm-4 col-md-3 control-label"><span className="glyphicon glyphicon-question-sign" aria-hidden="true" data-toggle="tooltip" data-placement="left" title="Use [Save as..] to save your file locally for its further manual transfer to any server or service such as Google Drive, Dropbox, GitHub Pages and etc."></span> Storage</label>
+                <div className="col-xs-6 col-sm-4 col-md-4">
+                    <div className="btn-group dropdown-menu-full-width">
+                        <button type="button" className="btn btn-white btn-block dropdown-toggle ia-author" data-toggle="dropdown">
+                            <span className="caret"></span>{this.state.dropdownSource}
+                        </button>
+                        <ul className="dropdown-menu" role="menu">
+                            {this.genDropdownSource('Disabled')}
+                            {this.genDropdownSource('Enabled')}
+                            <li className="divider" />
+                            {this.genDropdownSource('Custom')}
+                        </ul>
+                    </div>
+                    <div className="help-block"><a href="">Need help?</a></div>
+                </div>
+            </div>
             <div className="radio">
                 <label><input type="radio" name="optradio" value="1"/>Get comment widget id from webRunes (Recommended,
                     no

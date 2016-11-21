@@ -8,6 +8,7 @@ import CustomActions from './customActions';
 import CommentEnabler from './CommentEnabler.js';
 import StyleButton from './components/StyleButton.js';
 import LinkUrlDialog from './components/LinkUrlDialog.js';
+import PostSettings from './components/Postsettings.js';
 
 class CoreEditor extends React.Component {
     constructor(props) {
@@ -38,7 +39,7 @@ class CoreEditor extends React.Component {
         this.toggleBlockType    = this.toggleBlockType.bind(this);
         this.toggleInlineStyle  = this.toggleInlineStyle.bind(this);
         this.toggleCustomAction = this.toggleCustomAction.bind(this);
-        this.openEditPrompt      = this.openEditPrompt.bind(this);
+        this.openEditPrompt     = this.openEditPrompt.bind(this);
         this.onLinkControlClick = this.onLinkControlClick.bind(this);
         this.focus              = this.focus.bind(this);
 
@@ -87,6 +88,7 @@ class CoreEditor extends React.Component {
         }
         return false;
     }
+
     toggleBlockType(blockType) {
         TextEditorActions.publishEditorState(
             RichUtils.toggleBlockType(
@@ -95,6 +97,7 @@ class CoreEditor extends React.Component {
             )
         );
     }
+
     toggleInlineStyle(inlineStyle) {
         TextEditorActions.publishEditorState(
             RichUtils.toggleInlineStyle(
@@ -103,27 +106,36 @@ class CoreEditor extends React.Component {
             )
         );
     }
+
     toggleCustomAction(action) {
         // this is the place where to pass arguments to custom actions
-        CustomActions.toggleCustomAction(this.state.editorState, action, this.state.saveRelativePath, this.state.author,this.state.commentID,this.state.doc);
+        CustomActions.toggleCustomAction(
+            this.state.editorState,
+            action,
+            this.state.saveRelativePath,
+            this.state.author,
+            this.state.commentID,
+            this.state.doc,
+            this.state.description
+        );
     }
+
     gotCommentID (id) {
         this.setState({
             commentID:id
         });
     }
+
     componentDidUpdate () {
         window.frameReady();
     }
+
     myKeyBindingFn(e) {
       if (e.keyCode === 13) {
         window.frameReady();
       }
       return getDefaultKeyBinding(e);
     }
-
-
-
 
     render() {
         const {editorState} = this.state;
@@ -136,9 +148,11 @@ class CoreEditor extends React.Component {
                 className += ' RichEditor-hidePlaceholder';
             }
         }
-        
+
+        const about = this.state.doc.getElementOfType('Article').about || "";
+
         return (
-            <div>
+            <div className="col-xs-12">
                 <div className="RichEditor-root">
                   <BlockStyleControls
                     editorState={editorState}
@@ -163,53 +177,35 @@ class CoreEditor extends React.Component {
                     />
                   </div>
                 </div>
-                <div className="row ">
-                    <div className="col-xs-6">
-                        <CommentEnabler commentID={this.state.commentID} author={this.props.author} editUrl={this.state.editUrl} gotCommentID={this.gotCommentID.bind(this)}/>
-                    </div>
-                    <div className="col-xs-6">
-                        <button type="button" className="btn btn-default btn-sm pull-right" onClick={() => this.toggleCustomAction('save')}>
-                            Save
-                        </button>
-                        <button type="button" className="btn btn-default btn-sm pull-right" onClick={() => this.toggleCustomAction('saveas')}>
-                            Save as
-                        </button>
-                    </div>
+
+            <div className="form-group form-inline has-error">
+                <label htmlFor="id-Description" className="col-sm-4 col-md-3 control-label">Comments</label>
+                <div className="col-sm-8 col-md-9">
+                    <CommentEnabler commentID={this.state.commentID}
+                                    author={this.props.author}
+                                    editUrl={this.state.editUrl}
+                                    gotCommentID={this.gotCommentID.bind(this)}/>
                 </div>
-                <div className="form-group form-inline has-error">
-                    <label htmlFor="id-Description" className="col-sm-4 col-md-3 control-label">Description</label>
-                    <div className="col-sm-8 col-md-9">
-                        <input className="form-control" type="text" maxlength="512" placeholder="Optional. Max 512 characters" />
-                        <div className="help-block">Max 512 characters</div>
-                    </div>
-                </div>
-                <div className="form-group">
-                    <label htmlFor="id-Storage" className="col-xs-12 col-sm-4 col-md-3 control-label"><span className="glyphicon glyphicon-question-sign" aria-hidden="true" data-toggle="tooltip" data-placement="left" title="Use [Save as..] to save your file locally for its further manual transfer to any server or service such as Google Drive, Dropbox, GitHub Pages and etc."></span> Storage</label>
-                    <div className="col-xs-6 col-sm-4 col-md-4">
-                        <div className="btn-group dropdown-menu-full-width">
-                            <button type="button" className="btn btn-white btn-block dropdown-toggle ia-author" data-toggle="dropdown">
-                                <span className="caret"></span>WRIO OS
-                            </button>
-                            <ul className="dropdown-menu" role="menu">
-                                <li><a href="#"><span className="glyphicon glyphicon-ok pull-right"></span>WRIO OS</a></li>
-                                <li><a href="#">Save as..</a></li>
-                            </ul>
-                        </div>
-                        <div className="help-block">https://wr.io/id/Untitled/</div>
-                    </div>
-                    <div className="col-xs-6 col-sm-4 col-md-5">
-                        <input type="text" className="form-control" id="File-name" placeholder="Untitled" />
-                    </div>
-                </div>
-                <div className="form-group col-xs-12">
-                    <div className="pull-right">
-                        <button type="button" className="btn btn-default"><span className="glyphicon glyphicon-remove"></span>Cancel</button>
-                        <a href="blogs-create-enable_comments.htm" className="btn btn-success"><span className="glyphicon glyphicon-open"></span>Publish</a>
-                    </div>
-                </div>
+            </div>
+            <br />
+            <PostSettings saveUrl={this.state.editUrl}
+                          onPublish={this.publish.bind(this)}
+                          description={about}
+                />
+
             </div>
         );
     }
+
+    publish(source,file,desc) {
+        console.log(file,desc);
+        this.setState({
+            saveRelativePath: file,
+            description: desc
+        });
+        this.toggleCustomAction(source);
+    }
+
 }
 
 CoreEditor.propTypes = {
@@ -219,6 +215,7 @@ CoreEditor.propTypes = {
     author: React.PropTypes.string,
     commentID: React.PropTypes.string
 };
+
 
 function getBlockStyle(block) {
     switch (block.getType()) {
@@ -412,7 +409,7 @@ const styles = {
     },
     button: {
         marginTop: 10,
-        textAlign: 'center',
+        textAlign: 'center'
     }
 };
 
