@@ -10,7 +10,9 @@ import Immutable from 'immutable';
 import JSONDocument from './JSONDocument.js';
 import CommentSaver from './CommentSaver.js';
 import {urlMatch as CommentSaverUrlMatch} from './CommentSaver.js';
-import {extractFileName, parseUrl, getRegistredUser,appendIndex} from './webrunesAPI.js';
+import { getRegistredUser} from './webrunesAPI.js';
+import {parseEditingUrl, extractFileName, parseUrl, appendIndex} from './utils/url.js';
+import WrioStore from './stores/wrio.js';
 
 var domain = process.env.DOMAIN;
 
@@ -32,8 +34,6 @@ class LoadingError extends Component {
 }
 
 
-
-
 class Client extends Component {
     constructor(props) {
         super(props);
@@ -43,7 +43,6 @@ class Client extends Component {
             wrioID: '',
             saveUrl: '',
             saveDisabled: 0,
-            STORAGE_DOMAIN: "wr.io",
             editUrl:'',
             coreAdditionalHeight: 200,
             mentions: [],
@@ -59,31 +58,24 @@ class Client extends Component {
         return id ? `https://wr.io/${id}/?wr.io=${id}` : 'unknown';
     }
     parseEditingUrl() {
-        let editUrl = window.location.search.match(/\?article=([\.0-9a-zA-Z%:\/?]*)/);
-        if (editUrl) {
-            editUrl = appendIndex(editUrl[1]);
-            this.setState({
-                editUrl: editUrl
-            });
-            let editUrlParsed = parseUrl(editUrl);
-            console.log("Page edit link received", editUrl);
-            if (editUrlParsed && editUrlParsed.host == this.state.STORAGE_DOMAIN) {
-                this.state.saveRelativePath = extractFileName(editUrlParsed.pathname);
-            }
-        }
+        const [editUrl, saveRelativePath] = parseEditingUrl();
+        this.setState({
+            editUrl: editUrl,
+            saveRelativePath: saveRelativePath
+        });
     }
     componentWillMount() {
         document.getElementById("loadingInd").style = 'display:none;';
         this.parseEditingUrl();
         let wrioID = null;
-        getRegistredUser().then((data)=> 
-            this.parseArticleCore(wrioID = data)
-        ).then((res)=> 
-            this.setState({
-                wrioID,
-                render: 1
-            })
-        ).catch((e)=> console.error(e.stack));
+        WrioStore.listen((state) => {
+            this.parseArticleCore(state.wrioID).then((res)=>
+                    this.setState({
+                        wrioID,
+                        render: 1
+                    })
+            ).catch((e)=> console.error(e.stack));
+        });
     }
     parseArticleCore(author) {
         return new Promise((resolve, reject)=> {
@@ -110,9 +102,14 @@ class Client extends Component {
             }
         });
     }
+
+    componentDidUpdate() {
+        frameReady();
+    }
+
     render() {
         return (
-            <div cssStyles={{width: '100%'}}>
+            <div cssStyles={{width: '100%'}} className="clearfix">
                 {this.state.error? <LoadingError /> : ""}
                 {this.state.render ? <CoreEditor doc={this.state.doc}
                             saveRelativePath={this.state.saveRelativePath}

@@ -4,13 +4,13 @@ import {saveToS3} from './webrunesAPI.js';
 
 
 export default class CustomActions {
-    static toggleCustomAction(editorState, action, saveRelativePath, author,commentID, doc) {
+    static toggleCustomAction(editorState, action, saveRelativePath, author,commentID, doc, description) {
         switch (action) {
             case 'save':
-                saveAction(editorState, author, saveRelativePath,commentID, doc);
+                saveAction(editorState, author, saveRelativePath,commentID, doc, description);
                 break;
             case 'saveas':
-                saveAsAction(editorState, author,commentID, doc);
+                saveAsAction(editorState, author,commentID, doc, description);
                 break;
             default:
                 console.log('Invalid action');
@@ -20,8 +20,8 @@ export default class CustomActions {
 
 var domain = process.env.DOMAIN;
 
-const saveAction = (editorState, author, saveRelativePath, commentID,doc) => {
-    console.log('save_action');
+const saveAction = (editorState, author, saveRelativePath, commentID,doc,description) => {
+    doc.setAbout(description);
     doc.draftToHtml(editorState.getCurrentContent(), author,commentID).then(res => {
         let {json, html} = res;
         return saveToS3(saveRelativePath,html);
@@ -34,7 +34,8 @@ const saveAction = (editorState, author, saveRelativePath, commentID,doc) => {
     });
 };
 
-const saveAsAction = (editorState, author,commentID,doc) => {
+const saveAsAction = (editorState, author,commentID,doc, description) => {
+    doc.setAbout(description);
     doc.draftToHtml(editorState.getCurrentContent(), author, commentID).then(res => {
         let json = doc.getElementOfType('Article');
         let html = res.html;

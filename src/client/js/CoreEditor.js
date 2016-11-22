@@ -8,6 +8,7 @@ import CustomActions from './customActions';
 import CommentEnabler from './CommentEnabler.js';
 import StyleButton from './components/StyleButton.js';
 import LinkUrlDialog from './components/LinkUrlDialog.js';
+import PostSettings from './components/Postsettings.js';
 
 class CoreEditor extends React.Component {
     constructor(props) {
@@ -38,7 +39,7 @@ class CoreEditor extends React.Component {
         this.toggleBlockType    = this.toggleBlockType.bind(this);
         this.toggleInlineStyle  = this.toggleInlineStyle.bind(this);
         this.toggleCustomAction = this.toggleCustomAction.bind(this);
-        this.openEditPrompt      = this.openEditPrompt.bind(this);
+        this.openEditPrompt     = this.openEditPrompt.bind(this);
         this.onLinkControlClick = this.onLinkControlClick.bind(this);
         this.focus              = this.focus.bind(this);
 
@@ -87,6 +88,7 @@ class CoreEditor extends React.Component {
         }
         return false;
     }
+
     toggleBlockType(blockType) {
         TextEditorActions.publishEditorState(
             RichUtils.toggleBlockType(
@@ -95,6 +97,7 @@ class CoreEditor extends React.Component {
             )
         );
     }
+
     toggleInlineStyle(inlineStyle) {
         TextEditorActions.publishEditorState(
             RichUtils.toggleInlineStyle(
@@ -103,27 +106,36 @@ class CoreEditor extends React.Component {
             )
         );
     }
+
     toggleCustomAction(action) {
         // this is the place where to pass arguments to custom actions
-        CustomActions.toggleCustomAction(this.state.editorState, action, this.state.saveRelativePath, this.state.author,this.state.commentID,this.state.doc);
+        CustomActions.toggleCustomAction(
+            this.state.editorState,
+            action,
+            this.state.saveRelativePath,
+            this.state.author,
+            this.state.commentID,
+            this.state.doc,
+            this.state.description
+        );
     }
+
     gotCommentID (id) {
         this.setState({
             commentID:id
         });
     }
+
     componentDidUpdate () {
         window.frameReady();
     }
+
     myKeyBindingFn(e) {
       if (e.keyCode === 13) {
         window.frameReady();
       }
       return getDefaultKeyBinding(e);
     }
-
-
-
 
     render() {
         const {editorState} = this.state;
@@ -136,9 +148,11 @@ class CoreEditor extends React.Component {
                 className += ' RichEditor-hidePlaceholder';
             }
         }
-        
+
+        const about = this.state.doc.getElementOfType('Article').about || "";
+
         return (
-            <div>
+            <div className="col-xs-12">
                 <div className="RichEditor-root">
                   <BlockStyleControls
                     editorState={editorState}
@@ -163,16 +177,32 @@ class CoreEditor extends React.Component {
                     />
                   </div>
                 </div>
-                <CommentEnabler commentID={this.state.commentID} author={this.props.author} editUrl={this.state.editUrl} gotCommentID={this.gotCommentID.bind(this)}/>
-                <button type="button" className="btn btn-default btn-sm" onClick={() => this.toggleCustomAction('save')}>
-                    Save
-                </button>
-                <button type="button" className="btn btn-default btn-sm" onClick={() => this.toggleCustomAction('saveas')}>
-                    Save as
-                </button>
+
+            <br />
+            <CommentEnabler commentID={this.state.commentID}
+                            author={this.props.author}
+                            editUrl={this.state.editUrl}
+                            gotCommentID={this.gotCommentID.bind(this)}/>
+
+            <br />
+            <PostSettings saveUrl={this.state.editUrl}
+                          onPublish={this.publish.bind(this)}
+                          description={about}
+                />
+
             </div>
         );
     }
+
+    publish(source,file,desc) {
+        console.log(file,desc);
+        this.setState({
+            saveRelativePath: file,
+            description: desc
+        });
+        this.toggleCustomAction(source);
+    }
+
 }
 
 CoreEditor.propTypes = {
@@ -182,6 +212,7 @@ CoreEditor.propTypes = {
     author: React.PropTypes.string,
     commentID: React.PropTypes.string
 };
+
 
 function getBlockStyle(block) {
     switch (block.getType()) {
@@ -375,7 +406,7 @@ const styles = {
     },
     button: {
         marginTop: 10,
-        textAlign: 'center',
+        textAlign: 'center'
     }
 };
 
