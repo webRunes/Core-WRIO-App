@@ -7,12 +7,12 @@ import Immutable from 'immutable';
 import {ContentBlock, CharacterMetadata, Entity} from 'draft-js';
 
 
-var cleshe = '<!DOCTYPE html><html><head><meta charset="utf-8">' +
-    '<meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0">' +
-    '<noscript><meta http-equiv="refresh" content="0; URL=https://wrioos.com/no_jscript.html"></noscript>' +
-    '<meta name="description" content=""><meta name="author" content=""><meta name="keywords" content="">' +
-    '<title>|TITLE|</title>|BODY|' +
-    '</head><body><script type="text/javascript" src="https://wrioos.com/start.js"></script></body></html>';
+var cleshe = '<!DOCTYPE html><html><head><meta charset="utf-8">\n' +
+    '<meta http-equiv="X-UA-Compatible" content="IE=edge">\n<meta name="viewport" content="width=device-width, initial-scale=1.0">\n' +
+    '<noscript><meta http-equiv="refresh" content="0; URL=https://wrioos.com/no_jscript.html"></noscript>\n' +
+    '<meta name="description" content="|DESCRIPTION|"><meta name="author" content="">\n<meta name="keywords" content="">\n' +
+    '<title>|TITLE|</title>\n|BODY|' +
+    '</head>\n<body>\n<script type="text/javascript" src="https://wrioos.com/start.js">\n</script>\n</body></html>\n';
 
 const keyGen = () => 
     (new Date()).getTime().toString(32) + Math.random().toString(32);
@@ -45,7 +45,7 @@ class GenericLDJsonDocument {
         });
         return rv;
     }
-    makeArticle(lang, keywords, author, widgetData) {
+    makeArticle(lang, keywords, author, widgetData,about) {
         return {
             "@context": "http://schema.org",
             "@type": "Article",
@@ -54,18 +54,18 @@ class GenericLDJsonDocument {
             "author": author,
             "editor": "",
             "name": "",
-            "about": "",
+            "about": about,
             "articleBody": [],
             "hasPart": [],
             "mentions": [],
             "comment": widgetData
         };
     };
-    createArticle(author,commentID) {
+    createArticle(author,commentID,about) {
         if (this.getElementOfType("Article")) {
             console.log("Failed to create article, it already exists");
         } else {
-            this.jsonBlocks.push(this.makeArticle("En", "", author, commentID));
+            this.jsonBlocks.push(this.makeArticle("En", "", author, commentID,about));
         }
     }
     getCommentID() {
@@ -198,8 +198,15 @@ export default class JSONDocument extends GenericLDJsonDocument {
         var scrEnd = '</script>';
         var scripts = "";
         this.jsonBlocks.forEach((item) => {
-            scripts +=  scrStart + JSON.stringify(item) + scrEnd + '\n';
+            scripts +=  scrStart + JSON.stringify(item,null," ") + scrEnd + '\n';
         });
-        return cleshe.replace('|BODY|',scripts).replace('|TITLE|', this.getElementOfType('Article').name);
+        return cleshe.replace('|BODY|',scripts)
+            .replace('|TITLE|', this.getElementOfType('Article').name)
+            .replace('|DESCRIPTION|', this.getElementOfType('Article').about);
+    }
+
+    setAbout(text) {
+        let article = this.getElementOfType('Article');
+        article.about=text;
     }
 }

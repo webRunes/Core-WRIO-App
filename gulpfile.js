@@ -1,10 +1,8 @@
 require('babel-core/register');
 require('regenerator-runtime/runtime');
-
+console.log("Babel-core loaded");
 var gulp = require('gulp');
-var browserify = require('browserify');
 var babel = require('gulp-babel');
-var babelify = require('babelify');
 var source = require('vinyl-source-stream');
 var nodemon = require('gulp-nodemon');
 var yargs = require('yargs');
@@ -12,6 +10,7 @@ var argv = require('yargs').argv;
 var envify = require('envify/custom');
 var mocha = require('gulp-mocha');
 var eslint = require('gulp-eslint');
+var webpack = require('webpack');
 
 function restart_nodemon () {
     if (nodemon_instance) {
@@ -56,28 +55,6 @@ gulp.task('lint', function () {
         .pipe(eslint.failAfterError());
 });
 
-
-gulp.task('babel-server', function() {
-
-    gulp.src('src/index.js')
-        .pipe(babel())
-        .on('error', function(err) {
-            console.log('Babel server:', err.toString());
-        })
-        .pipe(gulp.dest('app'));
-
-    gulp.src('src/server/**/*.*')
-        .pipe(babel())
-        .on('error', function(err) {
-            console.log('Babel server:', err.toString());
-        })
-        .pipe(gulp.dest('app/server'))
-        .on('end',function() {
-            restart_nodemon();
-        });
-});
-
-
 var envify_params = {
     DOMAIN:"wrioos.com"
 };
@@ -87,18 +64,14 @@ if (argv.docker) {
     envify_params['DOMAIN'] = "wrioos.local"
 }
 
-gulp.task('babel-client', function() {
-    browserify({
-            entries: './src/client/js/client.js',
-            debug: true
-        })
-        .transform(babelify)
-        .transform(envify(envify_params))
-        .bundle()
-        .pipe(source('client.js'))
-        .pipe(gulp.dest('app/client'))
-        .on('end',function() {
-            restart_nodemon();
+gulp.task('babel-client', function(callback) {
+    webpack(require('./webpack.config.js'),
+        function(err, stats) {
+            if(err) throw new gutil.PluginError("webpack", err);
+            console.log("[webpack]", stats.toString({
+                // output options
+            }));
+            callback();
         });
 });
 
@@ -129,10 +102,10 @@ gulp.task('nodemon', function() {
 
 });
 
-gulp.task('default', ['lint','babel-server', 'babel-client', 'views']);
+gulp.task('default', ['lint', 'babel-client', 'views']);
 
 gulp.task('watch', ['default', 'nodemon'], function() {
-    gulp.watch(['src/index.js', 'src/server/**/*.*'], ['babel-server']);
-    gulp.watch('src/client/js/**/*.*', ['babel-client']);
+    gulp.watch(['src/index.js', 'src/server/**/*.*'], []);
+   // gulp.watch('src/client/js/**/*.*', ['babel-client']);
     gulp.watch('src/client/views/**/*.*', ['views']);
 });

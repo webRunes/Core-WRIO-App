@@ -1,70 +1,63 @@
-import nconf from './server/wrio_nconf';
-import express from 'express';
-import path from 'path';
-import fs from 'fs';
-import ejs from 'ejs';
-import session from 'express-session';
-import db from './server/db';
-import cookieParser from 'cookie-parser';
-import _SessionStore from 'connect-mongo';
+const express = require('express');
+const path = require('path');
+const fs =require('fs');
+const ejs =require('ejs');
+const session =require('express-session');
+const cookieParser =require('cookie-parser');
+const _SessionStore =require('connect-mongo');
+const nconf = require('./server/wrio_nconf.js');
 
 var app = express();
 app.ready = () => {};
 
 var DOMAIN = nconf.get('db:workdomain');
+app.use('/', express.static(path.join(__dirname, '../hub')));
 
-var SessionStore = _SessionStore(session);
-var cookie_secret = nconf.get("server:cookiesecret");
-app.use(cookieParser(cookie_secret));
-app.use('/assets', express.static(path.join(__dirname, '/client')));
-
-
-db.mongo()
-    .then((res) => {
-        console.log("A connection was successfully established with the server");
-        var db = res.db || {};
-        var server = require('http')
-            .createServer(app)
-            .listen(nconf.get("server:port"), (req, res) => {
-                console.log('app listening on port ' + nconf.get('server:port') + '...');
-                server_setup(db);
-                app.ready();
-                console.log("Application Started!");
-            });
-    })
-    .catch((err) => {
-        console.log('Error connecting to database:' + err.code + ': ' + err.message);
+var server = require('http')
+    .createServer(app)
+    .listen(nconf.get("server:port"), (req, res) => {
+        console.log('app listening on port ' + nconf.get('server:port') + '...');
+        app.ready();
+        console.log("Application Started!");
     });
 
-var server_setup = (db) => {
-    var sessionStore = new SessionStore({
-        db: db
-    });
-    app.use(session({
 
-        secret: cookie_secret,
-        saveUninitialized: true,
-        store: sessionStore,
-        resave: true,
-        cookie: {
-            secure: false,
-            domain: DOMAIN,
-            maxAge: 1000 * 60 * 60 * 24 * 30
-        },
-        key: 'sid'
+app.get('/create', (request, response) => {
+    response.sendFile(__dirname +
+        '/client/views/core.html');
+});
+
+app.get('/edit', (request, response) => {
+    response.sendFile(__dirname +
+        '/client/views/core.html');
+});
+
+function setupDevServer () {
+    const webpack = require('webpack');
+    const webpackDevMiddleware = require('webpack-dev-middleware');
+    const webpackHotMiddleware = require('webpack-hot-middleware');
+    let config = require('../webpack.config');
+    config.output.filename = 'client.js'; //override output filename
+    config.output.path = '/';
+    const compiler = webpack(config);
+
+
+    app.use(webpackDevMiddleware(compiler,{
+        publicPath: "/assets/",
+        stats: {colors: true},
+        watchOptions: {
+            aggregateTimeout: 300,
+            poll: true
+        }
     }));
-    app.use('/', express.static(path.join(__dirname, '/hub')));
+}
 
-    app.get('/create', (request, response) => {
-        response.sendFile(__dirname +
-            '/client/views/core.html');
-    });
+if (nconf.get("db:workdomain") === '.wrioos.local') {
+    setTimeout(() => console.log("Building development build, hold on... ☕ ☕ ☕"),2000);
+    setupDevServer();
+} else {
+    console.log("Development mode");
+    app.use('/assets', express.static(path.join(__dirname, '/client')));
+}
 
-    app.get('/edit', (request, response) => {
-        response.sendFile(__dirname +
-            '/client/views/core.html');
-    });
-
-};
-
-export default app;
+module.exports =  app;
