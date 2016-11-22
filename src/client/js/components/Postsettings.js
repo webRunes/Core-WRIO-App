@@ -90,7 +90,10 @@ export default class PostSettings extends React.Component {
                            placeholder="Optional. Max 512 characters"
                            value={this.state.description}
                            onChange={this.onChangeDescr.bind(this)} />
-                    <div className="help-block">Max {this.state.maxLength} characters</div>
+                    <div className="help-block">
+                        {this.state.exceedLength && <span>Max {this.state.maxLength} characters</span>} &nbsp;
+                    </div>
+
                 </div>
             </div>
             <div className="form-group">
@@ -119,11 +122,16 @@ export default class PostSettings extends React.Component {
             </div>
             <div className="form-group col-xs-12">
                 <div className="pull-right">
-                    <button type="button" className="btn btn-default"><span className="glyphicon glyphicon-remove"></span>Cancel</button>
+                    <button type="button" className="btn btn-default"><span className="glyphicon glyphicon-remove" onClick={this.goBack.bind(this)}></span>Cancel</button>
                     <a href="#" className="btn btn-success" onClick={this.publish.bind(this)}><span className="glyphicon glyphicon-open"></span>Publish</a>
                 </div>
             </div>
         </div>);
+    }
+    goBack() {
+        parent.postMessage(JSON.stringify({
+            "coreSaved": true
+        }), "*");
     }
 }
 
