@@ -1,7 +1,7 @@
 const request= require('supertest');
 const assert= require('assert');
 const should= require('should');
-const app= require('../app/index.js');
+const app= require('../src/index.js');
 
 var ready = false;
 app.ready = () => {
