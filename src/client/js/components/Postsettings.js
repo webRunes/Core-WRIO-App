@@ -157,5 +157,7 @@ export default class PostSettings extends React.Component {
 PostSettings.propTypes = {
     saveUrl: React.PropTypes.string,
     description: React.PropTypes.string,
-    onPublish: React.PropTypes.func
+    onPublish: React.PropTypes.func,
+    commentID:React.PropTypes.string,
+    author:PropTypes.string
 };
