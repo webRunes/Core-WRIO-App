@@ -33,6 +33,7 @@ app.get('/edit', (request, response) => {
 });
 
 function setupDevServer () {
+    console.log("Devserv start");
     const webpack = require('webpack');
     const webpackDevMiddleware = require('webpack-dev-middleware');
     const webpackHotMiddleware = require('webpack-hot-middleware');
@@ -56,8 +57,8 @@ if (nconf.get("db:workdomain") === '.wrioos.local') {
     setTimeout(() => console.log("Building development build, hold on... ☕ ☕ ☕"),2000);
     setupDevServer();
 } else {
-    console.log("Development mode");
-    app.use('/assets', express.static(path.join(__dirname, '/client')));
+    console.log("Production hosting mode");
+    app.use('/assets', express.static(path.join(__dirname, "..", './app/client')));
 }
 
 module.exports =  app;
