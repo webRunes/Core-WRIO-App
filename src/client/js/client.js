@@ -1,6 +1,6 @@
-import React from 'react';
+import 'es6-shim';
+import React, {Component} from 'react';
 import ReactDom from 'react-dom';
-import {scripts} from './mentions/scripts';
 import request from 'superagent';
 import {applyMentions} from './mixins/mentions';
 import getHttp from './getHttp';
@@ -10,11 +10,31 @@ import Immutable from 'immutable';
 import JSONDocument from './JSONDocument.js';
 import CommentSaver from './CommentSaver.js';
 import {urlMatch as CommentSaverUrlMatch} from './CommentSaver.js';
-import {extractFileName, parseUrl, getRegistredUser,appendIndex} from './webrunesAPI.js';
+import { getRegistredUser} from './webrunesAPI.js';
+import {parseEditingUrl, extractFileName, parseUrl, appendIndex} from './utils/url.js';
+import WrioStore from './stores/wrio.js';
 
 var domain = process.env.DOMAIN;
 
-class Client extends React.Component {
+class Loading extends Component {
+    render () {
+        return (<div>
+                Loading source page....
+                <img src="https://default.wrioos.com/img/loading.gif" id="loadingInd"/>
+            </div>);
+    }
+}
+
+class LoadingError extends Component {
+    render () {
+        return (<div>
+            Oops, something went wrong during downloading of the page, please try again
+        </div>);
+    }
+}
+
+
+class Client extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -23,130 +43,97 @@ class Client extends React.Component {
             wrioID: '',
             saveUrl: '',
             saveDisabled: 0,
-            STORAGE_DOMAIN: "wr.io",
             editUrl:'',
             coreAdditionalHeight: 200,
-            contentBlocks: [],
             mentions: [],
             commentID: "",
             render: 0,
-            doc: null
+            doc: null,
+            error: false
         };
+        this.parseEditingUrl = this.parseEditingUrl.bind(this);
+        this.parseArticleCore = this.parseArticleCore.bind(this);
     }
-
-
-  formatAuthor(id) {
-        if (id) {
-            return "https://wr.io/" + id + '/?wr.io=' + id;
-        } else {
-            return "unknown";
-        }
-
+    formatAuthor(id) {
+        return id ? `https://wr.io/${id}/?wr.io=${id}` : 'unknown';
     }
-
-
-
     parseEditingUrl() {
-        var editUrl = window.location.search.match(/\?article=([\.0-9a-zA-Z%:\/?]*)/);
-        if (editUrl) {
-
-            editUrl = appendIndex(editUrl[1]);
-            this.setState({
-                editUrl: editUrl
-            });
-
-            var editUrlParsed = parseUrl(editUrl);
-            console.log("Page edit link received", editUrl);
-            if (editUrlParsed) {
-                if (editUrlParsed.host == this.state.STORAGE_DOMAIN) {
-                    this.state.saveRelativePath = extractFileName(editUrlParsed.pathname);
-                }
-            }
-        }
-        //this.disableSave();
+        const [editUrl, saveRelativePath] = parseEditingUrl();
+        this.setState({
+            editUrl: editUrl,
+            saveRelativePath: saveRelativePath
+        });
     }
-
-
-
     componentWillMount() {
+        document.getElementById("loadingInd").style = 'display:none;';
         this.parseEditingUrl();
-
-        getRegistredUser().then((wrioID)=>{
-            this.parseArticleCore(wrioID, res => this.setState({
-                wrioID,
-                render: 1
-            }));
-        }).catch((e)=>{
-
+        let wrioID = null;
+        WrioStore.listen((state) => {
+            this.parseArticleCore(state.wrioID).then((res)=>
+                    this.setState({
+                        wrioID,
+                        render: 1
+                    })
+            ).catch((e)=> console.error(e.stack));
+        });
+    }
+    parseArticleCore(author) {
+        return new Promise((resolve, reject)=> {
+            if (window.location.pathname === "/create") {
+                var doc = new JSONDocument();
+                doc.createArticle(author, "");
+                this.setState({
+                    doc: doc
+                });
+                resolve();
+            } else {
+                getHttp(this.state.editUrl).then((article) => {
+                    setTimeout(window.frameReady, 300);
+                    var doc = new JSONDocument(article);
+                    this.setState({
+                       doc: doc,
+                       commentID: doc.getCommentID()
+                    });
+                    resolve();
+                }).catch(error=> {
+                    console.log("Unable to download source article",error);
+                    this.setState({error:true});
+                });
+            }
         });
     }
 
-    parseArticleCore(author,cb) {
-        var cb = cb || function() {};
-
-        if (window.location.pathname === "/create") {
-
-            var doc = new JSONDocument();
-            doc.createArticle(author, "");
-
-            this.setState({
-                doc: doc
-            });
-            return cb();
-
-        }
-        getHttp(this.state.editUrl, (article) => {
-
-            setTimeout(window.frameReady, 300);
-            document.getElementById("loadingInd").style = 'display:none;';
-
-            if (article && article.length !== 0) {
-
-                var doc = new JSONDocument(article);
-                this.setState({
-                   doc: doc,
-                   commentID: doc.getCommentID()
-                });
-
-            } else {
-                console.log("Unable to download source article");
-            }
-            cb();
-        });
+    componentDidUpdate() {
+        frameReady();
     }
 
     render() {
-        return this.state.render ? (<div className="container" cssStyles={{width: '100%'}}>
-                        <CoreEditor doc={this.state.doc}
-                                    saveRelativePath={this.state.saveRelativePath}
-                                    editUrl={this.state.editUrl}
-                                    author={this.formatAuthor(this.state.wrioID)}
-                                    commentID={this.state.commentID}
-                            />
-                    </div>) : null;
+        return (
+            <div cssStyles={{width: '100%'}} className="clearfix">
+                {this.state.error? <LoadingError /> : ""}
+                {this.state.render ? <CoreEditor doc={this.state.doc}
+                            saveRelativePath={this.state.saveRelativePath}
+                            editUrl={this.state.editUrl}
+                            author={this.formatAuthor(this.state.wrioID)}
+                            commentID={this.state.commentID} /> :
+                    <Loading /> }
+
+            </div>
+        );
     }
 }
 
-
 // TODO switch to full routing there
-if (CommentSaverUrlMatch()) {
-    ReactDom.render( < CommentSaver /> , document.getElementById('clientholder'));
-} else {
-    ReactDom.render( < Client /> , document.getElementById('clientholder'));
-}
+ReactDom.render( CommentSaverUrlMatch() ? <CommentSaver /> : <Client /> , document.getElementById('clientholder'));
 
 var oldHeight = 0;
 window.frameReady = () => {
-
-    var $body = $('.container');
-    var heightInit = $body.height()+30;
-
-    if (heightInit == oldHeight) return;
-    oldHeight = heightInit;
-    console.log("Height ready");
-
-    parent.postMessage(JSON.stringify({
-        "coreHeight": heightInit
-    }), "*");
+    let height = document.querySelector('#clientholder').clientHeight + 10;
+    if (height != oldHeight) {
+        oldHeight = height;
+        console.log("Height ready");
+        parent.postMessage(JSON.stringify({
+            "coreHeight": height
+        }), "*");
+    }
 };
-

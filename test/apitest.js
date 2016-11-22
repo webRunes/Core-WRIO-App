@@ -1,7 +1,7 @@
-import request from 'supertest';
-import assert from 'assert';
-import should from 'should';
-import app from '../app/index.js';
+const request= require('supertest');
+const assert= require('assert');
+const should= require('should');
+const app= require('../src/index.js');
 
 var ready = false;
 app.ready = () => {

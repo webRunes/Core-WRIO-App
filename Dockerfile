@@ -1,8 +1,11 @@
-FROM michbil/wrio:latest
+FROM mhart/alpine-node:6
 MAINTAINER denso.ffff@gmail.com
 
+#RUN apk add --no-cache make gcc g++ python
+RUN npm install -g yarn gulp
+
 COPY package.json /srv/package.json
-RUN cd /srv/ && npm install
+RUN cd /srv/ && yarn
 COPY . /srv/www/
 
 EXPOSE 5004

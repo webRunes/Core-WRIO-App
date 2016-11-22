@@ -1,15 +1,12 @@
 import {Mention, merge} from './mention';
 
-var mentions = undefined;
+let mentions = null;
 
-var attachMentionToElement = function(mention, json, order) {
-    order = order || 0;
-    var i,
-        keys = Object.keys(json);
-    for (i = 0; i < keys.length; i += 1) {
-        var key = keys[i];
+const attachMentionToElement = (mention, json, order = 0)=> {
+    let tmp = {};
+    for(let key in json) {
         if (['name', 'about'].indexOf(key) !== -1) {
-            order += 1;
+            order++;
             if (mention.order === order) {
                 json.m = json.m || {};
                 json.m[key] = json.m[key] || [];
@@ -19,11 +16,11 @@ var attachMentionToElement = function(mention, json, order) {
                 return true;
             }
         } else if (key === 'articleBody') {
-            var articleBody = json[key],
+            let articleBody = json[key],
                 pos;
             if (order + articleBody.length >= mention.order) {
                 pos = mention.order - order - 1;
-                var _mention = mention.attach(articleBody[pos]);
+                let _mention = mention.attach(articleBody[pos]);
                 if (_mention) {
                     json.m = json.m || {};
                     json.m[key] = json.m[key] || [];
@@ -37,7 +34,7 @@ var attachMentionToElement = function(mention, json, order) {
     return false;
 };
 
-export function check(json, order) {
+const check = (json, order)=> {
     mentions = json.mentions || mentions;
     if (mentions) {
         mentions = merge(mentions);
@@ -62,3 +59,5 @@ export function check(json, order) {
         });
     }
 };
+
+export {check};
