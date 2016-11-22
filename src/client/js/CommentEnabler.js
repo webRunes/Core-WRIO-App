@@ -69,6 +69,8 @@ export default class CommentEnabler extends React.Component {
                             <ul className="dropdown-menu" role="menu">
                                 {this.genDropdownSource('Disabled')}
                                 {this.genDropdownSource('Enabled')}
+                                <li className="divider" />
+                                {this.genDropdownSource('Advanced')}
                             </ul>
                         </div>
                         {this.state.isChecked ? commentStatus : ""}
