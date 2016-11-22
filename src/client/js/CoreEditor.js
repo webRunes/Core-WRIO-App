@@ -5,10 +5,12 @@ import TextEditorStore from './stores/texteditor.js';
 import TextEditorActions from './actions/texteditor.js';
 import LinkDialogActions from './actions/linkdialog.js';
 import CustomActions from './customActions';
-import CommentEnabler from './CommentEnabler.js';
+
 import StyleButton from './components/StyleButton.js';
 import LinkUrlDialog from './components/LinkUrlDialog.js';
 import PostSettings from './components/Postsettings.js';
+import WrioStore from './stores/wrio.js';
+import WrioActions from './actions/wrio.js';
 
 class CoreEditor extends React.Component {
     constructor(props) {
@@ -108,16 +110,26 @@ class CoreEditor extends React.Component {
     }
 
     toggleCustomAction(action) {
-        // this is the place where to pass arguments to custom actions
-        CustomActions.toggleCustomAction(
-            this.state.editorState,
-            action,
-            this.state.saveRelativePath,
-            this.state.author,
-            this.state.commentID,
-            this.state.doc,
-            this.state.description
+
+        const saveAction = (commentId) => CustomActions.toggleCustomAction(
+                                                this.state.editorState,
+                                                action,
+                                                this.state.saveRelativePath,
+                                                this.state.author,
+                                                commentId,
+                                                this.state.doc,
+                                                this.state.description
         );
+
+        if (this.state.commentID) { // don't request comment id, if it already stored in the document
+            saveAction(this.state.commentID);
+        } else {
+            WrioActions.busy(true);
+            WrioStore.requestCommentId(this.state.editUrl,(err,id) => {
+                saveAction(id);
+            });
+        }
+
     }
 
     gotCommentID (id) {
@@ -178,16 +190,13 @@ class CoreEditor extends React.Component {
                   </div>
                 </div>
 
-            <br />
-            <CommentEnabler commentID={this.state.commentID}
-                            author={this.props.author}
-                            editUrl={this.state.editUrl}
-                            gotCommentID={this.gotCommentID.bind(this)}/>
-
-            <br />
             <PostSettings saveUrl={this.state.editUrl}
                           onPublish={this.publish.bind(this)}
                           description={about}
+
+                          commentID={this.state.commentID}
+                          author={this.props.author}
+                          editUrl={this.state.editUrl}
                 />
 
             </div>
