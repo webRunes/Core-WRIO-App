@@ -48,7 +48,7 @@ export default class PostSettings extends React.Component {
             return({
                 exceedLength: true,
                 description: value
-            })
+            });
         } else {
             return({
                 exceedLength: false,
@@ -129,5 +129,6 @@ export default class PostSettings extends React.Component {
 
 PostSettings.propTypes = {
     saveUrl: React.PropTypes.string,
+    description: React.PropTypes.string,
     onPublish: React.PropTypes.func
 };

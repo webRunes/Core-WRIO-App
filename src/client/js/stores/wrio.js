@@ -10,7 +10,7 @@ export default Reflux.createStore({
         };
         getRegistredUser().then((wrioID)=> {
             this.state = {wrioID};
-            this.trigger(this.state)
+            this.trigger(this.state);
             }
         ).catch((e)=> console.error(e.stack));
     },
