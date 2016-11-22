@@ -61,11 +61,11 @@ class GenericLDJsonDocument {
             "comment": widgetData
         };
     };
-    createArticle(author,commentID) {
+    createArticle(author,commentID,about) {
         if (this.getElementOfType("Article")) {
             console.log("Failed to create article, it already exists");
         } else {
-            this.jsonBlocks.push(this.makeArticle("En", "", author, commentID));
+            this.jsonBlocks.push(this.makeArticle("En", "", author, commentID,about));
         }
     }
     getCommentID() {
@@ -202,6 +202,11 @@ export default class JSONDocument extends GenericLDJsonDocument {
         });
         return cleshe.replace('|BODY|',scripts)
             .replace('|TITLE|', this.getElementOfType('Article').name)
-            .replace('|ABOUT|', this.getElementOfType('Article').about);
+            .replace('|DESCRIPTION|', this.getElementOfType('Article').about);
+    }
+
+    setAbout(text) {
+        let article = this.getElementOfType('Article');
+        article.about=text;
     }
 }

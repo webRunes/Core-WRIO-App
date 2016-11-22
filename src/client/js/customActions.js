@@ -21,6 +21,7 @@ export default class CustomActions {
 var domain = process.env.DOMAIN;
 
 const saveAction = (editorState, author, saveRelativePath, commentID,doc,description) => {
+    doc.setAbout(description);
     doc.draftToHtml(editorState.getCurrentContent(), author,commentID).then(res => {
         let {json, html} = res;
         return saveToS3(saveRelativePath,html);
@@ -34,6 +35,7 @@ const saveAction = (editorState, author, saveRelativePath, commentID,doc,descrip
 };
 
 const saveAsAction = (editorState, author,commentID,doc, description) => {
+    doc.setAbout(description);
     doc.draftToHtml(editorState.getCurrentContent(), author, commentID).then(res => {
         let json = doc.getElementOfType('Article');
         let html = res.html;

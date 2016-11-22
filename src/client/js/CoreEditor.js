@@ -178,15 +178,12 @@ class CoreEditor extends React.Component {
                   </div>
                 </div>
 
-            <div className="form-group form-inline has-error">
-                <label htmlFor="id-Description" className="col-sm-4 col-md-3 control-label">Comments</label>
-                <div className="col-sm-8 col-md-9">
-                    <CommentEnabler commentID={this.state.commentID}
-                                    author={this.props.author}
-                                    editUrl={this.state.editUrl}
-                                    gotCommentID={this.gotCommentID.bind(this)}/>
-                </div>
-            </div>
+            <br />
+            <CommentEnabler commentID={this.state.commentID}
+                            author={this.props.author}
+                            editUrl={this.state.editUrl}
+                            gotCommentID={this.gotCommentID.bind(this)}/>
+
             <br />
             <PostSettings saveUrl={this.state.editUrl}
                           onPublish={this.publish.bind(this)}
