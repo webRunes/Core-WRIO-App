@@ -1,6 +1,6 @@
 require('babel-core/register');
 require('regenerator-runtime/runtime');
-
+console.log("Babel-core loaded");
 var gulp = require('gulp');
 var babel = require('gulp-babel');
 var source = require('vinyl-source-stream');
