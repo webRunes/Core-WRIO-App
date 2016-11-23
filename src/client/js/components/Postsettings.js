@@ -159,5 +159,5 @@ PostSettings.propTypes = {
     description: React.PropTypes.string,
     onPublish: React.PropTypes.func,
     commentID:React.PropTypes.string,
-    author:PropTypes.string
+    author:React.PropTypes.string
 };
