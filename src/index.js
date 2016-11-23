@@ -54,7 +54,7 @@ function setupDevServer () {
 }
 
 if (nconf.get("db:workdomain") === '.wrioos.local') {
-    setTimeout(() => console.log("Building development build, hold on... ☕ ☕ ☕"),2000);
+    setTimeout(() => console.log("Building in progress, sit tight... ☕ ☕ ☕"),2000);
     setupDevServer();
 } else {
     console.log("Production hosting mode");
