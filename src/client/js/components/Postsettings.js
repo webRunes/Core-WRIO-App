@@ -5,6 +5,7 @@
 import React from 'react';
 import {parseEditingUrl, extractFileName, parseUrl, appendIndex} from '../utils/url.js';
 import WrioStore from '../stores/wrio.js';
+import CommentEnabler from '../CommentEnabler.js';
 
 export default class PostSettings extends React.Component {
     constructor(props) {
@@ -20,12 +21,20 @@ export default class PostSettings extends React.Component {
             saveFile: "untitled",
             dropdownSource: this.dropdownSources['save'],
             editUrl,
-            saveRelativePath
+            saveRelativePath,
+            busy: false
         };
         Object.assign(this.state,this.applyDescription(props.description));
 
     }
 
+    componentDidMount() {
+        WrioStore.listen(this.storeListener.bind(this));
+    }
+
+    storeListener(state) {
+        this.setState({busy: state});
+    }
 
 
     publish() {
@@ -77,6 +86,7 @@ export default class PostSettings extends React.Component {
     }
 
     render () {
+        const loading = <img src="https://wrioos.com/Default-WRIO-Theme/img/loading.gif" />;
         let savePath = this.getSaveUrl();
         const className ="form-group form-inline " +  (this.state.exceedLength ? "has-error" : "");
         return (<div className="clearfix">
@@ -91,12 +101,12 @@ export default class PostSettings extends React.Component {
                            value={this.state.description}
                            onChange={this.onChangeDescr.bind(this)} />
                     <div className="help-block">
-                        {this.state.exceedLength && <span>Max {this.state.maxLength} characters</span>} &nbsp;
+                        {this.state.exceedLength &&  <span>Max {this.state.maxLength} characters</span>} &nbsp;
                     </div>
 
                 </div>
             </div>
-            <div className="form-group">
+            <div className="form-group clearfix">
                 <label htmlFor="id-Storage" className="col-xs-12 col-sm-4 col-md-3 control-label"><span className="glyphicon glyphicon-question-sign" aria-hidden="true" data-toggle="tooltip" data-placement="left" title="Use [Save as..] to save your file locally for its further manual transfer to any server or service such as Google Drive, Dropbox, GitHub Pages and etc."></span> Storage</label>
                 <div className="col-xs-6 col-sm-4 col-md-4">
                     <div className="btn-group dropdown-menu-full-width">
@@ -108,7 +118,7 @@ export default class PostSettings extends React.Component {
                             {this.genDropdownSource('saveas')}
                         </ul>
                     </div>
-                    <div className="help-block">{savePath}</div>
+
                 </div>
                 {!this.props.saveUrl && <div className="col-xs-6 col-sm-4 col-md-5">
                     <input type="text"
@@ -118,12 +128,21 @@ export default class PostSettings extends React.Component {
                            value={this.state.saveFile}
                            onChange={this.onChangeFile.bind(this)}
                         />
+                    <div className="help-block">Your page will be live at <a href={savePath}> {savePath} </a></div>
                 </div>}
             </div>
+
+            <CommentEnabler commentID={this.props.commentID}
+                            author={this.props.author}
+                            editUrl={this.getSaveUrl()}
+                            />
+
             <div className="form-group col-xs-12">
                 <div className="pull-right">
                     <button type="button" className="btn btn-default"><span className="glyphicon glyphicon-remove" onClick={this.goBack.bind(this)}></span>Cancel</button>
-                    <a href="#" className="btn btn-success" onClick={this.publish.bind(this)}><span className="glyphicon glyphicon-open"></span>Publish</a>
+                    <a href="#" className="btn btn-success" onClick={this.publish.bind(this)}>
+                        {this.state.busy ? loading : <span className="glyphicon glyphicon-open" />}
+                       Publish</a>
                 </div>
             </div>
         </div>);
@@ -138,5 +157,7 @@ export default class PostSettings extends React.Component {
 PostSettings.propTypes = {
     saveUrl: React.PropTypes.string,
     description: React.PropTypes.string,
-    onPublish: React.PropTypes.func
+    onPublish: React.PropTypes.func,
+    commentID:React.PropTypes.string,
+    author:React.PropTypes.string
 };
