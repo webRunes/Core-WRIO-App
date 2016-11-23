@@ -28,8 +28,8 @@ export function getWidgetID(url) {
         request
             .get(`//titter.${domain}/obtain_widget_id?query=${url}`)
             .withCredentials()
-            .then(({body})=> {
-                resolve(body);
+            .then(result=> {
+                resolve(result.text);
             }, (err)=> {
                 reject(err);
             });
