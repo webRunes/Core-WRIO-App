@@ -164,6 +164,7 @@ class CoreEditor extends React.Component {
         const about = this.state.doc.getElementOfType('Article').about || "";
 
         return (
+            <div class="clearfix">
             <div className="col-xs-12">
                 <div className="RichEditor-root form-group">
                   <BlockStyleControls
@@ -175,7 +176,7 @@ class CoreEditor extends React.Component {
                     editorState={editorState}
                     onToggle={this.toggleInlineStyle}
                   />
-                    <LinkUrlDialog />
+                  <LinkUrlDialog />
                   <div className={className} onClick={this.focus}>
                     <Editor
                       blockStyleFn={getBlockStyle}
@@ -189,6 +190,7 @@ class CoreEditor extends React.Component {
                     />
                   </div>
                 </div>
+            </div>
 
             <PostSettings saveUrl={this.state.editUrl}
                           onPublish={this.publish.bind(this)}
@@ -198,7 +200,6 @@ class CoreEditor extends React.Component {
                           author={this.props.author}
                           editUrl={this.state.editUrl}
                 />
-
             </div>
         );
     }
