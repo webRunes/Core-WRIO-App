@@ -89,7 +89,7 @@ export default class PostSettings extends React.Component {
         const loading = <img src="https://default.wrioos.com/img/loading.gif" />;
         let savePath = this.getSaveUrl();
         const className ="form-inline" +  (this.state.exceedLength ? " has-error" : "");
-        return (<div className="row form-horizontal">
+        return (<div className="form-horizontal">
             <div className={className}>
                 <label htmlFor="id-Description" className="col-sm-4 col-md-3 control-label">Description</label>
                 <div className="col-sm-8 col-md-9">
