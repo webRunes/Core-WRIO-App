@@ -27,7 +27,6 @@ export default class CommentEnabler extends React.Component {
     render() {
 
         return (
-                <div className="form-group">
                     <label htmlFor="id-Comment" className="col-xs-12 col-sm-4 col-md-3 control-label">
                         <span className="glyphicon glyphicon-question-sign" aria-hidden="true" data-toggle="tooltip" data-placement="left" title="Комментарии работают с помощью Твиттера. Всю информацию вы найдете по ссылке Need help?. Режим Advanced для тех, кто хочет иметь полный контроль над комментариями. Ради безопасности мы не сохраняем пароль от вашего Твиттер аккаунта, поэтому его нужно вводить каждый раз при включении Advanced mode"></span> Comments</label>
                     <div className="col-xs-6 col-sm-4 col-md-4">
@@ -41,8 +40,6 @@ export default class CommentEnabler extends React.Component {
                             </ul>
                         </div>
                     </div>
-
-                </div>
             );
     }
 
