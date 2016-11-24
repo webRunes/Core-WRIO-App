@@ -165,7 +165,7 @@ class CoreEditor extends React.Component {
 
         return (
             <div className="col-xs-12">
-                <div className="RichEditor-root">
+                <div className="RichEditor-root form-group">
                   <BlockStyleControls
                     editorState={editorState}
                     onToggle={this.toggleBlockType}
