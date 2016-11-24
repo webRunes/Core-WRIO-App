@@ -1,7 +1,7 @@
 import {Entity} from 'draft-js';
 import JSONDocument from './JSONDocument.js';
 import {saveToS3} from './webrunesAPI.js';
-
+import WrioActions from './actions/wrio.js';
 
 export default class CustomActions {
     static toggleCustomAction(editorState, action, saveRelativePath, author,commentID, doc, description) {
@@ -26,10 +26,12 @@ const saveAction = (editorState, author, saveRelativePath, commentID,doc,descrip
         let {json, html} = res;
         return saveToS3(saveRelativePath,html);
     }).then((res) => {
+        WrioActions.busy(false);
         parent.postMessage(JSON.stringify({
             "coreSaved": true
         }), "*");
     }).catch((err)=> {
+        WrioActions.busy(false);
         console.log(err);
     });
 };
@@ -41,6 +43,7 @@ const saveAsAction = (editorState, author,commentID,doc, description) => {
         let html = res.html;
         let fileName = (json.name === '' ? 'untitled' : json.name.split(' ').join('_')) + '.html';
         saveAs(fileName,html);
+        WrioActions.busy(false);
     });
 };
 
