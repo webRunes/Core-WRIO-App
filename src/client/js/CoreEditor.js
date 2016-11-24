@@ -164,6 +164,7 @@ class CoreEditor extends React.Component {
         const about = this.state.doc.getElementOfType('Article').about || "";
 
         return (
+            <div>
             <div className="col-xs-12">
                 <div className="RichEditor-root form-group">
                   <BlockStyleControls
@@ -191,7 +192,6 @@ class CoreEditor extends React.Component {
                 </div>
             </div>
 
-            <div>
             <PostSettings saveUrl={this.state.editUrl}
                           onPublish={this.publish.bind(this)}
                           description={about}
