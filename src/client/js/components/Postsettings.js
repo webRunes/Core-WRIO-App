@@ -106,31 +106,29 @@ export default class PostSettings extends React.Component {
 
                 </div>
             </div>
-            <div className="form-group">
-                <label htmlFor="id-Storage" className="col-xs-12 col-sm-4 col-md-3 control-label"><span className="glyphicon glyphicon-question-sign" aria-hidden="true" data-toggle="tooltip" data-placement="left" title="Use [Save as..] to save your file locally for its further manual transfer to any server or service such as Google Drive, Dropbox, GitHub Pages and etc."></span> Storage</label>
-                <div className="col-xs-6 col-sm-4 col-md-4">
-                    <div className="btn-group dropdown-menu-full-width">
-                        <button type="button" className="btn btn-white btn-block dropdown-toggle ia-author" data-toggle="dropdown">
-                            <span className="caret"></span>{this.state.dropdownSource}
-                        </button>
-                        <ul className="dropdown-menu" role="menu">
-                            {this.genDropdownSource('save')}
-                            {this.genDropdownSource('saveas')}
-                        </ul>
-                    </div>
-
+            <label htmlFor="id-Storage" className="col-xs-12 col-sm-4 col-md-3 control-label"><span className="glyphicon glyphicon-question-sign" aria-hidden="true" data-toggle="tooltip" data-placement="left" title="Use [Save as..] to save your file locally for its further manual transfer to any server or service such as Google Drive, Dropbox, GitHub Pages and etc."></span> Storage</label>
+            <div className="col-xs-6 col-sm-4 col-md-4">
+                <div className="btn-group dropdown-menu-full-width">
+                    <button type="button" className="btn btn-white btn-block dropdown-toggle ia-author" data-toggle="dropdown">
+                        <span className="caret"></span>{this.state.dropdownSource}
+                    </button>
+                    <ul className="dropdown-menu" role="menu">
+                        {this.genDropdownSource('save')}
+                        {this.genDropdownSource('saveas')}
+                    </ul>
                 </div>
-                {!this.props.saveUrl && <div className="col-xs-6 col-sm-4 col-md-5">
-                    <input type="text"
-                           className="form-control"
-                           id="File-name"
-                           placeholder="Untitled"
-                           value={this.state.saveFile}
-                           onChange={this.onChangeFile.bind(this)}
-                        />
-                    <div className="help-block">Your page will be live at {savePath}</div>
-                </div>}
+
             </div>
+            {!this.props.saveUrl && <div className="col-xs-6 col-sm-4 col-md-5">
+                <input type="text"
+                       className="form-control"
+                       id="File-name"
+                       placeholder="Untitled"
+                       value={this.state.saveFile}
+                       onChange={this.onChangeFile.bind(this)}
+                    />
+                <div className="help-block">Your page will be live at {savePath}</div>
+            </div>}
 
             <CommentEnabler commentID={this.props.commentID}
                             author={this.props.author}
