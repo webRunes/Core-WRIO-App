@@ -79,7 +79,7 @@ export default class PostSettings extends React.Component {
     render () {
         let savePath = this.getSaveUrl();
         const className ="form-group form-inline " +  (this.state.exceedLength ? "has-error" : "");
-        return (<div className="clearfix">
+        return (<div className="form-horizontal">
             <div className={className}>
                 <label htmlFor="id-Description" className="col-sm-4 col-md-3 control-label">Description</label>
                 <div className="col-sm-8 col-md-9">
@@ -110,7 +110,7 @@ export default class PostSettings extends React.Component {
                     </div>
                     <div className="help-block">{savePath}</div>
                 </div>
-                {!this.props.saveUrl && <div className="col-xs-6 col-sm-4 col-md-5">
+                {!this.props.saveUrl && <div className="col-xs-6 col-md-5">
                     <input type="text"
                            className="form-control"
                            id="File-name"
