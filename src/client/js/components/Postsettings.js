@@ -89,7 +89,7 @@ export default class PostSettings extends React.Component {
         const loading = <img src="https://default.wrioos.com/img/loading.gif" />;
         let savePath = this.getSaveUrl();
         const className ="form-inline" +  (this.state.exceedLength ? " has-error" : "");
-        return (<div className="form-horizontal">
+        return (<div className="row form-horizontal">
             <div className={className}>
                 <label htmlFor="id-Description" className="col-sm-4 col-md-3 control-label">Description</label>
                 <div className="col-sm-8 col-md-9">
@@ -106,7 +106,7 @@ export default class PostSettings extends React.Component {
 
                 </div>
             </div>
-            <div className="clearfix">
+            <div className="form-group">
                 <label htmlFor="id-Storage" className="col-xs-12 col-sm-4 col-md-3 control-label"><span className="glyphicon glyphicon-question-sign" aria-hidden="true" data-toggle="tooltip" data-placement="left" title="Use [Save as..] to save your file locally for its further manual transfer to any server or service such as Google Drive, Dropbox, GitHub Pages and etc."></span> Storage</label>
                 <div className="col-xs-6 col-sm-4 col-md-4">
                     <div className="btn-group dropdown-menu-full-width">
