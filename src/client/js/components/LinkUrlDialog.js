@@ -82,7 +82,7 @@ export default class LinkUrlDialog extends React.Component {
             right                 : 'auto',
             bottom                : 'auto',
             marginRight           : '-50%',
-            width                 : '320px',
+            width                 : '380px',
             transform             : 'translate(-50%, -50%)'
           }
         };
@@ -90,7 +90,7 @@ export default class LinkUrlDialog extends React.Component {
             <div style={styles.linkTitleInputContainer}>
                 <Modal shouldCloseOnOverlayClick={true} style={customStyles} isOpen={true}>
                     <div className="form-group">
-                        <label htmlFor="linkTitle">Title: </label>
+                        <label htmlFor="linkTitle">Text: </label>
                         <input
                           onChange={this.onTitleChange}
                           ref="linkTitle"
@@ -125,9 +125,9 @@ export default class LinkUrlDialog extends React.Component {
                         />
                     </div>
                     <div className="form-group pull-right">
-                        {this.state.isEditLink ? (<button className="btn btn-danger" onClick={this.onRemoveLink}><span className="glyphicon glyphicon-trash"></span>Remove</button>) : null}
-                        <button className="btn btn-default" onClick={this.onCancelLink}><span className="glyphicon glyphicon-remove"></span>Cancel</button>
-                        <button onClick={this.state.isEditLink ? this.onEditLink : this.onConfirmLink} className="btn btn-primary"><span className="glyphicon glyphicon-ok"></span>Submit</button>
+                        {this.state.isEditLink ? (<button className="btn btn-danger btn-sm" onClick={this.onRemoveLink}><span className="glyphicon glyphicon-trash"></span>Remove</button>) : null}
+                        <button className="btn btn-default btn-sm" onClick={this.onCancelLink}><span className="glyphicon glyphicon-remove"></span>Cancel</button>
+                        <button onClick={this.state.isEditLink ? this.onEditLink : this.onConfirmLink} className="btn btn-primary btn-sm"><span className="glyphicon glyphicon-ok"></span>Submit</button>
                     </div>
                 </Modal>
             </div>
