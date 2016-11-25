@@ -90,20 +90,17 @@ export default class PostSettings extends React.Component {
         let savePath = this.getSaveUrl();
         const className ="form-group" +  (this.state.exceedLength ? " has-error" : "");
         return (<div className="form-horizontal">
-            <div class="form-group">
-                <div className={className}>
-                    <label htmlFor="id-Description" className="col-sm-4 col-md-3 control-label">Description</label>
-                    <div className="col-sm-8 col-md-9">
-                        <textarea className="form-control" type="text" maxLength="512"
-                               style={{width:"100%"}} //hack, remove it
-                               cols="40"
-                               rows="6"
-                               placeholder="Optional. Max 512 characters"
-                               value={this.state.description}
-                               onChange={this.onChangeDescr.bind(this)} />
-                        <div className="help-block">
-                            {this.state.exceedLength && <span>Max {this.state.maxLength} characters</span>}
-                        </div>
+            <div className={className}>
+                <label htmlFor="id-Description" className="col-sm-4 col-md-3 control-label">Description</label>
+                <div className="col-sm-8 col-md-9">
+                    <textarea className="form-control" type="text" maxLength="512"
+                           cols="40"
+                           rows="6"
+                           placeholder="Optional. Max 512 characters"
+                           value={this.state.description}
+                           onChange={this.onChangeDescr.bind(this)} />
+                    <div className="help-block">
+                        {this.state.exceedLength && <span>Max {this.state.maxLength} characters</span>}
                     </div>
                 </div>
             </div>
