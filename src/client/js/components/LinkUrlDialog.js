@@ -90,7 +90,7 @@ export default class LinkUrlDialog extends React.Component {
             <div style={styles.linkTitleInputContainer}>
                 <Modal shouldCloseOnOverlayClick={true} style={customStyles} isOpen={true}>
                     <div className="form-group">
-                        <label htmlFor="linkTitle">Title: </label>
+                        <label htmlFor="linkTitle">Text: </label>
                         <input
                           onChange={this.onTitleChange}
                           ref="linkTitle"
