@@ -12,11 +12,12 @@ export default Reflux.createStore({
             busy: false
         };
         getRegistredUser().then((wrioID)=> {
-            this.state = {wrioID};
+            this.state.wrioID = wrioID;
             this.trigger(this.state);
             }
-        ).catch((e)=> console.error(e.stack));
+        ).catch((e)=> console.error("ERROR obtaining",e.stack));
     },
+
     getWrioID() {
         return this.state.wrioID;
     },
@@ -40,9 +41,14 @@ export default Reflux.createStore({
         this.state.commentsEnabled = state;
     },
 
+    onHeaderChanged(header) {
+        this.state.header = header;
+        this.trigger(this.state);
+    },
+
     onBusy(state) {
         this.state.busy = state;
-        this.trigger(state);
+        this.trigger(this.state);
     }
 
 });

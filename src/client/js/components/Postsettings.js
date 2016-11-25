@@ -7,6 +7,11 @@ import {parseEditingUrl, extractFileName, parseUrl, appendIndex} from '../utils/
 import WrioStore from '../stores/wrio.js';
 import CommentEnabler from '../CommentEnabler.js';
 
+function prepFileName(name) {
+    let res = name.replace(/ /g,'_');
+    return res.substring(0,120);
+}
+
 export default class PostSettings extends React.Component {
     constructor(props) {
         super(props);
@@ -18,11 +23,12 @@ export default class PostSettings extends React.Component {
         const [editUrl, saveRelativePath] = parseEditingUrl();
         this.state = {
             maxLength: 512,
-            saveFile: "untitled",
+            saveFile: "Untitled",
             dropdownSource: this.dropdownSources['save'],
             editUrl,
             saveRelativePath,
-            busy: false
+            busy: false,
+            userStartedEditing: false
         };
         Object.assign(this.state,this.applyDescription(props.description));
 
@@ -33,7 +39,14 @@ export default class PostSettings extends React.Component {
     }
 
     storeListener(state) {
-        this.setState({busy: state});
+        this.setState({busy: state.busy});
+        if (state.header) {
+            if (!this.state.userStartedEditing) {
+                this.setState({
+                    saveFile: prepFileName(state.header)
+                })
+            }
+        }
     }
 
 
@@ -68,6 +81,7 @@ export default class PostSettings extends React.Component {
 
     onChangeFile(e) {
         this.setState({
+            userStartedEditing: true,
             saveFile: e.target.value
         });
     }
@@ -82,7 +96,7 @@ export default class PostSettings extends React.Component {
     }
 
     getSaveUrl() {
-        return this.props.saveUrl || `https://wr.io/${WrioStore.getWrioID()}/${this.state.saveFile}.html`;
+        return this.props.saveUrl || `https://wr.io/${WrioStore.getWrioID()}/${this.state.saveFile}/index.html`;
     }
 
     render () {
@@ -117,6 +131,7 @@ export default class PostSettings extends React.Component {
                             {this.genDropdownSource('save')}
                             {this.genDropdownSource('saveas')}
                         </ul>
+                        <div className="help-block">Your page will be live at <a href={savePath} onClick={this.followLink.bind(this)}> {savePath} </a></div>
                     </div>
 
                 </div>
@@ -128,7 +143,7 @@ export default class PostSettings extends React.Component {
                            value={this.state.saveFile}
                            onChange={this.onChangeFile.bind(this)}
                         />
-                    <div className="help-block">Your page will be live at <a href={savePath}> {savePath} </a></div>
+
                 </div>}
             </div>
 
@@ -150,6 +165,12 @@ export default class PostSettings extends React.Component {
     goBack() {
         parent.postMessage(JSON.stringify({
             "coreSaved": true
+        }), "*");
+    }
+    followLink(e) {
+        e.preventDefault();
+        parent.postMessage(JSON.stringify({
+            "followLink": this.getSaveUrl()
         }), "*");
     }
 }

@@ -387,9 +387,6 @@ CustomActionControls.propTypes = {
     onToggle: React.PropTypes.func
 };
 
-
-
-
 const styles = {
     root: {
         fontFamily: '\'Georgia\', serif',
