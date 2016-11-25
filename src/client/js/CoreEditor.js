@@ -164,7 +164,7 @@ class CoreEditor extends React.Component {
         const about = this.state.doc.getElementOfType('Article').about || "";
 
         return (
-            <div class="clearfix">
+            <div className="clearfix">
             <div className="col-xs-12">
                 <div className="RichEditor-root form-group">
                   <BlockStyleControls
