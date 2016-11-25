@@ -393,7 +393,7 @@ CustomActionControls.propTypes = {
 
 const styles = {
     root: {
-        fontFamily: '\'Georgia\', serif',
+        fontFamily: '\'Arial\', serif',
         padding: 20,
         width: 600,
     },
@@ -404,7 +404,7 @@ const styles = {
         marginBottom: 10,
     },
     linkTitleInput: {
-        fontFamily: '\'Georgia\', serif',
+        fontFamily: '\'Arial\', serif',
         marginRight: 10,
         padding: 3,
     },
