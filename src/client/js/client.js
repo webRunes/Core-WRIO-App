@@ -38,8 +38,8 @@ class Client extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            startHeader: '<h2>',
-            endHeader: '</h2>',
+            startHeader: '<h1>',
+            endHeader: '</h1>',
             wrioID: '',
             saveUrl: '',
             saveDisabled: 0,
