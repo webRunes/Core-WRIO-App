@@ -18,8 +18,6 @@ export default class CommentEnabler extends React.Component {
         this.state.dropdownSource = this.state.isChecked ? "Enabled" : "Disabled";
     }
 
-
-
     _hasCommentID() {
         return this.state.commentID !== "";
     }
@@ -47,7 +45,6 @@ export default class CommentEnabler extends React.Component {
     componentDidUpdate () {
         window.frameReady();
     }
-
 
     setSource(source) {
         this.setState({
