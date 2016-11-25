@@ -112,7 +112,7 @@ export default class LinkUrlDialog extends React.Component {
                           className="form-control"
                         />
                     </div>
-                    <div className="form-group">
+                    <div className="form-group" style="display:none">
                         <label htmlFor="linkDesc">Description: </label>
                         <textarea
                           onChange={this.onDescChange}
