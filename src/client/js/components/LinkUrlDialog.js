@@ -82,6 +82,7 @@ export default class LinkUrlDialog extends React.Component {
             right                 : 'auto',
             bottom                : 'auto',
             marginRight           : '-50%',
+            width                 : '320px',
             transform             : 'translate(-50%, -50%)'
           }
         };
@@ -101,7 +102,7 @@ export default class LinkUrlDialog extends React.Component {
                         />
                     </div>
                     <div className="form-group">
-                        <label htmlFor="linkUrl">Url: </label>
+                        <label htmlFor="linkUrl">URL: </label>
                         <input
                           onChange={this.onUrlChange}
                           id="linkUrl"
@@ -117,21 +118,16 @@ export default class LinkUrlDialog extends React.Component {
                           onChange={this.onDescChange}
                           id="linkDesc"
                           ref="linkDesc"
+                          rows="4"
                           type="text"
                           value={this.state.descValue}
                           className="form-control"
                         />
                     </div>
-                    <div className="form-group">
-                        <button onClick={this.state.isEditLink ? this.onEditLink : this.onConfirmLink} className="btn btn-primary">
-                            Confirm
-                        </button>
-                        <button className="btn btn-warning" onClick={this.onCancelLink}>
-                            Cancel
-                        </button>
-                        {this.state.isEditLink ? (<button className="btn btn-danger" onClick={this.onRemoveLink}>
-                            Remove
-                        </button>) : null}
+                    <div className="form-group pull-right">
+                        {this.state.isEditLink ? (<button className="btn btn-danger" onClick={this.onRemoveLink}><span className="glyphicon glyphicon-trash"></span>Remove</button>) : null}
+                        <button className="btn btn-default" onClick={this.onCancelLink}><span className="glyphicon glyphicon-remove"></span>Cancel</button>
+                        <button onClick={this.state.isEditLink ? this.onEditLink : this.onConfirmLink} className="btn btn-primary"><span className="glyphicon glyphicon-ok"></span>Submit</button>
                     </div>
                 </Modal>
             </div>
