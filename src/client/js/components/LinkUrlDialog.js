@@ -82,14 +82,15 @@ export default class LinkUrlDialog extends React.Component {
             right                 : 'auto',
             bottom                : 'auto',
             marginRight           : '-50%',
+            width                 : '380px',
             transform             : 'translate(-50%, -50%)'
           }
         };
         return (
             <div style={styles.linkTitleInputContainer}>
                 <Modal shouldCloseOnOverlayClick={true} style={customStyles} isOpen={true}>
-                    <div className="form-group">
-                        <label htmlFor="linkTitle">Title: </label>
+                    { false && <div className="form-group">
+                        <label htmlFor="linkTitle">Text: </label>
                         <input
                           onChange={this.onTitleChange}
                           ref="linkTitle"
@@ -99,9 +100,9 @@ export default class LinkUrlDialog extends React.Component {
                           value={this.state.titleValue}
                           className="form-control"
                         />
-                    </div>
+                    </div> }
                     <div className="form-group">
-                        <label htmlFor="linkUrl">Url: </label>
+                        <label htmlFor="linkUrl">URL: </label>
                         <input
                           onChange={this.onUrlChange}
                           id="linkUrl"
@@ -111,27 +112,22 @@ export default class LinkUrlDialog extends React.Component {
                           className="form-control"
                         />
                     </div>
-                    <div className="form-group">
+                    {false && <div className="form-group">
                         <label htmlFor="linkDesc">Description: </label>
                         <textarea
                           onChange={this.onDescChange}
                           id="linkDesc"
                           ref="linkDesc"
+                          rows="4"
                           type="text"
                           value={this.state.descValue}
                           className="form-control"
                         />
-                    </div>
-                    <div className="form-group">
-                        <button onClick={this.state.isEditLink ? this.onEditLink : this.onConfirmLink} className="btn btn-primary">
-                            Confirm
-                        </button>
-                        <button className="btn btn-warning" onClick={this.onCancelLink}>
-                            Cancel
-                        </button>
-                        {this.state.isEditLink ? (<button className="btn btn-danger" onClick={this.onRemoveLink}>
-                            Remove
-                        </button>) : null}
+                    </div>}
+                    <div className="form-group pull-right">
+                        {this.state.isEditLink ? (<button className="btn btn-danger btn-sm" onClick={this.onRemoveLink}><span className="glyphicon glyphicon-trash"></span>Remove</button>) : null}
+                        <button className="btn btn-default btn-sm" onClick={this.onCancelLink}><span className="glyphicon glyphicon-remove"></span>Cancel</button>
+                        <button onClick={this.state.isEditLink ? this.onEditLink : this.onConfirmLink} className="btn btn-primary btn-sm"><span className="glyphicon glyphicon-ok"></span>Submit</button>
                     </div>
                 </Modal>
             </div>
@@ -144,7 +140,7 @@ LinkUrlDialog.propTypes = {
 
 const styles = {
     root: {
-        fontFamily: '\'Georgia\', serif',
+        fontFamily: '\'Arial\', serif',
         padding: 20,
         width: 600,
     },
@@ -155,7 +151,7 @@ const styles = {
         marginBottom: 10,
     },
     linkTitleInput: {
-        fontFamily: '\'Georgia\', serif',
+        fontFamily: '\'Arial\', serif',
         marginRight: 10,
         padding: 3,
     },
