@@ -65,7 +65,7 @@ class Client extends Component {
         });
     }
     componentWillMount() {
-        document.getElementById("loadingInd").style = 'display:none;';
+        document.getElementById("loadingInd").setAttribute('style','display:none;');
         this.parseEditingUrl();
         let wrioID = null;
         WrioStore.listen((state) => {
