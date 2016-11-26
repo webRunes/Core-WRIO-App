@@ -128,7 +128,7 @@ ReactDom.render( CommentSaverUrlMatch() ? <CommentSaver /> : <Client /> , docume
 
 var oldHeight = 0;
 window.frameReady = () => {
-    let height = document.querySelector('#clientholder').clientHeight + 50;
+    let height = document.querySelector('#clientholder').clientHeight + 0;
     if (height != oldHeight) {
         oldHeight = height;
         console.log("Height ready");
