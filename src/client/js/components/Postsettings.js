@@ -45,7 +45,7 @@ export default class PostSettings extends React.Component {
             if (!this.state.userStartedEditing) {
                 this.setState({
                     saveFile: prepFileName(state.header)
-                })
+                });
             }
         }
     }
