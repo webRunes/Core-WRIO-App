@@ -4,7 +4,7 @@ import ReactDom from 'react-dom';
 import request from 'superagent';
 import {applyMentions} from './mixins/mentions';
 import getHttp from './getHttp';
-import CoreEditor from './CoreEditor';
+import CoreEditor from './CoreEditor.js';
 import {ContentBlock, CharacterMetadata} from 'draft-js';
 import Immutable from 'immutable';
 import JSONDocument from './JSONDocument.js';
@@ -19,8 +19,7 @@ var domain = process.env.DOMAIN;
 class Loading extends Component {
     render () {
         return (<div>
-                Loading source page....
-                <img src="https://default.wrioos.com/img/loading.gif" id="loadingInd"/>
+                Loading source page <img src="https://default.wrioos.com/img/loading.gif" id="loadingInd"/>
             </div>);
     }
 }
@@ -38,8 +37,8 @@ class Client extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            startHeader: '<h1>',
-            endHeader: '</h1>',
+            startHeader: '<h2>',
+            endHeader: '</h2>',
             wrioID: '',
             saveUrl: '',
             saveDisabled: 0,

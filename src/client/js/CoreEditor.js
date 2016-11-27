@@ -147,6 +147,14 @@ class CoreEditor extends React.Component {
             <div className="clearfix">
             <div className="col-xs-12">
                 { this.state.error && <Alert type="danger" message="There was error while trying to save your file, please try again later" /> }
+
+                {false && <div className="well">
+                    <h4>You are not logged in</h4>
+                    <p>You can still create posts. However, you need to be logged in to save post access and to received donates.</p>
+                    <br />
+                    <a className="btn btn-sm btn-primary" href="#" role="button"><span
+                        className="glyphicon glyphicon-user"></span>Login with Twitter</a>
+                </div>}
                 <div className="RichEditor-root form-group">
                   <BlockStyleControls
                     editorState={editorState}
@@ -172,17 +180,17 @@ class CoreEditor extends React.Component {
                     />
                   </div>
                 </div>
-            </div>
+                </div>
 
             <PostSettings saveUrl={this.state.editUrl}
                           onPublish={this.publish.bind(this)}
                           onDelete={this.deleteDocument.bind(this)}
                           description={about}
 
-                          commentID={this.state.commentID}
-                          author={this.props.author}
-                          editUrl={this.state.editUrl}
-                />
+                              commentID={this.state.commentID}
+                              author={this.props.author}
+                              editUrl={this.state.editUrl}
+                    />
             </div>
         );
     }
