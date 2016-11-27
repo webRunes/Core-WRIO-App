@@ -165,6 +165,13 @@ class CoreEditor extends React.Component {
 
         return (
             <div class="clearfix">
+            <div className="well">
+                <h4>You are not logged in</h4>
+                <p>You can still create posts. However, you need to be logged in to save access path and to received donates.</p>
+                <br />
+                <a className="btn btn-sm btn-success" href="#" role="button" onClick={Login.requestLogin}><span
+                    className="glyphicon glyphicon-user"></span>Login with Twitter</a>
+            </div>
             <div className="col-xs-12">
                 <div className="RichEditor-root form-group">
                   <BlockStyleControls
