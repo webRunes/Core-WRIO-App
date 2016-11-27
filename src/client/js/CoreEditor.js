@@ -5,6 +5,7 @@ import TextEditorStore from './stores/texteditor.js';
 import TextEditorActions from './actions/texteditor.js';
 import LinkDialogActions from './actions/linkdialog.js';
 import SaveActions from './saveActions';
+import {deleteFromS3} from './webrunesAPI.js';
 
 import Alert from './components/Alert.js';
 import StyleButton from './components/StyleButton.js';
@@ -152,10 +153,11 @@ class CoreEditor extends React.Component {
                     onToggle={this.toggleBlockType}
                     onLinkToggle={this.onLinkControlClick}
                   />
-                  <InlineStyleControls
+
+                  { false && <InlineStyleControls
                     editorState={editorState}
                     onToggle={this.toggleInlineStyle}
-                  />
+                  />}
                   <LinkUrlDialog />
                   <div className={className} onClick={this.focus}>
                     <Editor
@@ -174,6 +176,7 @@ class CoreEditor extends React.Component {
 
             <PostSettings saveUrl={this.state.editUrl}
                           onPublish={this.publish.bind(this)}
+                          onDelete={this.deleteDocument.bind(this)}
                           description={about}
 
                           commentID={this.state.commentID}
@@ -224,6 +227,29 @@ class CoreEditor extends React.Component {
         }
     }
 
+    /**
+     * Deletes current document
+     */
+
+    deleteDocument(storageRelativePath) {
+        WrioActions.busy(true);
+        deleteFromS3(storageRelativePath).then((res)=>{
+            WrioActions.busy(false);
+            this.setState({
+                error: false
+            });
+            parent.postMessage(JSON.stringify({
+                "closeTab": true
+            }), "*");
+        }).catch((err)=>{
+            WrioActions.busy(false);
+            this.setState({
+                error: true
+            });
+            console.log(err);
+        });
+    }
+
 }
 
 CoreEditor.propTypes = {
@@ -249,7 +275,8 @@ const BLOCK_TYPES = [
     {
         label: 'Header',
         style: 'header-two'
-    }, {
+    },
+    /*{
         label: 'Blockquote',
         style: 'blockquote'
     }, {
@@ -258,8 +285,13 @@ const BLOCK_TYPES = [
     }, {
         label: 'OL',
         style: 'ordered-list-item'
-    }, {
+    }, */
+     {
         label: 'Link',
+        style: 'link'
+    },
+    {
+        label: 'Embed Image or Social Media',
         style: 'link'
     }
 ];

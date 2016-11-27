@@ -153,14 +153,15 @@ export default class PostSettings extends React.Component {
 
             <div className="col-xs-12">
                 <div className="pull-right">
-                    <button type="button" className="btn btn-danger" onClick={() => this.setState({alert: true})} onCancel={() => this.setState({alert: false})}><span className="glyphicon glyphicon-trash" ></span>Delete</button>
+                    { window.location.pathname !== "/create" &&
+                    <button type="button" className="btn btn-danger" onClick={() => this.setState({alert: true})} ><span className="glyphicon glyphicon-trash" ></span>Delete</button>}
                     <button type="button" className="btn btn-default" onClick={this.goBack.bind(this)}><span className="glyphicon glyphicon-remove"></span>Cancel</button>
                     <a href="#" className="btn btn-success" onClick={this.publish.bind(this)}>
                         {this.state.busy ? loading : <span className="glyphicon glyphicon-open" />}
                        Publish</a>
                 </div>
             </div>
-            {this.state.alert && <Modal onOk />}
+            {this.state.alert && <Modal  onCancel={() => this.setState({alert: false})} onOk={this.deleteHandler.bind(this)}/>}
         </div>);
     }
     goBack() {
@@ -174,10 +175,12 @@ export default class PostSettings extends React.Component {
             "followLink": this.getSaveUrl()
         }), "*");
     }
-
-    deleteFile(e) {
-
+    deleteHandler () {
+        this.setState({alert: false});
+        this.props.onDelete(this.fileSavePattern());
     }
+
+
 }
 
 PostSettings.propTypes = {
@@ -203,6 +206,7 @@ class Modal extends React.Component {
 
     onOk () {
         this.props.onOk();
+        $('#confirm-delete').hide();
     }
 
     onCancel() {
@@ -218,8 +222,8 @@ class Modal extends React.Component {
                         Are you sure want to delete document?
                     </div>
                     <div className="modal-footer">
-                        <button type="button" className="btn btn-default" data-dismiss="modal">Cancel</button>
-                        <a className="btn btn-danger btn-ok">Delete</a>
+                        <button type="button" className="btn btn-default" data-dismiss="modal" onClick={this.onCancel}>Cancel</button>
+                        <a className="btn btn-danger btn-ok" onClick={this.onOk}>Delete</a>
                     </div>
                 </div>
             </div>
