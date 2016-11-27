@@ -28,7 +28,8 @@ export default class PostSettings extends React.Component {
             editUrl,
             saveRelativePath,
             busy: false,
-            userStartedEditing: false
+            userStartedEditing: false,
+            alert: false
         };
         Object.assign(this.state,this.applyDescription(props.description));
 
@@ -49,9 +50,12 @@ export default class PostSettings extends React.Component {
         }
     }
 
+    fileSavePattern() {
+        return `${this.state.saveFile}/index.html`;
+    }
 
     publish() {
-        this.props.onPublish(this.source,`${this.state.saveFile}.html`,this.state.description);
+        this.props.onPublish(this.source,this.fileSavePattern(), this.getSaveUrl(),this.state.description);
     }
 
     setSource(src) {
@@ -96,7 +100,7 @@ export default class PostSettings extends React.Component {
     }
 
     getSaveUrl() {
-        return this.props.saveUrl || `https://wr.io/${WrioStore.getWrioID()}/${this.state.saveFile}/index.html`;
+        return this.props.saveUrl || `https://wr.io/${WrioStore.getWrioID()}/${this.fileSavePattern()}`;
     }
 
     render () {
@@ -149,12 +153,14 @@ export default class PostSettings extends React.Component {
 
             <div className="col-xs-12">
                 <div className="pull-right">
-                    <button type="button" className="btn btn-default"><span className="glyphicon glyphicon-remove" onClick={this.goBack.bind(this)}></span>Cancel</button>
+                    <button type="button" className="btn btn-danger" onClick={() => this.setState({alert: true})} onCancel={() => this.setState({alert: false})}><span className="glyphicon glyphicon-trash" ></span>Delete</button>
+                    <button type="button" className="btn btn-default" onClick={this.goBack.bind(this)}><span className="glyphicon glyphicon-remove"></span>Cancel</button>
                     <a href="#" className="btn btn-success" onClick={this.publish.bind(this)}>
                         {this.state.busy ? loading : <span className="glyphicon glyphicon-open" />}
                        Publish</a>
                 </div>
             </div>
+            {this.state.alert && <Modal onOk />}
         </div>);
     }
     goBack() {
@@ -168,12 +174,60 @@ export default class PostSettings extends React.Component {
             "followLink": this.getSaveUrl()
         }), "*");
     }
+
+    deleteFile(e) {
+
+    }
 }
 
 PostSettings.propTypes = {
     saveUrl: React.PropTypes.string,
     description: React.PropTypes.string,
     onPublish: React.PropTypes.func,
+    onDelete: React.PropTypes.func,
     commentID:React.PropTypes.string,
     author:React.PropTypes.string
+};
+
+class Modal extends React.Component {
+
+    constructor(props) {
+        super(props);
+        this.onOk = this.onOk.bind(this);
+        this.onCancel = this.onCancel.bind(this);
+    }
+
+    componentDidMount() {
+        $('#confirm-delete').show();
+    }
+
+    onOk () {
+        this.props.onOk();
+    }
+
+    onCancel() {
+        $('#confirm-delete').hide();
+        this.props.onCancel();
+    }
+
+    render() {
+        return (<div className="modal" id="confirm-delete" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="false">
+            <div className="modal-dialog">
+                <div className="modal-content">
+                    <div className="modal-header">
+                        Are you sure want to delete document?
+                    </div>
+                    <div className="modal-footer">
+                        <button type="button" className="btn btn-default" data-dismiss="modal">Cancel</button>
+                        <a className="btn btn-danger btn-ok">Delete</a>
+                    </div>
+                </div>
+            </div>
+        </div>);
+    }
+}
+
+Modal.propTypes = {
+    onOk: React.PropTypes.func,
+    onCancel: React.PropTypes.func
 };

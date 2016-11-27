@@ -4,13 +4,13 @@ import {saveToS3} from './webrunesAPI.js';
 import WrioActions from './actions/wrio.js';
 
 export default class CustomActions {
-    static toggleCustomAction(editorState, action, saveRelativePath, author,commentID, doc, description) {
+    static execSave(editorState, action, saveRelativePath, author,commentID, doc, description) {
         switch (action) {
             case 'save':
-                saveAction(editorState, author, saveRelativePath,commentID, doc, description);
+                return saveAction(editorState, author, saveRelativePath,commentID, doc, description);
                 break;
             case 'saveas':
-                saveAsAction(editorState, author,commentID, doc, description);
+                return saveAsAction(editorState, author,commentID, doc, description);
                 break;
             default:
                 console.log('Invalid action');
@@ -22,7 +22,7 @@ var domain = process.env.DOMAIN;
 
 const saveAction = (editorState, author, saveRelativePath, commentID,doc,description) => {
     doc.setAbout(description);
-    doc.draftToHtml(editorState.getCurrentContent(), author,commentID).then(res => {
+    return doc.draftToHtml(editorState.getCurrentContent(), author,commentID).then(res => {
         let {json, html} = res;
         return saveToS3(saveRelativePath,html);
     }).then((res) => {
@@ -30,20 +30,18 @@ const saveAction = (editorState, author, saveRelativePath, commentID,doc,descrip
         parent.postMessage(JSON.stringify({
             "coreSaved": true
         }), "*");
-    }).catch((err)=> {
-        WrioActions.busy(false);
-        console.log(err);
+        return true;
     });
 };
 
 const saveAsAction = (editorState, author,commentID,doc, description) => {
     doc.setAbout(description);
-    doc.draftToHtml(editorState.getCurrentContent(), author, commentID).then(res => {
+    return doc.draftToHtml(editorState.getCurrentContent(), author, commentID).then(res => {
         let json = doc.getElementOfType('Article');
         let html = res.html;
         let fileName = (json.name === '' ? 'untitled' : json.name.split(' ').join('_')) + '.html';
         saveAs(fileName,html);
-        WrioActions.busy(false);
+        return true;
     });
 };
 

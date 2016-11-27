@@ -51,7 +51,7 @@ class GenericLDJsonDocument {
             "@type": "Article",
             "inLanguage": lang,
             "keywords": keywords,
-            "author": author,
+            "author": `https://wr.io/${author}/?wr.io=${author}`,
             "editor": "",
             "name": "Untitled",
             "about": about,
