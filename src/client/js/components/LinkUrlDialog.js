@@ -89,7 +89,7 @@ export default class LinkUrlDialog extends React.Component {
         return (
             <div style={styles.linkTitleInputContainer}>
                 <Modal shouldCloseOnOverlayClick={true} style={customStyles} isOpen={true}>
-                    <div className="form-group" style="display:none;">
+                    { false && <div className="form-group">
                         <label htmlFor="linkTitle">Text: </label>
                         <input
                           onChange={this.onTitleChange}
@@ -100,7 +100,7 @@ export default class LinkUrlDialog extends React.Component {
                           value={this.state.titleValue}
                           className="form-control"
                         />
-                    </div>
+                    </div> }
                     <div className="form-group">
                         <label htmlFor="linkUrl">URL: </label>
                         <input
@@ -112,7 +112,7 @@ export default class LinkUrlDialog extends React.Component {
                           className="form-control"
                         />
                     </div>
-                    <div className="form-group" style="display:none;">
+                    {false && <div className="form-group">
                         <label htmlFor="linkDesc">Description: </label>
                         <textarea
                           onChange={this.onDescChange}
@@ -123,7 +123,7 @@ export default class LinkUrlDialog extends React.Component {
                           value={this.state.descValue}
                           className="form-control"
                         />
-                    </div>
+                    </div>}
                     <div className="form-group pull-right">
                         {this.state.isEditLink ? (<button className="btn btn-danger btn-sm" onClick={this.onRemoveLink}><span className="glyphicon glyphicon-trash"></span>Remove</button>) : null}
                         <button className="btn btn-default btn-sm" onClick={this.onCancelLink}><span className="glyphicon glyphicon-remove"></span>Cancel</button>

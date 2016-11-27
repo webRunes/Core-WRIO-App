@@ -169,34 +169,34 @@ class CoreEditor extends React.Component {
                     <h4>You are not logged in</h4>
                     <p>You can still create posts. However, you need to be logged in to save access path and to received donates.</p>
                     <br />
-                    <a className="btn btn-sm btn-success" href="#" role="button" onClick={Login.requestLogin}><span
+                    <a className="btn btn-sm btn-primary" href="#" role="button" onClick={Login.requestLogin}><span
                         className="glyphicon glyphicon-user"></span>Login with Twitter</a>
                 </div>
                 <div className="col-xs-12">
-                    <div className="RichEditor-root form-group">
-                      <BlockStyleControls
-                        editorState={editorState}
-                        onToggle={this.toggleBlockType}
-                        onLinkToggle={this.onLinkControlClick}
-                      />
-                      <InlineStyleControls
-                        editorState={editorState}
-                        onToggle={this.toggleInlineStyle}
-                      />
-                      <LinkUrlDialog />
-                      <div className={className} onClick={this.focus}>
-                        <Editor
-                          blockStyleFn={getBlockStyle}
-                          editorState={editorState}
-                          handleKeyCommand={this.handleKeyCommand}
-                          onChange={this.handleChange.bind(this)}
-                          placeholder="Enter text..."
-                          ref="editor"
-                          spellCheck={true}
-                          keyBindingFn={this.myKeyBindingFn}
-                        />
-                      </div>
-                    </div>
+                <div className="RichEditor-root form-group">
+                  <BlockStyleControls
+                    editorState={editorState}
+                    onToggle={this.toggleBlockType}
+                    onLinkToggle={this.onLinkControlClick}
+                  />
+                  <InlineStyleControls
+                    editorState={editorState}
+                    onToggle={this.toggleInlineStyle}
+                  />
+                  <LinkUrlDialog />
+                  <div className={className} onClick={this.focus}>
+                    <Editor
+                      blockStyleFn={getBlockStyle}
+                      editorState={editorState}
+                      handleKeyCommand={this.handleKeyCommand}
+                      onChange={this.handleChange.bind(this)}
+                      placeholder="Enter text..."
+                      ref="editor"
+                      spellCheck={true}
+                      keyBindingFn={this.myKeyBindingFn}
+                    />
+                  </div>
+                </div>
                 </div>
 
                 <PostSettings saveUrl={this.state.editUrl}
