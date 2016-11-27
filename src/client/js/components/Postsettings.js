@@ -219,7 +219,7 @@ class Modal extends React.Component {
             <div className="modal-dialog">
                 <div className="modal-content">
                     <div className="modal-header">
-                        Are you sure want to delete document?
+                        Are you sure you want to delete?
                     </div>
                     <div className="modal-footer">
                         <button type="button" className="btn btn-default" data-dismiss="modal" onClick={this.onCancel}>Cancel</button>

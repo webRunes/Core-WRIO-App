@@ -146,7 +146,7 @@ class CoreEditor extends React.Component {
         return (
             <div className="clearfix">
             <div className="col-xs-12">
-                { this.state.error && <Alert type="danger" message="There was error while trying to save your file, please try again later" /> }
+                { this.state.error && <Alert type="danger" message="There is an error saving your file, please try again later" /> }
 
                 {false && <div className="well">
                     <h4>You are not logged in</h4>
