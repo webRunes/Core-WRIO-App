@@ -165,7 +165,14 @@ class CoreEditor extends React.Component {
 
         return (
             <div className="clearfix">
-            <div className="col-xs-12">
+                <div className="well">
+                    <h4>You are not logged in</h4>
+                    <p>You can still create posts. However, you need to be logged in to save access path and to received donates.</p>
+                    <br />
+                    <a className="btn btn-sm btn-primary" href="#" role="button" onClick={Login.requestLogin}><span
+                        className="glyphicon glyphicon-user"></span>Login with Twitter</a>
+                </div>
+                <div className="col-xs-12">
                 <div className="RichEditor-root form-group">
                   <BlockStyleControls
                     editorState={editorState}
@@ -190,16 +197,16 @@ class CoreEditor extends React.Component {
                     />
                   </div>
                 </div>
-            </div>
+                </div>
 
-            <PostSettings saveUrl={this.state.editUrl}
-                          onPublish={this.publish.bind(this)}
-                          description={about}
+                <PostSettings saveUrl={this.state.editUrl}
+                              onPublish={this.publish.bind(this)}
+                              description={about}
 
-                          commentID={this.state.commentID}
-                          author={this.props.author}
-                          editUrl={this.state.editUrl}
-                />
+                              commentID={this.state.commentID}
+                              author={this.props.author}
+                              editUrl={this.state.editUrl}
+                    />
             </div>
         );
     }
