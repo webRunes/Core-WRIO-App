@@ -38,8 +38,8 @@ class Client extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            startHeader: '<h2>',
-            endHeader: '</h2>',
+            startHeader: '<h1>',
+            endHeader: '</h1>',
             wrioID: '',
             saveUrl: '',
             saveDisabled: 0,
@@ -128,7 +128,7 @@ ReactDom.render( CommentSaverUrlMatch() ? <CommentSaver /> : <Client /> , docume
 
 var oldHeight = 0;
 window.frameReady = () => {
-    let height = document.querySelector('#clientholder').clientHeight + 50;
+    let height = document.querySelector('#clientholder').clientHeight + 2;
     if (height != oldHeight) {
         oldHeight = height;
         console.log("Height ready");

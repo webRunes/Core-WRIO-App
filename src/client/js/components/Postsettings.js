@@ -86,27 +86,29 @@ export default class PostSettings extends React.Component {
     }
 
     render () {
-        const loading = <img src="https://wrioos.com/Default-WRIO-Theme/img/loading.gif" />;
+        const loading = <img src="https://default.wrioos.com/img/loading.gif" />;
         let savePath = this.getSaveUrl();
-        const className ="form-group form-inline " +  (this.state.exceedLength ? "has-error" : "");
-        return (<div className="clearfix">
+        const className ="form-group" +  (this.state.exceedLength ? " has-error" : "");
+        return (<div className="form-horizontal">
+            <div className="callout">
+                <h5>You are not logged in</h5>
+                You can still create posts. However, you need to be logged in to save access path and to received donates.
+            </div>
             <div className={className}>
                 <label htmlFor="id-Description" className="col-sm-4 col-md-3 control-label">Description</label>
                 <div className="col-sm-8 col-md-9">
                     <textarea className="form-control" type="text" maxLength="512"
-                           style={{width:"100%"}} //hack, remove it
                            cols="40"
                            rows="6"
                            placeholder="Optional. Max 512 characters"
                            value={this.state.description}
                            onChange={this.onChangeDescr.bind(this)} />
                     <div className="help-block">
-                        {this.state.exceedLength &&  <span>Max {this.state.maxLength} characters</span>} &nbsp;
+                        {this.state.exceedLength && <span>Max {this.state.maxLength} characters</span>}
                     </div>
-
                 </div>
             </div>
-            <div className="form-group clearfix">
+            <div className="form-group">
                 <label htmlFor="id-Storage" className="col-xs-12 col-sm-4 col-md-3 control-label"><span className="glyphicon glyphicon-question-sign" aria-hidden="true" data-toggle="tooltip" data-placement="left" title="Use [Save as..] to save your file locally for its further manual transfer to any server or service such as Google Drive, Dropbox, GitHub Pages and etc."></span> Storage</label>
                 <div className="col-xs-6 col-sm-4 col-md-4">
                     <div className="btn-group dropdown-menu-full-width">
@@ -118,7 +120,6 @@ export default class PostSettings extends React.Component {
                             {this.genDropdownSource('saveas')}
                         </ul>
                     </div>
-
                 </div>
                 {!this.props.saveUrl && <div className="col-xs-6 col-sm-4 col-md-5">
                     <input type="text"
@@ -128,16 +129,15 @@ export default class PostSettings extends React.Component {
                            value={this.state.saveFile}
                            onChange={this.onChangeFile.bind(this)}
                         />
-                    <div className="help-block">Your page will be live at <a href={savePath}> {savePath} </a></div>
+                    <div className="help-block">Your page will be live at {savePath}</div>
                 </div>}
             </div>
-
             <CommentEnabler commentID={this.props.commentID}
                             author={this.props.author}
                             editUrl={this.getSaveUrl()}
                             />
 
-            <div className="form-group col-xs-12">
+            <div className="col-xs-12">
                 <div className="pull-right">
                     <button type="button" className="btn btn-default"><span className="glyphicon glyphicon-remove" onClick={this.goBack.bind(this)}></span>Cancel</button>
                     <a href="#" className="btn btn-success" onClick={this.publish.bind(this)}>
