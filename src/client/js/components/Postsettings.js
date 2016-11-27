@@ -90,6 +90,10 @@ export default class PostSettings extends React.Component {
         let savePath = this.getSaveUrl();
         const className ="form-group" +  (this.state.exceedLength ? " has-error" : "");
         return (<div className="form-horizontal">
+            <div className="callout">
+                <h5>You are not logged in</h5>
+                You can still create posts. However, you need to be logged in to save access path and to received donates.
+            </div>
             <div className={className}>
                 <label htmlFor="id-Description" className="col-sm-4 col-md-3 control-label">Description</label>
                 <div className="col-sm-8 col-md-9">
