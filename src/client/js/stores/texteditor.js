@@ -5,6 +5,8 @@ import Reflux from 'reflux';
 import TextActions from '../actions/texteditor.js';
 import {CompositeDecorator, ContentState, SelectionState, Editor, EditorState, Entity, RichUtils, CharacterMetadata, getDefaultKeyBinding,  Modifier} from 'draft-js';
 import LinkEntity from '../components/LinkEntity.js';
+import JSONDocument from '../JSONDocument.js';
+import WrioActions from '../actions/wrio.js';
 
 // helper function
 function findLinkEntities(contentBlock, callback) {
@@ -28,6 +30,7 @@ export default Reflux.createStore({
         this.state = {
             editorState: EditorState.createEmpty()
         };
+        this.oldHeader = "";
     },
 
     setLinkEditCallback(cb) {
@@ -62,6 +65,11 @@ export default Reflux.createStore({
 
     onUpdateEditorState(state) {
         this.state.editorState = state;
+        const header = JSONDocument.getTitle(state.getCurrentContent());
+        if (header != this.oldHeader) {
+            WrioActions.headerChanged(header);
+        }
+        this.oldHeader = header;
         //this.trigger(this.state);
         ///console.log("reaction",state);
     },

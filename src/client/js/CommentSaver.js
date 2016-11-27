@@ -36,7 +36,7 @@ export default class CommentSaver extends React.Component {
     }
 
     componentDidMount() {
-        document.getElementById("loadingInd").style = 'display:none;';
+        document.getElementById("loadingInd").setAttribute('style','display:none;');
 
     }
 

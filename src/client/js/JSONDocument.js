@@ -51,11 +51,11 @@ class GenericLDJsonDocument {
             "@type": "Article",
             "inLanguage": lang,
             "keywords": keywords,
-            "author": author,
+            "author": `https://wr.io/${author}/?wr.io=${author}`,
             "editor": "",
-            "name": "",
+            "name": "Untitled",
             "about": about,
-            "articleBody": [],
+            "articleBody": [" "],
             "hasPart": [],
             "mentions": [],
             "comment": widgetData
@@ -85,9 +85,11 @@ export default class JSONDocument extends GenericLDJsonDocument {
         this.comment = '';
         this.order = 0;
     }
+
     _createMetadata(name) {
         return Immutable.List(name.split('').map(e => CharacterMetadata.create()));
     }
+
     _parseArticlePart(subArticle, processUrl) {
         let articleText = '';
         let name = subArticle.name;
@@ -121,6 +123,7 @@ export default class JSONDocument extends GenericLDJsonDocument {
             ]));
         }
     }
+
     toDraft() {
         this.order = 0;
         let article = this.getElementOfType("Article");
@@ -129,6 +132,13 @@ export default class JSONDocument extends GenericLDJsonDocument {
         this._parseArticlePart(article,false);
         article.hasPart.forEach(subarticle => this._parseArticlePart(subarticle, true));
     }
+
+    static getTitle(contentState) {
+        const blockMap = contentState.getBlockMap(),
+            firstBlock = blockMap.first();
+        return firstBlock.getText();
+    }
+
     draftToJson(contentState) {
         let blockMap = contentState.getBlockMap(),
             firstBlock = blockMap.first(),

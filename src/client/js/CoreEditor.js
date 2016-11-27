@@ -4,13 +4,16 @@ import {CompositeDecorator, ContentState, SelectionState, Editor, EditorState, E
 import TextEditorStore from './stores/texteditor.js';
 import TextEditorActions from './actions/texteditor.js';
 import LinkDialogActions from './actions/linkdialog.js';
-import CustomActions from './customActions';
+import SaveActions from './saveActions';
+import {deleteFromS3} from './webrunesAPI.js';
 
+import Alert from './components/Alert.js';
 import StyleButton from './components/StyleButton.js';
 import LinkUrlDialog from './components/LinkUrlDialog.js';
 import PostSettings from './components/Postsettings.js';
 import WrioStore from './stores/wrio.js';
 import WrioActions from './actions/wrio.js';
+
 
 class CoreEditor extends React.Component {
     constructor(props) {
@@ -34,13 +37,13 @@ class CoreEditor extends React.Component {
             editUrl: props.editUrl,
             author: props.author,
             commentID: this.props.commentID,
-            doc:doc
+            doc:doc,
+            error:false
         };
 
         this.handleKeyCommand   = this.handleKeyCommand.bind(this);
         this.toggleBlockType    = this.toggleBlockType.bind(this);
         this.toggleInlineStyle  = this.toggleInlineStyle.bind(this);
-        this.toggleCustomAction = this.toggleCustomAction.bind(this);
         this.openEditPrompt     = this.openEditPrompt.bind(this);
         this.onLinkControlClick = this.onLinkControlClick.bind(this);
         this.focus              = this.focus.bind(this);
@@ -109,29 +112,6 @@ class CoreEditor extends React.Component {
         );
     }
 
-    toggleCustomAction(action) {
-
-        const saveAction = (commentId) => CustomActions.toggleCustomAction(
-                                                this.state.editorState,
-                                                action,
-                                                this.state.saveRelativePath,
-                                                this.state.author,
-                                                commentId,
-                                                this.state.doc,
-                                                this.state.description
-        );
-
-        if (this.state.commentID) { // don't request comment id, if it already stored in the document
-            saveAction(this.state.commentID);
-        } else {
-            WrioActions.busy(true);
-            WrioStore.requestCommentId(this.state.editUrl,(err,id) => {
-                saveAction(id);
-            });
-        }
-
-    }
-
     gotCommentID (id) {
         this.setState({
             commentID:id
@@ -165,24 +145,27 @@ class CoreEditor extends React.Component {
 
         return (
             <div className="clearfix">
-                <div className="well" style="display:none;">
+            <div className="col-xs-12">
+                { this.state.error && <Alert type="danger" message="There is an error saving your file, please try again later" /> }
+
+                {false && <div className="well">
                     <h4>You are not logged in</h4>
                     <p>You can still create posts. However, you need to be logged in to save post access and to received donates.</p>
                     <br />
                     <a className="btn btn-sm btn-primary" href="#" role="button"><span
                         className="glyphicon glyphicon-user"></span>Login with Twitter</a>
-                </div>
-                <div className="col-xs-12">
+                </div>}
                 <div className="RichEditor-root form-group">
                   <BlockStyleControls
                     editorState={editorState}
                     onToggle={this.toggleBlockType}
                     onLinkToggle={this.onLinkControlClick}
                   />
-                  <InlineStyleControls
+
+                  { false && <InlineStyleControls
                     editorState={editorState}
                     onToggle={this.toggleInlineStyle}
-                  />
+                  />}
                   <LinkUrlDialog />
                   <div className={className} onClick={this.focus}>
                     <Editor
@@ -199,9 +182,10 @@ class CoreEditor extends React.Component {
                 </div>
                 </div>
 
-                <PostSettings saveUrl={this.state.editUrl}
-                              onPublish={this.publish.bind(this)}
-                              description={about}
+            <PostSettings saveUrl={this.state.editUrl}
+                          onPublish={this.publish.bind(this)}
+                          onDelete={this.deleteDocument.bind(this)}
+                          description={about}
 
                               commentID={this.state.commentID}
                               author={this.props.author}
@@ -211,13 +195,67 @@ class CoreEditor extends React.Component {
         );
     }
 
-    publish(source,file,desc) {
-        console.log(file,desc);
-        this.setState({
-            saveRelativePath: file,
-            description: desc
+    /**
+     * Pulish file to store
+     * @param action 'save' or 'saveas'
+     * @param storageRelativePath relative path to the user's directory
+     * @param url - absolute save path, needed for widget url creation
+     * @param desc - description of the document
+     */
+    publish(action,storageRelativePath,url,desc) {
+        console.log(storageRelativePath,desc);
+
+        const saveAction = (commentId) => SaveActions.execSave(
+            this.state.editorState,
+            action,
+            storageRelativePath,
+            this.state.author,
+            commentId,
+            this.state.doc,
+            desc
+        );
+        if (this.state.commentID) { // don't request comment id, if it already stored in the document
+            saveAction(this.state.commentID).then(()=>{
+                WrioActions.busy(false);
+                this.setState({
+                    error: false
+                });
+            }).catch((err)=> {
+                WrioActions.busy(false);
+                this.setState({
+                   error: true
+                });
+                console.log(err);
+            });
+        } else {
+            WrioActions.busy(true);
+            WrioStore.requestCommentId(url,(err,id) => {
+                saveAction(id);
+            });
+        }
+    }
+
+    /**
+     * Deletes current document
+     */
+
+    deleteDocument(storageRelativePath) {
+        WrioActions.busy(true);
+        deleteFromS3(storageRelativePath).then((res)=>{
+            WrioActions.busy(false);
+            this.setState({
+                error: false
+            });
+            parent.postMessage(JSON.stringify({
+                "closeTab": true
+            }), "*");
+        }).catch((err)=>{
+            WrioActions.busy(false);
+            this.setState({
+                error: true
+            });
+            console.log(err);
         });
-        this.toggleCustomAction(source);
     }
 
 }
@@ -245,7 +283,8 @@ const BLOCK_TYPES = [
     {
         label: 'Header',
         style: 'header-two'
-    }, {
+    },
+    /*{
         label: 'Blockquote',
         style: 'blockquote'
     }, {
@@ -254,8 +293,13 @@ const BLOCK_TYPES = [
     }, {
         label: 'OL',
         style: 'ordered-list-item'
-    }, {
+    }, */
+     {
         label: 'Link',
+        style: 'link'
+    },
+    {
+        label: 'Embed Image or Social Media',
         style: 'link'
     }
 ];
@@ -365,38 +409,6 @@ ActionButton.propTypes = {
     label: React.PropTypes.string,
     action: React.PropTypes.string
 };
-
-var CUSTOM_ACTIONS = [
-    {
-        label: 'Save',
-        action: 'save'
-    }, {
-        label: 'Save As',
-        action: 'saveas'
-    }
-];
-
-const CustomActionControls = (props) => {
-    return (
-        <div className="RichEditor-controls">
-            {CUSTOM_ACTIONS.map(type =>
-              <ActionButton
-                key={type.label}
-                label={type.label}
-                onToggle={props.onToggle}
-                action={type.action}
-              />
-            )}
-          </div>
-    );
-};
-
-CustomActionControls.propTypes = {
-    onToggle: React.PropTypes.func
-};
-
-
-
 
 const styles = {
     root: {
