@@ -165,7 +165,7 @@ class CoreEditor extends React.Component {
 
         return (
             <div className="clearfix">
-                <div className="well">
+                <div className="well" style="display:none">
                     <h4>You are not logged in</h4>
                     <p>You can still create posts. However, you need to be logged in to save access path and to received donates.</p>
                     <br />
