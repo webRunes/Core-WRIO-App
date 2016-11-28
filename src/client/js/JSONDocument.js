@@ -36,6 +36,12 @@ class GenericLDJsonDocument {
     constructor(article = []) {
         this.jsonBlocks = article;
     }
+
+    /**
+     * Returns LD+JSON entity of type <type>
+     * @param type
+     * @returns {*}
+     */
     getElementOfType(type) {
         var rv;
         this.jsonBlocks.forEach((element) => {
@@ -45,6 +51,17 @@ class GenericLDJsonDocument {
         });
         return rv;
     }
+
+    /**
+     * Make new article skeleton
+     * @param lang - article language
+     * @param keywords - keywords list
+     * @param author - author WRIO id
+     * @param widgetData - commentID for the article
+     * @param about - description for the article
+     * @returns LD+JSON template
+     */
+
     makeArticle(lang, keywords, author, widgetData,about) {
         return {
             "@context": "http://schema.org",
@@ -61,6 +78,12 @@ class GenericLDJsonDocument {
             "comment": widgetData
         };
     };
+    /**
+     * Wrapper for makeArticle
+     * @param author
+     * @param commentID
+     * @param about
+     */
     createArticle(author,commentID,about) {
         if (this.getElementOfType("Article")) {
             console.log("Failed to create article, it already exists");
@@ -90,8 +113,17 @@ export default class JSONDocument extends GenericLDJsonDocument {
         return Immutable.List(name.split('').map(e => CharacterMetadata.create()));
     }
 
+    /**
+     * Parse individual json part
+     * @param subArticle - input json
+     * @param processUrl - url flag
+     * @returns {Array} of ContentBlocks
+     * @private
+     */
+
     _parseArticlePart(subArticle, processUrl) {
         let articleText = '';
+        let res = [];
         let name = subArticle.name;
         if (name === undefined) { // in case of SocialMediaPosting use headline
             name = subArticle.headline;
@@ -100,7 +132,7 @@ export default class JSONDocument extends GenericLDJsonDocument {
         if (this.name) {
             this.order++;
         }
-        this.contentBlocks.push(new ContentBlock([
+        res.push(new ContentBlock([
             ['text', name],
             ['key', keyGen()],
             ['characterList', this._createMetadata(name)],
@@ -115,29 +147,52 @@ export default class JSONDocument extends GenericLDJsonDocument {
             articleText += subArticle.url;
         }
         if (articleText !== '') {
-            this.contentBlocks.push(new ContentBlock([
+            res.push(new ContentBlock([
                 ['text', articleText],
                 ['key', keyGen()],
                 ['characterList', this._createMetadata(articleText)],
                 ['type', 'unstyled']
             ]));
         }
+        return res;
     }
+
+    /**
+     * Convert JSON representation to draftJS contentState
+     * modifies this.contentBlocks
+     */
 
     toDraft() {
         this.order = 0;
         let article = this.getElementOfType("Article");
         this.mentions = article.mentions ? extractMentions(article.mentions) : [];
         this.comment = article.comment;
-        this._parseArticlePart(article,false);
-        article.hasPart.forEach(subarticle => this._parseArticlePart(subarticle, true));
+        // parse article root
+        this.contentBlocks = this._parseArticlePart(article,false);
+        // and merge it with data from the hasPart section
+        this.contentBlocks = this.contentBlocks.concat(this.contentBlocks, article.hasPart.reduce((r,subarticle) => {
+            r = r.concat(r,this._parseArticlePart(subarticle, true));
+            return r;
+        },[]));
+        return this.contentBlocks;
     }
+
+    /**
+     * Get first block(title) of the page
+     * @param contentState
+     * @returns {string} Title of the page
+     */
 
     static getTitle(contentState) {
         const blockMap = contentState.getBlockMap(),
             firstBlock = blockMap.first();
         return firstBlock.getText();
     }
+
+    /**
+     * Converts current draftJS content state to LD+JSON representation
+     * @param contentState
+     */
 
     draftToJson(contentState) {
         let blockMap = contentState.getBlockMap(),
@@ -191,6 +246,15 @@ export default class JSONDocument extends GenericLDJsonDocument {
             });
         });
     }
+
+    /**
+     * Converts draftJS editor contents to
+     * @param contentState - draftJS content state
+     * @param author - author of the page
+     * @param commentID - comment id
+     * @returns {Promise} to the struct with html and json representation of the article
+     */
+
     draftToHtml(contentState, author, commentID) {
         return new Promise((resolve, reject) => {
             contentState = contentState || {};
@@ -203,6 +267,12 @@ export default class JSONDocument extends GenericLDJsonDocument {
                 });
         });
     }
+
+    /**
+     * Exports document to html text
+     * @returns {string} text of the html document
+     */
+
     toHtml() {
         var scrStart = '<script type="application/ld+json">';
         var scrEnd = '</script>';
@@ -214,6 +284,11 @@ export default class JSONDocument extends GenericLDJsonDocument {
             .replace('|TITLE|', this.getElementOfType('Article').name)
             .replace('|DESCRIPTION|', this.getElementOfType('Article').about);
     }
+
+    /**
+     * sets current document description(about)
+     * @param text - description text
+     */
 
     setAbout(text) {
         let article = this.getElementOfType('Article');

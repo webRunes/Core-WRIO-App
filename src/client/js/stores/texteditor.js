@@ -37,6 +37,8 @@ export default Reflux.createStore({
         this.state.linkEditCallback = cb;
     },
 
+
+
     createLinkEntity(title,url,desc) {
         return Entity.create('LINK', 'MUTABLE', {
             linkTitle: title,
