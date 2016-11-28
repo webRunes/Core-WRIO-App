@@ -28,7 +28,7 @@ const getMention = (name, about, link) => ({
         "@type": "Article",
         "name": name,
         "about": about,
-        "link": link
+        "url": link
     });
 
 
