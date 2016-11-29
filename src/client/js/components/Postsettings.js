@@ -219,7 +219,10 @@ class Modal extends React.Component {
             <div className="modal-dialog">
                 <div className="modal-content">
                     <div className="modal-header">
-                        Are you sure you want to delete?
+                        <h4 class="modal-title">Delete</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to delete?</p>
                     </div>
                     <div className="modal-footer">
                         <a className="btn btn-danger btn-ok" onClick={this.onOk}><span className="glyphicon glyphicon-trash" ></span>Delete</a>
