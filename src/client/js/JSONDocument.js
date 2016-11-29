@@ -227,6 +227,16 @@ export default class JSONDocument extends GenericLDJsonDocument {
                 }
             }
         });
+
+        const formatMention = (url,text,blockIndex,offset) => `${url}?'${text}':${blockIndex},${offset}`;
+        let order = 0;
+        if (typeof article.name === "string") {
+            order++;
+        }
+        if (typeof article.about === "string") {
+            order++;
+        }
+
         blockMap.toArray().forEach((block, i) => {
             let entity;
             block.findEntityRanges(char => {
@@ -239,8 +249,9 @@ export default class JSONDocument extends GenericLDJsonDocument {
                     let url = data.linkUrl,
                         name = data.linkTitle || '',
                         desc = data.linkDesc || '';
+                    const linkText = block.getText().substring(anchorOffset, focusOffset);
                     article.mentions.push(
-                        getMention(name, "", `${url}?'${block.getText().substring(anchorOffset, focusOffset)}':${i},${anchorOffset}`)
+                        getMention(name, "", formatMention(url,linkText,order+i,anchorOffset))
                     );
                 }
             });
