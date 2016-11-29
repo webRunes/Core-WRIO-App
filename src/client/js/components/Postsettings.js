@@ -222,8 +222,8 @@ class Modal extends React.Component {
                         Are you sure you want to delete?
                     </div>
                     <div className="modal-footer">
-                        <button type="button" className="btn btn-default" data-dismiss="modal" onClick={this.onCancel}>Cancel</button>
                         <a className="btn btn-danger btn-ok" onClick={this.onOk}>Delete</a>
+                        <button type="button" className="btn btn-default" data-dismiss="modal" onClick={this.onCancel}>Cancel</button>
                     </div>
                 </div>
             </div>
