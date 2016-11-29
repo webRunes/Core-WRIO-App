@@ -229,9 +229,7 @@ export default class JSONDocument extends GenericLDJsonDocument {
         });
 
         const formatMention = (url,text,blockIndex,offset) => `${url}?'${text}':${blockIndex},${offset}`;
-
         let order = 0;
-
         if (typeof article.name === "string") {
             order++;
         }
@@ -253,7 +251,7 @@ export default class JSONDocument extends GenericLDJsonDocument {
                         desc = data.linkDesc || '';
                     const linkText = block.getText().substring(anchorOffset, focusOffset);
                     article.mentions.push(
-                        getMention(name, "", formatMention(url,linkText,order+i,anchorOffset) )
+                        getMention(name, "", formatMention(url,linkText,order+i,anchorOffset));
                     );
                 }
             });
