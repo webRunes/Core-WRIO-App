@@ -19,7 +19,7 @@ var domain = process.env.DOMAIN;
 class Loading extends Component {
     render () {
         return (<div>
-                Loading source page <img src="https://default.wrioos.com/img/loading.gif" id="loadingInd"/>
+                Loading editor <img src="https://default.wrioos.com/img/loading.gif" id="loadingInd"/>
             </div>);
     }
 }

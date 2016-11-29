@@ -150,7 +150,7 @@ class CoreEditor extends React.Component {
 
                 {false && <div className="well">
                     <h4>You are not logged in</h4>
-                    <p>You can still create posts. However, you need to be logged in to save post access and to received donates.</p>
+                    <p>You can still create posts. However, you need to be logged in to save access path to the post and to received donates.</p>
                     <br />
                     <a className="btn btn-sm btn-primary" href="#" role="button"><span
                         className="glyphicon glyphicon-user"></span>Login with Twitter</a>
