@@ -4,7 +4,7 @@ import ReactDom from 'react-dom';
 import request from 'superagent';
 import {applyMentions} from './mixins/mentions';
 import getHttp from './getHttp';
-import CoreEditor from './CoreEditor';
+import CoreEditor from './CoreEditor.js';
 import {ContentBlock, CharacterMetadata} from 'draft-js';
 import Immutable from 'immutable';
 import JSONDocument from './JSONDocument.js';
@@ -64,7 +64,7 @@ class Client extends Component {
         });
     }
     componentWillMount() {
-        document.getElementById("loadingInd").style = 'display:none;';
+        document.getElementById("loadingInd").setAttribute('style','display:none;');
         this.parseEditingUrl();
         let wrioID = null;
         WrioStore.listen((state) => {

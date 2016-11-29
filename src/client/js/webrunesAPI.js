@@ -23,6 +23,24 @@ export function saveToS3(path,html) {
     });
 }
 
+
+export function deleteFromS3(path) {
+    return new Promise((resolve,reject) => {
+        request
+            .post(`//storage.${domain}/api/delete`)
+            .withCredentials()
+            .set('Accept', 'application/json')
+            .send({
+                'url': path,
+            })
+            .then(({body})=> {
+                resolve(body);
+            }, (err)=> {
+                reject(err);
+            });
+    });
+}
+
 export function getWidgetID(url) {
     return new Promise((resolve,reject) => {
         request
@@ -34,7 +52,7 @@ export function getWidgetID(url) {
                 reject(err);
             });
     });
-};
+}
 
 export function getRegistredUser() {
     return new Promise((resolve,reject) => {

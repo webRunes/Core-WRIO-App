@@ -7,6 +7,11 @@ import {parseEditingUrl, extractFileName, parseUrl, appendIndex} from '../utils/
 import WrioStore from '../stores/wrio.js';
 import CommentEnabler from '../CommentEnabler.js';
 
+function prepFileName(name) {
+    let res = name.replace(/ /g,'_');
+    return res.substring(0,120);
+}
+
 export default class PostSettings extends React.Component {
     constructor(props) {
         super(props);
@@ -18,11 +23,13 @@ export default class PostSettings extends React.Component {
         const [editUrl, saveRelativePath] = parseEditingUrl();
         this.state = {
             maxLength: 512,
-            saveFile: "untitled",
+            saveFile: "Untitled",
             dropdownSource: this.dropdownSources['save'],
             editUrl,
             saveRelativePath,
-            busy: false
+            busy: false,
+            userStartedEditing: false,
+            alert: false
         };
         Object.assign(this.state,this.applyDescription(props.description));
 
@@ -33,12 +40,22 @@ export default class PostSettings extends React.Component {
     }
 
     storeListener(state) {
-        this.setState({busy: state});
+        this.setState({busy: state.busy});
+        if (state.header) {
+            if (!this.state.userStartedEditing) {
+                this.setState({
+                    saveFile: prepFileName(state.header)
+                });
+            }
+        }
     }
 
+    fileSavePattern() {
+        return `${this.state.saveFile}/index.html`;
+    }
 
     publish() {
-        this.props.onPublish(this.source,`${this.state.saveFile}.html`,this.state.description);
+        this.props.onPublish(this.source,this.fileSavePattern(), this.getSaveUrl(),this.state.description);
     }
 
     setSource(src) {
@@ -68,6 +85,7 @@ export default class PostSettings extends React.Component {
 
     onChangeFile(e) {
         this.setState({
+            userStartedEditing: true,
             saveFile: e.target.value
         });
     }
@@ -82,7 +100,7 @@ export default class PostSettings extends React.Component {
     }
 
     getSaveUrl() {
-        return this.props.saveUrl || `https://wr.io/${WrioStore.getWrioID()}/${this.state.saveFile}.html`;
+        return this.props.saveUrl || `https://wr.io/${WrioStore.getWrioID()}/${this.fileSavePattern()}`;
     }
 
     render () {
@@ -115,6 +133,7 @@ export default class PostSettings extends React.Component {
                             {this.genDropdownSource('save')}
                             {this.genDropdownSource('saveas')}
                         </ul>
+                        <div className="help-block">Your page will be live at {savePath}</div>
                     </div>
                 </div>
                 {!this.props.saveUrl && <div className="col-xs-6 col-sm-4 col-md-5">
@@ -125,7 +144,6 @@ export default class PostSettings extends React.Component {
                            value={this.state.saveFile}
                            onChange={this.onChangeFile.bind(this)}
                         />
-                    <div className="help-block">Your page will be live at {savePath}</div>
                 </div>}
             </div>
             <CommentEnabler commentID={this.props.commentID}
@@ -135,12 +153,15 @@ export default class PostSettings extends React.Component {
 
             <div className="col-xs-12">
                 <div className="pull-right">
-                    <button type="button" className="btn btn-default"><span className="glyphicon glyphicon-remove" onClick={this.goBack.bind(this)}></span>Cancel</button>
+                    { window.location.pathname !== "/create" &&
+                    <button type="button" className="btn btn-danger" onClick={() => this.setState({alert: true})} ><span className="glyphicon glyphicon-trash" ></span>Delete</button>}
+                    <button type="button" className="btn btn-default" onClick={this.goBack.bind(this)}><span className="glyphicon glyphicon-remove"></span>Cancel</button>
                     <a href="#" className="btn btn-success" onClick={this.publish.bind(this)}>
                         {this.state.busy ? loading : <span className="glyphicon glyphicon-open" />}
                        Publish</a>
                 </div>
             </div>
+            {this.state.alert && <Modal  onCancel={() => this.setState({alert: false})} onOk={this.deleteHandler.bind(this)}/>}
         </div>);
     }
     goBack() {
@@ -148,12 +169,69 @@ export default class PostSettings extends React.Component {
             "coreSaved": true
         }), "*");
     }
+    followLink(e) {
+        e.preventDefault();
+        parent.postMessage(JSON.stringify({
+            "followLink": this.getSaveUrl()
+        }), "*");
+    }
+    deleteHandler () {
+        this.setState({alert: false});
+        this.props.onDelete(this.fileSavePattern());
+    }
+
+
 }
 
 PostSettings.propTypes = {
     saveUrl: React.PropTypes.string,
     description: React.PropTypes.string,
     onPublish: React.PropTypes.func,
+    onDelete: React.PropTypes.func,
     commentID:React.PropTypes.string,
     author:React.PropTypes.string
+};
+
+class Modal extends React.Component {
+
+    constructor(props) {
+        super(props);
+        this.onOk = this.onOk.bind(this);
+        this.onCancel = this.onCancel.bind(this);
+    }
+
+    componentDidMount() {
+        $('#confirm-delete').show();
+    }
+
+    onOk () {
+        this.props.onOk();
+        $('#confirm-delete').hide();
+    }
+
+    onCancel() {
+        $('#confirm-delete').hide();
+        this.props.onCancel();
+    }
+
+    render() {
+        return (<div className="modal" id="confirm-delete" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="false">
+            <div className="modal-dialog">
+                <div className="modal-content">
+                    <div className="modal-header">
+                        Are you sure you want to delete?
+                    </div>
+                    <div className="modal-footer">
+                        <button type="button" className="btn btn-default" data-dismiss="modal" onClick={this.onCancel}>Cancel</button>
+                        <a className="btn btn-danger btn-ok" onClick={this.onOk}>Delete</a>
+                    </div>
+                </div>
+            </div>
+        </div>);
+    }
+}
+
+Modal.propTypes = {
+    onOk: React.PropTypes.func,
+    onCancel: React.PropTypes.func
 };
