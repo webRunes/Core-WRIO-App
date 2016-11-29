@@ -251,7 +251,7 @@ export default class JSONDocument extends GenericLDJsonDocument {
                         desc = data.linkDesc || '';
                     const linkText = block.getText().substring(anchorOffset, focusOffset);
                     article.mentions.push(
-                        getMention(name, "", formatMention(url,linkText,order+i,anchorOffset));
+                        getMention(name, "", formatMention(url,linkText,order+i,anchorOffset))
                     );
                 }
             });
