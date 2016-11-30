@@ -164,7 +164,7 @@ export default class PostSettings extends React.Component {
                     <a href="#" className="btn btn-success" onClick={this.publish.bind(this)}>
                         {this.state.busy ? loading : <span className="glyphicon glyphicon-open" /> }
                        Publish</a>
-                       <br /><br /><br /><br /> //iframe height fix for dropdown. Will be removed later
+                       <br /><br /><br /><br />
                 </div>
             </div>
             {this.state.alert && <Modal  onCancel={() => this.setState({alert: false})} onOk={this.deleteHandler.bind(this)}/>}
