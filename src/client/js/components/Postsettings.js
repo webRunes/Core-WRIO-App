@@ -104,7 +104,7 @@ export default class PostSettings extends React.Component {
     }
 
     render () {
-        const loading = <img src="https://default.wrioos.com/img/loading.gif" style={{margin-right:4px}} />;
+        const loading = <img src="https://default.wrioos.com/img/loading.gif" style={{margin-right:4px;}} />;
         let savePath = this.getSaveUrl();
         const className ="form-group" +  (this.state.exceedLength ? " has-error" : "");
         return (<div className="form-horizontal">
