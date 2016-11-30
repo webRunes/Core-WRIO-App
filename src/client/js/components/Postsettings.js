@@ -104,7 +104,7 @@ export default class PostSettings extends React.Component {
     }
 
     render () {
-        const loading = <img src="https://default.wrioos.com/img/loading.gif" />;
+        const loading = <img src="https://default.wrioos.com/img/loading.gif" style="margin-right:4px" />;
         let savePath = this.getSaveUrl();
         const className ="form-group" +  (this.state.exceedLength ? " has-error" : "");
         return (<div className="form-horizontal">
@@ -162,7 +162,7 @@ export default class PostSettings extends React.Component {
                     <button type="button" className="btn btn-danger" onClick={() => this.setState({alert: true})} ><span className="glyphicon glyphicon-trash" ></span>Delete</button>}
                     <button type="button" className="btn btn-default" onClick={this.goBack.bind(this)}><span className="glyphicon glyphicon-remove"></span>Cancel</button>
                     <a href="#" className="btn btn-success" onClick={this.publish.bind(this)}>
-                        {this.state.busy ? loading : <span className="glyphicon glyphicon-open" /> }
+                        {this.state.busy ? loading : <span className="glyphicon glyphicon-open" />}
                        Publish</a>
                        <br /><br /><br /><br />
                 </div>
