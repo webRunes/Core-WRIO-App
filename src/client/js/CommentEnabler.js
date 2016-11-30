@@ -26,7 +26,7 @@ export default class CommentEnabler extends React.Component {
         return (
             <div className="form-group">
                 <label htmlFor="id-Comment" className="col-xs-12 col-sm-4 col-md-3 control-label">
-                <span className="glyphicon glyphicon-question-sign" aria-hidden="true" data-toggle="tooltip" data-placement="left" title="Comments work through the Twitter. The Advanced mode is designed for those wishing to have full control over comments. For the reasons of security we do not save the password from you Twitter account, thus you need to re-enter it every time you turn the Advanced mode on."></span> Comments</label>
+                { false && <span className="glyphicon glyphicon-question-sign" aria-hidden="true" data-toggle="tooltip" data-placement="left" title="Comments work through the Twitter. The Advanced mode is designed for those wishing to have full control over comments. For the reasons of security we do not save the password from you Twitter account, thus you need to re-enter it every time you turn the Advanced mode on."></span> }Comments</label>
                 <div className="col-xs-6 col-sm-4 col-md-4">
                     <div className="btn-group dropdown-menu-full-width">
                         <button type="button" className="btn btn-white btn-block dropdown-toggle ia-author" data-toggle="dropdown">
