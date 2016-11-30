@@ -146,7 +146,7 @@ export default class PostSettings extends React.Component {
                 </div>}
             </div>
             <div className="form-group">
-                <label className="col-xs-12 col-sm-4 col-md-3 control-label">&nbsp;</label>
+                <label className="col-xs-12 col-sm-4 col-md-3 control-label hidden-xs">&nbsp;</label>
                 <div className="col-xs-12 col-sm-8 col-md-9">
                     <div className="help-block">Your page will be live at {savePath}</div>
                 </div>
