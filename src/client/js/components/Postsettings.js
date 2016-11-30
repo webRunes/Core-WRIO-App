@@ -221,7 +221,7 @@ class Modal extends React.Component {
                     <div className="modal-header">
                         <h4 class="modal-title">Delete</h4>
                     </div>
-                    <div class="modal-body">
+                    <div className="modal-body">
                         <p>Are you sure you want to delete?</p>
                     </div>
                     <div className="modal-footer">
