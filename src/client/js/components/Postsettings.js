@@ -157,8 +157,9 @@ export default class PostSettings extends React.Component {
                     <button type="button" className="btn btn-danger" onClick={() => this.setState({alert: true})} ><span className="glyphicon glyphicon-trash" ></span>Delete</button>}
                     <button type="button" className="btn btn-default" onClick={this.goBack.bind(this)}><span className="glyphicon glyphicon-remove"></span>Cancel</button>
                     <a href="#" className="btn btn-success" onClick={this.publish.bind(this)}>
-                        {this.state.busy ? loading : <span className="glyphicon glyphicon-open" />}
+                        {this.state.busy ? loading : <span className="glyphicon glyphicon-open" /> }
                        Publish</a>
+                       <br /><br /><br /><br /> //iframe height fix for dropdown. Will be removed later
                 </div>
             </div>
             {this.state.alert && <Modal  onCancel={() => this.setState({alert: false})} onOk={this.deleteHandler.bind(this)}/>}
