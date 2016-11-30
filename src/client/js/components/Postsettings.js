@@ -133,7 +133,6 @@ export default class PostSettings extends React.Component {
                             {this.genDropdownSource('save')}
                             {this.genDropdownSource('saveas')}
                         </ul>
-                        <div className="help-block">Your page will be live at {savePath}</div>
                     </div>
                 </div>
                 {!this.props.saveUrl && <div className="col-xs-6 col-sm-4 col-md-5">
@@ -145,6 +144,12 @@ export default class PostSettings extends React.Component {
                            onChange={this.onChangeFile.bind(this)}
                         />
                 </div>}
+            </div>
+            <div className="form-group">
+                <label className="col-xs-12 col-sm-4 col-md-3 control-label">&nbsp;</label>
+                <div className="col-xs-12 col-sm-8 col-md-9">
+                    <div className="help-block">Your page will be live at {savePath}</div>
+                </div>
             </div>
             <CommentEnabler commentID={this.props.commentID}
                             author={this.props.author}
