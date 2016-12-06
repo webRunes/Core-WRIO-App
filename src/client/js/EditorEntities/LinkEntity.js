@@ -12,13 +12,13 @@ export default class Link extends React.Component {
     constructor(props) {
         super(props);
         this.getProps(props);
+        this.onLinkEdit = this.onLinkEdit.bind(this);
     }
 
     getProps(props) {
         const {
             linkTitle, linkUrl, linkDesc, editCallback
             } = Entity.get(props.entityKey).getData();
-        console.log(Entity.get(props.entityKey).getData());
         this.linkTitle = linkTitle;
         this.linkUrl = linkUrl;
         this.linkDesc = linkDesc;
@@ -35,11 +35,7 @@ export default class Link extends React.Component {
         this.getProps(props);
     }
     render() {
-        return (
-            <a href={this.linkUrl} onClick={this.onLinkEdit.bind(this)}>
-                {this.linkTitle}
-            </a>
-        );
+        return (<a href={this.linkUrl} onClick={this.onLinkEdit}>{this.linkTitle}</a>);
     }
 }
 

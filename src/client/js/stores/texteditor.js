@@ -4,7 +4,7 @@
 import Reflux from 'reflux';
 import TextActions from '../actions/texteditor.js';
 import {CompositeDecorator, ContentState, SelectionState, Editor, EditorState, Entity, RichUtils, CharacterMetadata, getDefaultKeyBinding,  Modifier} from 'draft-js';
-import LinkEntity from '../components/LinkEntity.js';
+import LinkEntity from '../EditorEntities/LinkEntity.js';
 import JSONDocument from '../JSONDocument.js';
 import WrioActions from '../actions/wrio.js';
 
@@ -36,8 +36,6 @@ export default Reflux.createStore({
     setLinkEditCallback(cb) {
         this.state.linkEditCallback = cb;
     },
-
-
 
     createLinkEntity(title,url,desc) {
         return Entity.create('LINK', 'MUTABLE', {
@@ -115,6 +113,7 @@ export default Reflux.createStore({
 
         });
         return editorState;
+
 
     },
 
