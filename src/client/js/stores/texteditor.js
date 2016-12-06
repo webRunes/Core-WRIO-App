@@ -22,6 +22,13 @@ function findLinkEntities(contentBlock, callback) {
     );
 }
 
+function appendHttp(url) {
+    if (!/^https?:\/\//i.test(url)) {
+        return 'http://' + url;
+    }
+    return url;
+}
+
 
 export default Reflux.createStore({
     listenables:TextActions,
@@ -118,6 +125,8 @@ export default Reflux.createStore({
     },
 
     onCreateNewLink(titleValue,urlValue,descValue) {
+
+        urlValue = appendHttp(urlValue);
 
         const entityKey = this.createLinkEntity(titleValue,urlValue,descValue);
         const {editorState} = this.state;
