@@ -1,6 +1,6 @@
 import React from 'react';
 import Reflux from 'reflux';
-import {CompositeDecorator, ContentState, SelectionState, Editor, EditorState, Entity, RichUtils, CharacterMetadata, getDefaultKeyBinding,  Modifier} from 'draft-js';
+import {CompositeDecorator, ContentState, SelectionState, Editor, EditorState, Entity, RichUtils, CharacterMetadata, getDefaultKeyBinding,  Modifier, convertToRaw} from 'draft-js';
 import TextEditorStore from './stores/texteditor.js';
 import TextEditorActions from './actions/texteditor.js';
 import LinkDialogActions from './actions/linkdialog.js';
@@ -32,7 +32,7 @@ class CoreEditor extends React.Component {
         TextEditorStore.setLinkEditCallback(this.openEditPrompt.bind(this));
 
         this.state = {
-            editorState:TextEditorStore.createEditorState(contentBlocks,mentions),
+            editorState:  EditorState.moveFocusToEnd (TextEditorStore.createEditorState(contentBlocks,mentions)),
             saveRelativePath: props.saveRelativePath,
             editUrl: props.editUrl,
             author: props.author,
@@ -40,6 +40,7 @@ class CoreEditor extends React.Component {
             doc:doc,
             error:false
         };
+
 
         this.handleKeyCommand   = this.handleKeyCommand.bind(this);
         this.toggleBlockType    = this.toggleBlockType.bind(this);
@@ -50,6 +51,7 @@ class CoreEditor extends React.Component {
 
         TextEditorStore.listen(this.onStatusChange.bind(this));
         Reflux.listenTo(TextEditorStore,"onFocus");
+        setTimeout(this.focus.bind(this),200);
     }
 
 
@@ -59,7 +61,9 @@ class CoreEditor extends React.Component {
         });
     }
 
+
     handleChange (editorState) {
+        console.log(convertToRaw(editorState.getCurrentContent()));
         this.setState({
             editorState:editorState
         });
