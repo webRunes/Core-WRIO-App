@@ -11,35 +11,34 @@ import {CompositeDecorator, ContentState, SelectionState, Editor, EditorState, E
 export default class Link extends React.Component {
     constructor(props) {
         super(props);
-        this.getProps(props);
+        this.state = this.getProps(props);
+        this.onLinkEdit = this.onLinkEdit.bind(this);
     }
 
     getProps(props) {
         const {
             linkTitle, linkUrl, linkDesc, editCallback
             } = Entity.get(props.entityKey).getData();
-        console.log(Entity.get(props.entityKey).getData());
-        this.linkTitle = linkTitle;
-        this.linkUrl = linkUrl;
-        this.linkDesc = linkDesc;
-        this.entityKey = props.entityKey;
-        this.linkCallback = editCallback;
+        console.log(props.decoratedText);
+        return {
+            linkTitle: props.decoratedText || linkTitle,
+            linkUrl,
+            linkDesc,
+            entityKey:props.entityKey,
+            linkCallback:editCallback
+        };
     }
 
     onLinkEdit (e) {
         e.preventDefault();
-        this.linkCallback(this.linkTitle, this.linkUrl, this.linkDesc, this.entityKey);
+        this.state.linkCallback(this.state.linkTitle, this.state.linkUrl, this.state.linkDesc, this.state.entityKey);
     }
 
     componentWillReceiveProps(props) {
-        this.getProps(props);
+        this.setState(this.getProps(props));
     }
     render() {
-        return (
-            <a href={this.linkUrl} onClick={this.onLinkEdit.bind(this)}>
-                {this.linkTitle}
-            </a>
-        );
+        return (<a href={this.state.linkUrl} onClick={this.onLinkEdit}>{this.props.children}</a>);
     }
 }
 
