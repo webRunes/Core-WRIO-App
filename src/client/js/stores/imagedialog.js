@@ -21,7 +21,7 @@ const checkTimeout = () => new Promise((resolve,reject) => {
         setTimeout(()=>{
             activeTimeout = false;
             resolve();
-        },IFRAMELY_LIMIT)
+        },IFRAMELY_LIMIT);
     } else {
         resolve();
     }
@@ -42,7 +42,8 @@ export default Reflux.createStore({
             urlValue: '',
             descValue: '',
             showURLInput: false,
-            isEditLink: false
+            isEditLink: false,
+            previewBusy: false,
         };
 
     },
@@ -103,12 +104,20 @@ export default Reflux.createStore({
         });
     },
 
+    _previewBusy(busy) {
+        this.state.previewBusy = busy;
+        this.trigger(this.state);
+    },
+
     downloadEmebed(url) {
+        this._previewBusy(true);
         return new Promise((resolve, reject) => {
             request.get('https://iframely.wrioos.com/iframely?url=' + url, (err, result) => {
                 if (err) {
+                    this._previewBusy(false);
                     return reject(err);
                 }
+                this._previewBusy(false);
                 resolve(result.body.meta);
             });
         });
