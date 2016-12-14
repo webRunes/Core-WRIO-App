@@ -38,7 +38,7 @@ export default class SocialMediaEntity extends React.Component {
 
     getProps(props) {
         const {
-            src,description,editCallback
+            src,description,title,editCallback
             } = Entity.get(props.entityKey).getData();
         console.log(props.decoratedText);
         this.downloadEmebed( {
@@ -50,6 +50,7 @@ export default class SocialMediaEntity extends React.Component {
             html:"<img class=\"img_loading\" src=\"https://default.wrioos.com/img/loading.gif\" />",
             src,
             description,
+            title,
             entityKey: props.entityKey,
             linkCallback: editCallback
         };
@@ -78,9 +79,9 @@ export default class SocialMediaEntity extends React.Component {
     render() {
         const htmlData = {__html: this.state.html};
         const content = <div dangerouslySetInnerHTML={htmlData} />;
-        const title = this.state.description;
+        const title = this.state.title;
         const description= this.state.description;
-        return <Figure content={content} title={title} description={description}/>;
+        return <Figure content={content} title={title} description={description} onClick={this.onLinkEdit}/>;
     }}
 
 SocialMediaEntity.propTypes = {

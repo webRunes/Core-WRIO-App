@@ -89,18 +89,7 @@ export default class LinkUrlDialog extends React.Component {
         return (
             <div style={styles.linkTitleInputContainer}>
                 <Modal shouldCloseOnOverlayClick={true} style={customStyles} isOpen={true}>
-                    { this.state.showTitle && <div className="form-group">
-                        <label htmlFor="linkTitle">Text: </label>
-                        <input
-                          onChange={this.onTitleChange}
-                          ref="linkTitle"
-                          id="linkTitle"
-                          style={styles.linkTitleInput}
-                          type="text"
-                          value={this.state.titleValue}
-                          className="form-control"
-                        />
-                    </div> }
+
                     <div className="form-group">
                         <label htmlFor="linkUrl">URL: </label>
                         <input
@@ -112,6 +101,18 @@ export default class LinkUrlDialog extends React.Component {
                           className="form-control"
                         />
                     </div>
+                    { this.state.showTitle && <div className="form-group">
+                        <label htmlFor="linkTitle">Title: </label>
+                        <input
+                            onChange={this.onTitleChange}
+                            ref="linkTitle"
+                            id="linkTitle"
+                            style={styles.linkTitleInput}
+                            type="text"
+                            value={this.state.titleValue}
+                            className="form-control"
+                            />
+                    </div> }
                     {this.state.showDescription && <div className="form-group">
                         <label htmlFor="linkDesc">Description: </label>
                         <textarea

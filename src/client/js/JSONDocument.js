@@ -40,7 +40,7 @@ const getSocialMediaPosting = (src,description,title) => ({
         "@type":"SocialMediaPosting",
         "sharedContent":{
             "@type":"WebPage",
-            "headline":description,
+            "headline":title,
             "about":description,
             "url":src
         }
@@ -305,10 +305,11 @@ export default class JSONDocument extends GenericLDJsonDocument {
                 if (entity) {
                     let data = entity.getData();
                     let url = data.src,
-                        desc = data.description || '';
+                        desc = data.description || '',
+                        title = data.title || '';
                     const linkText = block.getText().substring(anchorOffset, focusOffset);
                     article.hasPart.push(
-                       getSocialMediaPosting(url,desc)
+                       getSocialMediaPosting(url,desc,title)
                     );
                 }
             });
