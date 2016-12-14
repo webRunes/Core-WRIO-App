@@ -131,7 +131,7 @@ export default Reflux.createStore({
         const entityKey = this._createImageSocialEntitity(blockData.sharedContent.url,blockData.headline);
         const key = contentBlock.getKey();
         const _editorState = EditorState.forceSelection(editorState,SelectionState.createEmpty(key));
-        return this._insertEntityKey(_editorState,entityKey)
+        return this._insertEntityKey(_editorState,entityKey);
 
     },
 

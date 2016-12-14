@@ -368,7 +368,8 @@ const BlockStyleControls = (props) => {
 BlockStyleControls.propTypes = {
     editorState: React.PropTypes.object,
     onToggle: React.PropTypes.func,
-    onLinkToggle: React.PropTypes.func
+    onLinkToggle: React.PropTypes.func,
+    onImageToggle: React.PropTypes.func
 };
 
 var INLINE_STYLES = [
