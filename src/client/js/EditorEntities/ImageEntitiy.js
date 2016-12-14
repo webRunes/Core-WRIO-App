@@ -7,37 +7,41 @@ import {CompositeDecorator, ContentState, SelectionState, Editor, EditorState, E
 export default class ImageEntity extends React.Component {
     constructor(props) {
         super(props);
-        this.getProps(props);
+        this.state = this.getProps(props);
+        this.onLinkEdit = this.onLinkEdit.bind(this);
     }
 
     getProps(props) {
         const {
-            linkTitle, linkUrl, linkDesc, editCallback
+            src,description,editCallback
             } = Entity.get(props.entityKey).getData();
-        console.log(Entity.get(props.entityKey).getData());
-        this.linkTitle = linkTitle;
-        this.linkUrl = linkUrl;
-        this.linkDesc = linkDesc;
-        this.entityKey = props.entityKey;
-        this.linkCallback = editCallback;
+        console.log(props.decoratedText);
+        return {
+           src,
+           description,
+           entityKey: props.entityKey,
+           linkCallback: editCallback
+        };
     }
 
     onLinkEdit (e) {
         e.preventDefault();
-        this.linkCallback(this.linkTitle, this.linkUrl, this.linkDesc, this.entityKey);
+        this.state.linkCallback("", this.state.src, this.state.description, this.state.entityKey);
     }
 
     componentWillReceiveProps(props) {
-        this.getProps(props);
+        this.setState(this.getProps(props));
     }
     render() {
         return (
-            <img src={this.linkUrl} onClick={this.onLinkEdit.bind(this)}>{this.linkTitle}</img>
-        );
-    }
-}
+            <article style={{width: '50%'}} onClick={this.onLinkEdit}>
+        <figure>
+            <img src={this.state.src} />
+            <figcaption className="callout figure-details">{this.state.description} </figcaption>
+        </figure></article>);
+    }}
 
-Link.propTypes = {
+ImageEntity.propTypes = {
     entityKey: React.PropTypes.string,
     children: React.PropTypes.array
 };

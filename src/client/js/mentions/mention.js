@@ -35,6 +35,16 @@ class Mention {
 */
 }
 
+// factory method to genereate new mention objects
+const MentionFactory = (m) => {
+    switch (m["@type"]) {
+        case "ImageObject":
+            return new Image(m) ;
+        default:
+            return new Mention(m);
+    }
+};
+
 const merge = (mentions)=>
     sortBy(mentions, (m)=>
         (new Mention(m)).order
@@ -46,4 +56,4 @@ const extractMentions = (mentions) =>
         new Mention(mention)
     );
 
-export {merge, extractMentions, Mention};
+export {merge, extractMentions, Mention, MentionFactory};

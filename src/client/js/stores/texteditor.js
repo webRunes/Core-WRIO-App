@@ -3,24 +3,32 @@
  */
 import Reflux from 'reflux';
 import TextActions from '../actions/texteditor.js';
-import {CompositeDecorator, ContentState, SelectionState, Editor, EditorState, Entity, RichUtils, CharacterMetadata, getDefaultKeyBinding,  Modifier} from 'draft-js';
+import {AtomicBlockUtils, CompositeDecorator, ContentState, SelectionState, Editor, EditorState, Entity, RichUtils, CharacterMetadata, getDefaultKeyBinding,  Modifier} from 'draft-js';
 import LinkEntity from '../EditorEntities/LinkEntity.js';
+import ImageEntity from '../EditorEntities/ImageEntitiy.js';
+import SocialMediaEntity from '../EditorEntities/SocialMediaEntity.js';
 import JSONDocument from '../JSONDocument.js';
 import WrioActions from '../actions/wrio.js';
 
 // helper function
-function findLinkEntities(contentBlock, callback) {
+const findEntitiesOfType = (type) => (contentBlock, callback) => {
     contentBlock.findEntityRanges(
         (character) => {
             const entityKey = character.getEntity();
             return (
                 !!entityKey &&
-                Entity.get(entityKey).getType() === 'LINK'
+                Entity.get(entityKey).getType() === type
             );
         },
         callback
     );
-}
+};
+
+const findLinkEntities   = findEntitiesOfType('LINK');
+const findImageEntities  = findEntitiesOfType('IMAGE');
+const findSocialEntities = findEntitiesOfType('SOCIAL');
+const isImageLink = (filename) => (/\.(gif|jpg|jpeg|tiff|png)$/i).test(filename);
+
 
 function appendHttp(url) {
     if (!/^https?:\/\//i.test(url)) {
@@ -42,6 +50,9 @@ export default Reflux.createStore({
 
     setLinkEditCallback(cb) {
         this.state.linkEditCallback = cb;
+    },
+    setImageEditCallback(cb) {
+        this.state.imageEditCallback = cb;
     },
 
     createLinkEntity(title,url,desc) {
@@ -87,42 +98,68 @@ export default Reflux.createStore({
         console.log("reaction",state);
     },
 
-    createEditorState(contentBlocks, mentions) {
+    createEditorState(metaBlocks, mentions) {
         const decorator = new CompositeDecorator([{
             strategy: findLinkEntities,
             component: LinkEntity
-        }]);
+        },{
+            strategy: findImageEntities,
+            component: ImageEntity
+        },
+        {
+            strategy: findSocialEntities,
+            component: SocialMediaEntity
+        }
+        ]);
+
+        const contentBlocks = metaBlocks.map(x => x.block);
+
         let editorState = contentBlocks.length > 0 ?
             EditorState.createWithContent(ContentState.createFromBlockArray(contentBlocks), decorator) :
             EditorState.createEmpty(decorator);
 
-        mentions.forEach((mention, i) => {
-            const entityKey = this.createLinkEntity(mention.linkWord,mention.url,mention.linkDesc);
-            const block = contentBlocks[mention.block];
-            if (!block) {
-                console.warn("Cannot create mention",mention);
-                return;
-            }
-            const key = block.getKey();
-            try {
-                editorState = RichUtils.toggleLink(
-                    editorState,
-                    SelectionState.createEmpty(key).merge({
-                        anchorOffset: mention.start,
-                        focusKey: key,
-                        focusOffset: mention.end
-                    }),
-                    entityKey
-                );
-            } catch (e) {
-                console.error("Unable to map mention",e); // lets just skip buggy mention for now
-            }
 
-        });
-        return editorState;
+        editorState = metaBlocks.reduce((editorState,metaBlock) => metaBlock.data ? this.constructSocial(editorState,metaBlock) : editorState, editorState);
 
+        return mentions.reduce((editorState,mention) => this.constructMention(editorState,contentBlocks,mention),editorState);
 
     },
+
+    constructSocial(editorState,metaBlock) {
+        const contentBlock = metaBlock.block;
+        const blockData = metaBlock.data;
+        const entityKey = this._createImageSocialEntitity(blockData.sharedContent.url,blockData.headline);
+        const key = contentBlock.getKey();
+        const _editorState = EditorState.forceSelection(editorState,SelectionState.createEmpty(key));
+        return this._insertEntityKey(_editorState,entityKey)
+
+    },
+
+    constructMention(editorState, contentBlocks,mention) {
+        const entityKey = this.createLinkEntity(mention.linkWord,mention.url,mention.linkDesc);
+        const block = contentBlocks[mention.block];
+        if (!block) {
+            console.warn("Cannot create mention",mention);
+            return;
+        }
+        const key = block.getKey();
+
+        try {
+            return RichUtils.toggleLink(
+                editorState,
+                SelectionState.createEmpty(key).merge({
+                    anchorOffset: mention.start,
+                    focusKey: key,
+                    focusOffset: mention.end
+                }),
+                entityKey
+            );
+        } catch (e){
+            console.error("Error mapping a mention",e);
+            return editorState;
+        }
+    },
+
 
     onCreateNewLink(titleValue,urlValue,descValue) {
 
@@ -148,8 +185,45 @@ export default Reflux.createStore({
             linkUrl: urlValue,
             linkDesc: descValue
         });
-        this.onPublishEditorState(_editorState);
     },
+
+    onCreateNewImage (url,description) {
+        const entityKey = this._createImageSocialEntitity(url,description);
+        const {editorState} = this.state;
+        this.onPublishEditorState(this._insertEntityKey(editorState,entityKey));
+    },
+
+    _createImageSocialEntitity(url,description) {
+        const urlType = isImageLink(url) ? 'IMAGE' : 'SOCIAL';
+        const entityKey = Entity.create(urlType, 'IMMUTABLE',
+            {
+                src: url ,
+                description,
+                editCallback: this.state.imageEditCallback
+            });
+        return entityKey;
+    },
+
+    _insertEntityKey(editorState, entityKey) {
+        const newEditorState = AtomicBlockUtils.insertAtomicBlock(
+            editorState,
+            entityKey,
+            ' '
+        );
+        return EditorState.forceSelection(
+            newEditorState,
+            editorState.getCurrentContent().getSelectionAfter()
+        );
+    },
+
+    onEditImage(src,description,linkEntityKey) {
+        Entity.mergeData(linkEntityKey, {
+            src,
+            description
+        });
+    },
+
+
 
     onRemoveLink(linkEntityKey) {
         const {editorState} = this.state;
