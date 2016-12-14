@@ -187,18 +187,19 @@ export default Reflux.createStore({
         });
     },
 
-    onCreateNewImage (url,description) {
-        const entityKey = this._createImageSocialEntitity(url,description);
+    onCreateNewImage (url,description,title) {
+        const entityKey = this._createImageSocialEntitity(url,description,title);
         const {editorState} = this.state;
         this.onPublishEditorState(this._insertEntityKey(editorState,entityKey));
     },
 
-    _createImageSocialEntitity(url,description) {
+    _createImageSocialEntitity(url,description,title) {
         const urlType = isImageLink(url) ? 'IMAGE' : 'SOCIAL';
         const entityKey = Entity.create(urlType, 'IMMUTABLE',
             {
                 src: url ,
                 description,
+                title,
                 editCallback: this.state.imageEditCallback
             });
         return entityKey;
@@ -216,7 +217,7 @@ export default Reflux.createStore({
         );
     },
 
-    onEditImage(src,description,linkEntityKey) {
+    onEditImage(src,description,title,linkEntityKey) {
         Entity.mergeData(linkEntityKey, {
             src,
             description
