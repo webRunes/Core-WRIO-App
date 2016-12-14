@@ -104,7 +104,7 @@ export default class PostSettings extends React.Component {
     }
 
     render () {
-        const loading = <img src="https://default.wrioos.com/img/loading.gif" />;
+        const loading = <img src="https://default.wrioos.com/img/loading.gif" style={{color: "red"}} style={{margin:"0 4px 0"}} />;
         let savePath = this.getSaveUrl();
         const className ="form-group" +  (this.state.exceedLength ? " has-error" : "");
         return (<div className="form-horizontal">
@@ -133,7 +133,6 @@ export default class PostSettings extends React.Component {
                             {this.genDropdownSource('save')}
                             {this.genDropdownSource('saveas')}
                         </ul>
-                        <div className="help-block">Your page will be live at {savePath}</div>
                     </div>
                 </div>
                 {!this.props.saveUrl && <div className="col-xs-6 col-sm-4 col-md-5">
@@ -145,6 +144,12 @@ export default class PostSettings extends React.Component {
                            onChange={this.onChangeFile.bind(this)}
                         />
                 </div>}
+            </div>
+            <div className="form-group">
+                <label className="col-xs-12 col-sm-4 col-md-3 control-label hidden-xs">&nbsp;</label>
+                <div className="col-xs-12 col-sm-8 col-md-9">
+                    <div className="help-block">Your page will be live at {savePath}</div>
+                </div>
             </div>
             <CommentEnabler commentID={this.props.commentID}
                             author={this.props.author}
@@ -159,6 +164,7 @@ export default class PostSettings extends React.Component {
                     <a href="#" className="btn btn-success" onClick={this.publish.bind(this)}>
                         {this.state.busy ? loading : <span className="glyphicon glyphicon-open" />}
                        Publish</a>
+                       <br /><br /><br /><br />
                 </div>
             </div>
             {this.state.alert && <Modal  onCancel={() => this.setState({alert: false})} onOk={this.deleteHandler.bind(this)}/>}
@@ -219,11 +225,14 @@ class Modal extends React.Component {
             <div className="modal-dialog">
                 <div className="modal-content">
                     <div className="modal-header">
+                        <h4 class="modal-title">Delete</h4>
+                    </div>
+                    <div className="modal-body">
                         Are you sure you want to delete?
                     </div>
                     <div className="modal-footer">
-                        <button type="button" className="btn btn-default" data-dismiss="modal" onClick={this.onCancel}>Cancel</button>
-                        <a className="btn btn-danger btn-ok" onClick={this.onOk}>Delete</a>
+                        <a className="btn btn-danger btn-ok" onClick={this.onOk}><span className="glyphicon glyphicon-trash" ></span>Delete</a>
+                        <button type="button" className="btn btn-default" data-dismiss="modal" onClick={this.onCancel}><span className="glyphicon glyphicon-remove"></span>Cancel</button>
                     </div>
                 </div>
             </div>
