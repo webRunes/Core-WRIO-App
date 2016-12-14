@@ -99,7 +99,7 @@ export default class LinkUrlDialog extends React.Component {
                           type="text"
                           value={this.state.urlValue}
                           className="form-control"
-                        />
+                        /> {this.state.previewBusy && <img src="https://default.wrioos.com/img/loading.gif"/>}
                     </div>
                     { this.state.showTitle && <div className="form-group">
                         <label htmlFor="linkTitle">Title: </label>
