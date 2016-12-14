@@ -4,16 +4,27 @@ import {CompositeDecorator, ContentState, SelectionState, Editor, EditorState, E
 import TextEditorStore from './stores/texteditor.js';
 import TextEditorActions from './actions/texteditor.js';
 import LinkDialogActions from './actions/linkdialog.js';
+import LinkDialogStore from './stores/linkDialog.js';
+import ImageDialogActions from './actions/imagedialog.js';
+import ImageDialogStore from './stores/imagedialog.js';
+
 import SaveActions from './saveActions';
 import {deleteFromS3} from './webrunesAPI.js';
 
 import Alert from './components/Alert.js';
 import StyleButton from './components/StyleButton.js';
 import LinkUrlDialog from './components/LinkUrlDialog.js';
+import ImageUrlDialog from './components/ImageUrlDialog.js';
 import PostSettings from './components/Postsettings.js';
 import WrioStore from './stores/wrio.js';
 import WrioActions from './actions/wrio.js';
 
+
+const openEditPrompt = (actions) => (titleValue, urlValue, descValue, linkEntityKey) => {
+    actions.openToEdit(titleValue,urlValue,descValue,linkEntityKey);
+};
+const openLinkEditPrompt = openEditPrompt(LinkDialogActions);
+const openImageEditPrompt = openEditPrompt(ImageDialogActions);
 
 class CoreEditor extends React.Component {
     constructor(props) {
@@ -29,7 +40,8 @@ class CoreEditor extends React.Component {
             mentions = [];
         }
 
-        TextEditorStore.setLinkEditCallback(this.openEditPrompt.bind(this));
+        TextEditorStore.setLinkEditCallback(openLinkEditPrompt);
+        TextEditorStore.setImageEditCallback(openImageEditPrompt);
 
         this.state = {
             editorState:  EditorState.moveFocusToEnd (TextEditorStore.createEditorState(contentBlocks,mentions)),
@@ -45,7 +57,6 @@ class CoreEditor extends React.Component {
         this.handleKeyCommand   = this.handleKeyCommand.bind(this);
         this.toggleBlockType    = this.toggleBlockType.bind(this);
         this.toggleInlineStyle  = this.toggleInlineStyle.bind(this);
-        this.openEditPrompt     = this.openEditPrompt.bind(this);
         this.onLinkControlClick = this.onLinkControlClick.bind(this);
         this.focus              = this.focus.bind(this);
 
@@ -84,9 +95,11 @@ class CoreEditor extends React.Component {
         LinkDialogActions.openToCreate(title,"","");
     }
 
-    openEditPrompt(titleValue, urlValue, descValue, linkEntityKey) {
-        LinkDialogActions.openToEdit(titleValue,urlValue,descValue,linkEntityKey);
+    onImageControlClick() {
+        var title = TextEditorStore.getSelectedText();
+        ImageDialogActions.openToCreate(title,"","");
     }
+
 
     handleKeyCommand(command) {
         const {editorState} = this.state;
@@ -164,13 +177,15 @@ class CoreEditor extends React.Component {
                     editorState={editorState}
                     onToggle={this.toggleBlockType}
                     onLinkToggle={this.onLinkControlClick}
+                    onImageToggle={this.onImageControlClick}
                   />
 
                   { false && <InlineStyleControls
                     editorState={editorState}
                     onToggle={this.toggleInlineStyle}
                   />}
-                  <LinkUrlDialog />
+                  <LinkUrlDialog actions={LinkDialogActions} store={LinkDialogStore}/>
+                  <ImageUrlDialog actions={ImageDialogActions} store={ImageDialogStore}/>
                   <div className={className} onClick={this.focus}>
                     <Editor
                       blockStyleFn={getBlockStyle}
@@ -304,14 +319,12 @@ const BLOCK_TYPES = [
     },
     {
         label: 'Embed Image or Social Media',
-        style: 'link'
+        style: 'image'
     }
 ];
 
 const BlockStyleControls = (props) => {
-    const {
-        editorState
-    } = props;
+    const { editorState } = props;
     const selection = editorState.getSelection();
     const blockType = editorState
         .getCurrentContent()
@@ -328,7 +341,17 @@ const BlockStyleControls = (props) => {
                         onToggle={props.onLinkToggle}
                         style={type.style}
                     />);
-                } else {
+                }
+                else if (type.style === 'image') {
+                    return (<StyleButton
+                        key={type.label}
+                        active={type.style === blockType}
+                        label={type.label}
+                        onToggle={props.onImageToggle}
+                        style={type.style}
+                        />);
+                }
+                else {
                     return (<StyleButton
                         key={type.label}
                         active={type.style === blockType}
@@ -345,7 +368,8 @@ const BlockStyleControls = (props) => {
 BlockStyleControls.propTypes = {
     editorState: React.PropTypes.object,
     onToggle: React.PropTypes.func,
-    onLinkToggle: React.PropTypes.func
+    onLinkToggle: React.PropTypes.func,
+    onImageToggle: React.PropTypes.func
 };
 
 var INLINE_STYLES = [

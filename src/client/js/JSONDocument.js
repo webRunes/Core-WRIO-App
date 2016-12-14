@@ -30,6 +30,22 @@ const getMention = (name, about, link) => ({
         "about": about,
         "url": link
     });
+const getImageObject = (url, description) => ({
+    "@type": "ImageObject",
+    "contentUrl": url,
+    "description": description
+});
+
+const getSocialMediaPosting = (src,description,title) => ({
+        "@type":"SocialMediaPosting",
+        "sharedContent":{
+            "@type":"WebPage",
+            "headline":description,
+            "about":description,
+            "url":src
+        }
+    }
+);
 
 
 class GenericLDJsonDocument {
@@ -125,19 +141,32 @@ export default class JSONDocument extends GenericLDJsonDocument {
         let articleText = '';
         let res = [];
         let name = subArticle.name;
-        if (name === undefined) { // in case of SocialMediaPosting use headline
-            name = subArticle.headline;
-        }
+
+        const wrap = (block,data) => new Object({block:block, data:data}); // wrap contentBlock to save metadata
+        const pushWrap = (block,data=null) => res.push(wrap(block,data));
 
         if (this.name) {
             this.order++;
         }
-        res.push(new ContentBlock([
+
+        if (subArticle['@type'] == 'SocialMediaPosting') {
+            pushWrap(new ContentBlock([
+                ['text', articleText],
+                ['key', keyGen()],
+                ['characterList', this._createMetadata(articleText)],
+                ['type', 'unstyled']
+            ]),subArticle);
+            return res;
+        }
+
+        pushWrap(new ContentBlock([
             ['text', name],
             ['key', keyGen()],
             ['characterList', this._createMetadata(name)],
             ['type', 'header-two']
         ]));
+
+
         if (subArticle.articleBody) {
             subArticle.articleBody.forEach((paragraph, i) => {
                 articleText += paragraph;
@@ -147,13 +176,14 @@ export default class JSONDocument extends GenericLDJsonDocument {
             articleText += subArticle.url;
         }
         if (articleText !== '') {
-            res.push(new ContentBlock([
+            pushWrap(new ContentBlock([
                 ['text', articleText],
                 ['key', keyGen()],
                 ['characterList', this._createMetadata(articleText)],
                 ['type', 'unstyled']
             ]));
         }
+
         return res;
     }
 
@@ -168,13 +198,14 @@ export default class JSONDocument extends GenericLDJsonDocument {
         this.mentions = article.mentions ? extractMentions(article.mentions) : [];
         this.comment = article.comment;
         // parse article root
-        this.contentBlocks = this._parseArticlePart(article,false);
+        let contentBlocks = this._parseArticlePart(article,false);
         // and merge it with data from the hasPart section
-        this.contentBlocks = this.contentBlocks.concat(this.contentBlocks, article.hasPart.reduce((r,subarticle) => {
+        contentBlocks = article.hasPart.reduce((r,subarticle) => {
             r = r.concat(r,this._parseArticlePart(subarticle, true));
             return r;
-        },[]));
-        return this.contentBlocks;
+        },contentBlocks);
+        this.contentBlocks = contentBlocks;
+        return contentBlocks;
     }
 
     /**
@@ -202,6 +233,7 @@ export default class JSONDocument extends GenericLDJsonDocument {
         let article = this.getElementOfType('Article');
         article.articleBody = [];
         article.hasPart = [];
+        article.image = [];
         article.mentions = [];
         article.name = firstBlock.getText();
         let isPart = false;
@@ -239,11 +271,14 @@ export default class JSONDocument extends GenericLDJsonDocument {
 
         blockMap.toArray().forEach((block, i) => {
             let entity;
-            block.findEntityRanges(char => {
+
+            const findEntityOfType = (type) => char => {
                 let entityKey = char.getEntity();
                 entity = !!entityKey ? Entity.get(entityKey) : null;
-                return !!entity && entity.getType() === 'LINK';
-            }, (anchorOffset, focusOffset) => {
+                return !!entity && entity.getType() === type;
+            };
+
+            block.findEntityRanges(findEntityOfType("LINK"), (anchorOffset, focusOffset) => {
                 if (entity) {
                     let data = entity.getData();
                     let url = data.linkUrl,
@@ -252,6 +287,28 @@ export default class JSONDocument extends GenericLDJsonDocument {
                     const linkText = block.getText().substring(anchorOffset, focusOffset);
                     article.mentions.push(
                         getMention(name, "", formatMention(url,linkText,order+i,anchorOffset))
+                    );
+                }
+            });
+            block.findEntityRanges(findEntityOfType("IMAGE"), (anchorOffset, focusOffset) => {
+                if (entity) {
+                    let data = entity.getData();
+                    let url = data.src,
+                        desc = data.description || '';
+                    const linkText = block.getText().substring(anchorOffset, focusOffset);
+                    article.image.push(
+                        getImageObject(`${url}?:${order+1},${anchorOffset}`,desc)
+                    );
+                }
+            });
+            block.findEntityRanges(findEntityOfType("SOCIAL"), (anchorOffset, focusOffset) => {
+                if (entity) {
+                    let data = entity.getData();
+                    let url = data.src,
+                        desc = data.description || '';
+                    const linkText = block.getText().substring(anchorOffset, focusOffset);
+                    article.hasPart.push(
+                       getSocialMediaPosting(url,desc)
                     );
                 }
             });
