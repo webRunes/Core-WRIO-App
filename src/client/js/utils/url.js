@@ -43,7 +43,7 @@ export function formatAuthor(id) {
 function extractEditUrl() {
     let editUrl = window.location.search.match(/\?article=([\.0-9a-zA-Z%:\/?]*)/);
     if (editUrl) {
-        return appendIndex(editUrl[1]);
+        return appendIndex(decodeURIComponent(editUrl[1]));
     }
 }
 

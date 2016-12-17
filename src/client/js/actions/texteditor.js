@@ -6,7 +6,9 @@ export default Reflux.createActions([
     'publishEditorState',
     'newEditorState',
     'createNewLink',
+    'createNewImage',
     'editLink',
+    'editImage',
     'removeLink',
     'focus'
 

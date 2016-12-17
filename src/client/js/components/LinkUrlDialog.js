@@ -1,9 +1,27 @@
 import React from 'react';
 import Modal from 'react-modal';
 import TextEditorActions from '../actions/texteditor.js';
-import LinkDialogActions from '../actions/linkdialog.js';
-import LinkDialogStore from '../stores/linkDialog.js';
 
+const customStyles = {
+    overlay : {
+        position          : 'fixed',
+        top               : 0,
+        left              : 0,
+        right             : 0,
+        bottom            : 0,
+        backgroundColor   : 'rgba(255, 255, 255, 0.75)',
+        zIndex            : 10
+    },
+    content : {
+        top                   : '50%',
+        left                  : '50%',
+        right                 : 'auto',
+        bottom                : 'auto',
+        marginRight           : '-50%',
+        width                 : '380px',
+        transform             : 'translate(-50%, -50%)'
+    }
+};
 
 export default class LinkUrlDialog extends React.Component {
     constructor(props) {
@@ -16,9 +34,12 @@ export default class LinkUrlDialog extends React.Component {
         this.onCancelLink = this.onCancelLink.bind(this);
         this.onRemoveLink = this.onRemoveLink.bind(this);
 
-        this.state = LinkDialogStore.getInitialState();
+        this.state = this.props.store.getInitialState();
 
-        LinkDialogStore.listen(this.onStatusChange.bind(this));
+        this.state.showTitle = false;
+        this.state.showDescription = false;
+
+        this.props.store.listen(this.onStatusChange.bind(this));
     }
 
     onStatusChange(state) { // When s
@@ -26,31 +47,32 @@ export default class LinkUrlDialog extends React.Component {
     }
 
     onTitleChange(e) {
-        LinkDialogActions.titleChange(e.target.value);
+        this.props.actions.titleChange(e.target.value);
     }
     onUrlChange(e) {
-        LinkDialogActions.urlChange(e.target.value);
+        this.props.actions.urlChange(e.target.value);
     }
     onDescChange(e) {
-        LinkDialogActions.descChange(e.target.value);
+        this.props.actions.descChange(e.target.value);
     }
 
     onEditLink(e) {
         e.preventDefault();
         const {titleValue, urlValue, descValue,linkEntityKey} = this.state;
         TextEditorActions.editLink(titleValue,urlValue,descValue,linkEntityKey);
-        LinkDialogActions.closeDialog();
+        this.props.actions.closeDialog();
     }
+
     onConfirmLink(e) {
         e.preventDefault(e);
         const {titleValue, urlValue, descValue} = this.state;
         TextEditorActions.createNewLink(titleValue,urlValue,descValue);
-        LinkDialogActions.closeDialog();
+        this.props.actions.closeDialog();
     }
 
     onCancelLink(e) {
         e.preventDefault();
-        LinkDialogActions.closeDialog();
+        this.props.actions.closeDialog();
 
     }
 
@@ -58,49 +80,16 @@ export default class LinkUrlDialog extends React.Component {
         e.preventDefault();
         const {linkEntityKey} = this.state;
         TextEditorActions.removeLink(linkEntityKey);
-        LinkDialogActions.closeDialog();
+        this.props.actions.closeDialog();
     }
-
-
 
     render() {
 
         if (!this.state.showURLInput){ return (<div></div>);}
-        const customStyles = {
-          overlay : {
-            position          : 'fixed',
-            top               : 0,
-            left              : 0,
-            right             : 0,
-            bottom            : 0,
-            backgroundColor   : 'rgba(255, 255, 255, 0.75)',
-            zIndex            : 10
-          },
-          content : {
-            top                   : '50%',
-            left                  : '50%',
-            right                 : 'auto',
-            bottom                : 'auto',
-            marginRight           : '-50%',
-            width                 : '380px',
-            transform             : 'translate(-50%, -50%)'
-          }
-        };
         return (
             <div style={styles.linkTitleInputContainer}>
                 <Modal shouldCloseOnOverlayClick={true} style={customStyles} isOpen={true}>
-                    { false && <div className="form-group">
-                        <label htmlFor="linkTitle">Text: </label>
-                        <input
-                          onChange={this.onTitleChange}
-                          ref="linkTitle"
-                          id="linkTitle"
-                          style={styles.linkTitleInput}
-                          type="text"
-                          value={this.state.titleValue}
-                          className="form-control"
-                        />
-                    </div> }
+
                     <div className="form-group">
                         <label htmlFor="linkUrl">URL: </label>
                         <input
@@ -110,9 +99,21 @@ export default class LinkUrlDialog extends React.Component {
                           type="text"
                           value={this.state.urlValue}
                           className="form-control"
-                        />
+                        /> {this.state.previewBusy && <img src="https://default.wrioos.com/img/loading.gif"/>}
                     </div>
-                    {false && <div className="form-group">
+                    { this.state.showTitle && <div className="form-group">
+                        <label htmlFor="linkTitle">Title: </label>
+                        <input
+                            onChange={this.onTitleChange}
+                            ref="linkTitle"
+                            id="linkTitle"
+                            style={styles.linkTitleInput}
+                            type="text"
+                            value={this.state.titleValue}
+                            className="form-control"
+                            />
+                    </div> }
+                    {this.state.showDescription && <div className="form-group">
                         <label htmlFor="linkDesc">Description: </label>
                         <textarea
                           onChange={this.onDescChange}
@@ -136,6 +137,8 @@ export default class LinkUrlDialog extends React.Component {
 };
 
 LinkUrlDialog.propTypes = {
+    actions: React.PropTypes.object,
+    store: React.PropTypes.object
 };
 
 const styles = {
