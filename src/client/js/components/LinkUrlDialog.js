@@ -13,7 +13,7 @@ const customStyles = {
         zIndex            : 10
     },
     content : {
-        top                   : '20%',
+        top                   : '40%',
         left                  : '50%',
         right                 : 'auto',
         bottom                : 'auto',
