@@ -1,16 +1,9 @@
-/**
- * Created by michbil on 10.08.16.
- */
-
-/**
- * Created by michbil on 07.08.16.
- */
 import Reflux from 'reflux';
-import LinkActions from '../actions/linkdialog.js';
+import Actions from '../actions/linkdialog.js';
 import TextEditorActions from '../actions/texteditor.js';
 
 export default Reflux.createStore({
-    listenables: LinkActions,
+    listenables: Actions,
     init() {
         this.state = {
             showURLInput: false
