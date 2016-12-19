@@ -187,7 +187,7 @@ export default Reflux.createStore({
            block: this._getMentionContentBlock(contentBlocks,mention),
            data: getImageObject(mention.src,mention.name,mention.description)
        };
-       return this.constructSocial(editorState,metaData)
+       return this.constructSocial(editorState,metaData);
     },
 
 
