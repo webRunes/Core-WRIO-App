@@ -13,12 +13,13 @@ export default class ImageEntity extends React.Component {
 
     getProps(props) {
         const {
-            src,description,editCallback
+            src,description,title, editCallback
             } = Entity.get(props.entityKey).getData();
         console.log(props.decoratedText);
         return {
            src,
            description,
+           title,
            entityKey: props.entityKey,
            linkCallback: editCallback
         };
@@ -37,7 +38,10 @@ export default class ImageEntity extends React.Component {
             <article style={{width: '50%'}} onClick={this.onLinkEdit}>
         <figure>
             <img src={this.state.src} />
-            <figcaption className="callout figure-details">{this.state.description} </figcaption>
+            <figcaption className="callout figure-details">
+                <h5>{this.state.title}</h5>
+                <p>{this.state.description}</p>
+            </figcaption>
         </figure></article>);
     }}
 
