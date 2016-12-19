@@ -160,7 +160,7 @@ export default Reflux.createStore({
 
     constructEntity(entityKey,editorState,contentBlocks,mention) {
 
-        const key = this._getMentionContentBlockKey().getKey();
+        const key = this._getMentionContentBlock().getKey();
         try {
             return RichUtils.toggleLink(
                 editorState,
