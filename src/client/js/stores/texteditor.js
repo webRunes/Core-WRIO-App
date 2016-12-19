@@ -153,15 +153,15 @@ export default Reflux.createStore({
         const block = contentBlocks[mention.block];
         if (!block) {
             console.warn("Cannot create mention",mention);
-            return editorState;
+            throw new Error("Mention create error");
         }
         return block;
     },
 
     constructEntity(entityKey,editorState,contentBlocks,mention) {
 
-        const key = this._getMentionContentBlock().getKey();
         try {
+            const key = this._getMentionContentBlock().getKey();
             return RichUtils.toggleLink(
                 editorState,
                 SelectionState.createEmpty(key).merge({
