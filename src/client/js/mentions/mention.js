@@ -11,28 +11,31 @@ class Mention {
         this.start = Number(positions[1]);
         this.end = this.start + this.linkWord.length;
     }
-/*    warn(text) {
-        text = text || 'Wrong mention: ' + this.url;
-    }
+}
 
-    attach(s) {
-        var before = s.substr(0, this.start),
-            toReplace = s.substr(this.start, this.linkWord.length),
-            after = s.substring(this.start + this.linkWord.length, s.length);
-        if (toReplace === this.linkWord) {
-            return {
-                before: before,
-                link: {
-                    text: toReplace,
-                    url: this.newUrl
-                },
-                after: after
-            };
-        }
-        this.warn();
-        return null;
+const fixUrlProtocol = (url)=> {
+    if (!url) {
+        return;
     }
-*/
+    var separatorPosition = url.indexOf('//');
+    if (separatorPosition !== -1) {
+        url = url.substring(separatorPosition + 2, url.length);
+    }
+    return '//' + url;
+};
+
+class Image {
+    constructor(opts) {
+        this.name = opts.name;
+        this.description = opts.description;
+        this.url = opts.contentUrl;
+        var cutUrl = this.url.split('?'),
+            positions = cutUrl[1].split(',');
+        this.src = cutUrl[0];
+        this.order = Number(positions[0]);
+        this.start = Number(positions[1]);
+        this.block = this.order;
+    }
 }
 
 // factory method to genereate new mention objects
@@ -51,9 +54,6 @@ const merge = (mentions)=>
     );
 
 
-const extractMentions = (mentions) =>
-    mentions.map(mention => 
-        new Mention(mention)
-    );
+const extractMentions = (mentions) => mentions.map(MentionFactory);
 
 export {merge, extractMentions, Mention, MentionFactory};

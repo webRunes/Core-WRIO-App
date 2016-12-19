@@ -3,6 +3,7 @@ var webpack = require('webpack');
 var nconf = require('./src/server/wrio_nconf');
 
 var envs = {};
+var minify = false;
 
 if (nconf.get("server:workdomain") == '.wrioos.local')  {
     console.log("Got docker dev mode");
@@ -13,6 +14,7 @@ if (nconf.get("server:workdomain") == '.wrioos.local')  {
         }
     };
 } else {
+    minify = true;
     envs = {
         "process.env": {
             NODE_ENV: JSON.stringify('development'),
@@ -51,7 +53,7 @@ var e = {
 
 };
 
-var minify = false;
+
 if (minify) {
     e.plugins.push(new webpack.optimize.UglifyJsPlugin({
         beautify: true,
