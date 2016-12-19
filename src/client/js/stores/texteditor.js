@@ -9,6 +9,7 @@ import ImageEntity from '../EditorEntities/ImageEntitiy.js';
 import SocialMediaEntity from '../EditorEntities/SocialMediaEntity.js';
 import JSONDocument from '../JSONDocument.js';
 import WrioActions from '../actions/wrio.js';
+import {getImageObject} from '../JSONDocument.js';
 
 // helper function
 const findEntitiesOfType = (type) => (contentBlock, callback) => {
@@ -88,8 +89,6 @@ export default Reflux.createStore({
             WrioActions.headerChanged(header);
         }
         this.oldHeader = header;
-        //this.trigger(this.state);
-        ///console.log("reaction",state);
     },
 
     onPublishEditorState(state) {
@@ -98,7 +97,7 @@ export default Reflux.createStore({
         console.log("reaction",state);
     },
 
-    createEditorState(metaBlocks, mentions) {
+    createEditorState(metaBlocks, mentions, images) {
         const decorator = new CompositeDecorator([{
             strategy: findLinkEntities,
             component: LinkEntity
@@ -112,38 +111,56 @@ export default Reflux.createStore({
         }
         ]);
 
+        const valuesToKeys = (hash,value)=>{
+            let key = value['order']+1;
+            hash[key] = value['block'];
+            return hash;
+        };
+        const orderedBlocks = metaBlocks.reduce(valuesToKeys,{});
+
+        console.log(orderedBlocks);
         const contentBlocks = metaBlocks.map(x => x.block);
 
         let editorState = contentBlocks.length > 0 ?
             EditorState.createWithContent(ContentState.createFromBlockArray(contentBlocks), decorator) :
             EditorState.createEmpty(decorator);
 
-
         editorState = metaBlocks.reduce((editorState,metaBlock) => metaBlock.data ? this.constructSocial(editorState,metaBlock) : editorState, editorState);
+        if (images) {
+            editorState = images.reduce((editorState,mention) => this.constructImage(editorState,orderedBlocks,mention),editorState);
+        }
 
-        return mentions.reduce((editorState,mention) => this.constructMention(editorState,contentBlocks,mention),editorState);
+        return mentions.reduce((editorState,mention) => this.constructMention(editorState,orderedBlocks,mention),editorState);
 
     },
 
     constructSocial(editorState,metaBlock) {
         const contentBlock = metaBlock.block;
         const blockData = metaBlock.data;
-        const entityKey = this._createImageSocialEntitity(blockData.sharedContent.url,blockData.headline);
+        let entityKey;
+        if (blockData["@type"] == "ImageObject") {
+            entityKey = this._createImageSocialEntity(blockData.contentUrl,blockData.name,blockData.description);
+        } else {
+            entityKey = this._createImageSocialEntity(blockData.sharedContent.url,blockData.sharedContent.headline,block.sharedContent.about);
+        }
         const key = contentBlock.getKey();
         const _editorState = EditorState.forceSelection(editorState,SelectionState.createEmpty(key));
         return this._insertEntityKey(_editorState,entityKey);
 
     },
 
-    constructMention(editorState, contentBlocks,mention) {
-        const entityKey = this.createLinkEntity(mention.linkWord,mention.url,mention.linkDesc);
+    _getMentionContentBlock(contentBlocks,mention) {
         const block = contentBlocks[mention.block];
         if (!block) {
             console.warn("Cannot create mention",mention);
-            return;
+            return editorState;
         }
-        const key = block.getKey();
+        return block;
+    },
 
+    constructEntity(entityKey,editorState,contentBlocks,mention) {
+
+        const key = this._getMentionContentBlockKey().getKey();
         try {
             return RichUtils.toggleLink(
                 editorState,
@@ -158,6 +175,19 @@ export default Reflux.createStore({
             console.error("Error mapping a mention",e);
             return editorState;
         }
+    },
+
+    constructMention(editorState, contentBlocks,mention) {
+        const entityKey = this.createLinkEntity(mention.linkWord,mention.url,mention.linkDesc);
+        return this.constructEntity(entityKey,editorState,contentBlocks,mention);
+    },
+
+    constructImage(editorState, contentBlocks,mention) {
+       const metaData = {
+           block: this._getMentionContentBlock(contentBlocks,mention),
+           data: getImageObject(mention.src,mention.name,mention.description)
+       };
+       return this.constructSocial(editorState,metaData)
     },
 
 
@@ -188,12 +218,12 @@ export default Reflux.createStore({
     },
 
     onCreateNewImage (url,description,title) {
-        const entityKey = this._createImageSocialEntitity(url,description,title);
+        const entityKey = this._createImageSocialEntity(url,description,title);
         const {editorState} = this.state;
         this.onPublishEditorState(this._insertEntityKey(editorState,entityKey));
     },
 
-    _createImageSocialEntitity(url,description,title) {
+    _createImageSocialEntity(url,description,title) {
         const urlType = isImageLink(url) ? 'IMAGE' : 'SOCIAL';
         const entityKey = Entity.create(urlType, 'IMMUTABLE',
             {

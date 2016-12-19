@@ -44,7 +44,7 @@ class CoreEditor extends React.Component {
         TextEditorStore.setImageEditCallback(openImageEditPrompt);
 
         this.state = {
-            editorState:  EditorState.moveFocusToEnd (TextEditorStore.createEditorState(contentBlocks,mentions)),
+            editorState:  EditorState.moveFocusToEnd (TextEditorStore.createEditorState(contentBlocks,mentions,doc.images)),
             saveRelativePath: props.saveRelativePath,
             editUrl: props.editUrl,
             author: props.author,
