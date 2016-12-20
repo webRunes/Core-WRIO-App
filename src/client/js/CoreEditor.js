@@ -231,7 +231,8 @@ class CoreEditor extends React.Component {
             this.state.author,
             commentId,
             this.state.doc,
-            desc
+            desc,
+            url
         );
         if (this.state.commentID) { // don't request comment id, if it already stored in the document
             saveAction(this.state.commentID).then(()=>{

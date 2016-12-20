@@ -4,10 +4,10 @@ import {saveToS3} from './webrunesAPI.js';
 import WrioActions from './actions/wrio.js';
 
 export default class CustomActions {
-    static execSave(editorState, action, saveRelativePath, author,commentID, doc, description) {
+    static execSave(editorState, action, saveRelativePath, author,commentID, doc, description,saveAbsolutePath) {
         switch (action) {
             case 'save':
-                return saveAction(editorState, author, saveRelativePath,commentID, doc, description);
+                return saveAction(editorState, author, saveRelativePath,commentID, doc, description, saveAbsolutePath);
                 break;
             case 'saveas':
                 return saveAsAction(editorState, author,commentID, doc, description);
@@ -20,7 +20,7 @@ export default class CustomActions {
 
 var domain = process.env.DOMAIN;
 
-const saveAction = (editorState, author, saveRelativePath, commentID,doc,description) => {
+const saveAction = (editorState, author, saveRelativePath, commentID,doc,description,saveAbs) => {
     doc.setAbout(description);
     return doc.draftToHtml(editorState.getCurrentContent(), author,commentID).then(res => {
         let {json, html} = res;
@@ -28,7 +28,7 @@ const saveAction = (editorState, author, saveRelativePath, commentID,doc,descrip
     }).then((res) => {
         WrioActions.busy(false);
         parent.postMessage(JSON.stringify({
-            "coreSaved": true
+            "followLink": saveAbs
         }), "*");
         return true;
     });
