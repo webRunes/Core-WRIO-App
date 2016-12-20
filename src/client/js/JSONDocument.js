@@ -155,7 +155,7 @@ export default class JSONDocument extends GenericLDJsonDocument {
         const wrap = (block,data) => new Object({block:block, data:data, order: this.order}); // wrap contentBlock to save metadata
         const pushWrap = (block,data=null) => res.push(wrap(block,data));
 
-        if (this.getElementOfType("Article").name) {
+        if (subArticle.name) {
             pushWrap(new ContentBlock([
                 ['text', name],
                 ['key', keyGen()],
@@ -173,7 +173,7 @@ export default class JSONDocument extends GenericLDJsonDocument {
             pushWrap(new ContentBlock([
                 ['text', ' '],
                 ['key', keyGen()],
-                ['characterList', this._createMetadata(articleText)],
+                ['characterList', this._createMetadata(" ")],
                 ['type', 'unstyled']
             ]),subArticle);
             return res;

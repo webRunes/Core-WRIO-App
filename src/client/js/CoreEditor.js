@@ -234,23 +234,31 @@ class CoreEditor extends React.Component {
             desc,
             url
         );
-        if (this.state.commentID) { // don't request comment id, if it already stored in the document
-            saveAction(this.state.commentID).then(()=>{
-                WrioActions.busy(false);
-                this.setState({
-                    error: false
-                });
-            }).catch((err)=> {
-                WrioActions.busy(false);
-                this.setState({
-                   error: true
-                });
-                console.log(err);
+
+        const doSave = (id) => saveAction(id).then(()=>{
+            WrioActions.busy(false);
+            this.setState({
+                error: false
             });
+        }).catch((err)=> {
+            WrioActions.busy(false);
+            this.setState({
+                error: true
+            });
+            console.log(err);
+        });
+
+        let commentID = this.state.commentID;
+
+        if (this.state.commentID) { // don't request comment id, if it already stored in the document
+           if (!WrioStore.areCommentsEnabled()) {
+               commentID = ''; // delete comment id if comments not enabled
+           }
+           doSave(commentID);
         } else {
             WrioActions.busy(true);
             WrioStore.requestCommentId(url,(err,id) => {
-                saveAction(id);
+                doSave(id);
             });
         }
     }
