@@ -172,13 +172,7 @@ export default class PostSettings extends React.Component {
     }
     goBack() {
         parent.postMessage(JSON.stringify({
-            "coreSaved": true
-        }), "*");
-    }
-    followLink(e) {
-        e.preventDefault();
-        parent.postMessage(JSON.stringify({
-            "followLink": this.getSaveUrl()
+            "coreSaved": true,
         }), "*");
     }
     deleteHandler () {
