@@ -1,4 +1,4 @@
-import 'es6-shim';
+require('babel-polyfill');
 import React, {Component} from 'react';
 import ReactDom from 'react-dom';
 import request from 'superagent';
@@ -46,7 +46,7 @@ class Client extends Component {
             coreAdditionalHeight: 200,
             mentions: [],
             commentID: "",
-            render: 0,
+            render: false,
             doc: null,
             error: false
         };
@@ -68,38 +68,38 @@ class Client extends Component {
         this.parseEditingUrl();
         let wrioID = null;
         WrioStore.listen((state) => {
-            this.parseArticleCore(state.wrioID).then((res)=>
-                    this.setState({
-                        wrioID,
-                        render: 1
-                    })
-            ).catch((e)=> console.error(e.stack));
-        });
-    }
-    parseArticleCore(author) {
-        return new Promise((resolve, reject)=> {
-            if (window.location.pathname === "/create") {
-                var doc = new JSONDocument();
-                doc.createArticle(author, "");
-                this.setState({
-                    doc: doc
-                });
-                resolve();
-            } else {
-                getHttp(this.state.editUrl).then((article) => {
-                    setTimeout(window.frameReady, 300);
-                    var doc = new JSONDocument(article);
-                    this.setState({
-                       doc: doc,
-                       commentID: doc.getCommentID()
-                    });
-                    resolve();
-                }).catch(error=> {
-                    console.log("Unable to download source article",error);
-                    this.setState({error:true});
-                });
+            if (!this.state.render)
+            {
+                this.parseArticleCore(state.wrioID).then((res)=>
+                        this.setState({
+                            wrioID,
+                            render: true
+                        })
+                ).catch((e)=> console.error(e.stack));
             }
         });
+    }
+    async parseArticleCore(author) {
+        if (window.location.pathname === "/create") {
+            var doc = new JSONDocument();
+            doc.createArticle(author, "");
+            this.setState({
+                doc: doc
+            });
+        } else {
+            try {
+                const article = await getHttp(this.state.editUrl);
+                setTimeout(window.frameReady, 300);
+                var doc = new JSONDocument(article);
+                this.setState({
+                    doc: doc,
+                    commentID: doc.getCommentID()
+                });
+            } catch (error) {
+                console.log("Unable to download source article",error);
+                this.setState({error:true});
+            }
+        }
     }
 
     componentDidUpdate() {
