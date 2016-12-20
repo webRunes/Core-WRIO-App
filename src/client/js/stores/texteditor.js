@@ -94,7 +94,7 @@ export default Reflux.createStore({
     onPublishEditorState(state) {
         this.state.editorState = state;
         this.trigger(this.state);
-        console.log("reaction",state);
+      //  console.log("reaction",state);
     },
 
     createEditorState(metaBlocks, mentions, images) {
@@ -118,7 +118,7 @@ export default Reflux.createStore({
         };
         const orderedBlocks = metaBlocks.reduce(valuesToKeys,{});
 
-        console.log(orderedBlocks);
+        //console.log(orderedBlocks);
         const contentBlocks = metaBlocks.map(x => x.block);
 
         let editorState = contentBlocks.length > 0 ?
@@ -151,6 +151,7 @@ export default Reflux.createStore({
 
     _getMentionContentBlock(contentBlocks,mention) {
         const block = contentBlocks[mention.block];
+
         if (!block) {
             console.warn("Cannot create mention",mention);
             throw new Error("Mention create error");
@@ -161,7 +162,7 @@ export default Reflux.createStore({
     constructEntity(entityKey,editorState,contentBlocks,mention) {
 
         try {
-            const key = this._getMentionContentBlock().getKey();
+            const key = this._getMentionContentBlock(contentBlocks,mention).getKey();
             return RichUtils.toggleLink(
                 editorState,
                 SelectionState.createEmpty(key).merge({
@@ -177,12 +178,12 @@ export default Reflux.createStore({
         }
     },
 
-    constructMention(editorState, contentBlocks,mention) {
+    constructMention(editorState, contentBlocks, mention) {
         const entityKey = this.createLinkEntity(mention.linkWord,mention.url,mention.linkDesc);
         return this.constructEntity(entityKey,editorState,contentBlocks,mention);
     },
 
-    constructImage(editorState, contentBlocks,mention) {
+    constructImage(editorState, contentBlocks, mention) {
        const metaData = {
            block: this._getMentionContentBlock(contentBlocks,mention),
            data: getImageObject(mention.src,mention.name,mention.description)
