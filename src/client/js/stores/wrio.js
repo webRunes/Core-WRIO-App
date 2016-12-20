@@ -37,8 +37,13 @@ export default Reflux.createStore({
 
         });
     },
+
     onCommentsEnabled(state) {
         this.state.commentsEnabled = state;
+    },
+
+    areCommentsEnabled () {
+        return this.state.commentsEnabled;
     },
 
     onHeaderChanged(header) {
