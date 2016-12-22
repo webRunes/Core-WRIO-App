@@ -70,7 +70,7 @@ export default class SocialMediaEntity extends React.Component {
 
     onLinkEdit (e) {
         e.preventDefault();
-        this.state.linkCallback("", this.state.src, this.state.description, this.state.entityKey);
+        this.state.linkCallback(this.state.title, this.state.src, this.state.description, this.state.entityKey);
     }
 
     componentWillReceiveProps(props) {
@@ -81,7 +81,7 @@ export default class SocialMediaEntity extends React.Component {
         const content = <div dangerouslySetInnerHTML={htmlData} />;
         const title = this.state.title;
         const description= this.state.description;
-        return <Figure content={content} title={title} description={description} onClick={this.onLinkEdit}/>;
+        return <div  onClick={this.onLinkEdit}> <Figure content={content} title={title} description={description}/></div>;
     }}
 
 SocialMediaEntity.propTypes = {

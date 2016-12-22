@@ -123,6 +123,8 @@ export default Reflux.createStore({
             linkUrl: urlValue,
             linkDesc: descValue
         });
+        editorFocus();
+      //  this.onPublishEditorState(EditorState.moveFocusToEnd(this.state.editorState));
     },
 
     onEditImage(src,description,title,linkEntityKey) {
@@ -131,6 +133,8 @@ export default Reflux.createStore({
             title,
             description
         });
+        editorFocus();
+       // this.onPublishEditorState(EditorState.moveFocusToEnd(this.state.editorState));
     },
 
     onRemoveLink(linkEntityKey) {
