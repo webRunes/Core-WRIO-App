@@ -137,15 +137,15 @@ export default Reflux.createStore({
        // this.onPublishEditorState(EditorState.moveFocusToEnd(this.state.editorState));
     },
 
-    onRemoveLink(linkEntityKey) {
+    onRemoveEntity(entityKeyToRemove) {
         const {editorState} = this.state;
-        let _editorState;
+
         editorState.getCurrentContent().getBlockMap().map(block => {
             block.findEntityRanges(char => {
                 let entityKey = char.getEntity();
-                return !!entityKey && entityKey === linkEntityKey && Entity.get(entityKey).getType() === 'LINK';
+                return !!entityKey && entityKey === entityKeyToRemove;
             }, (anchorOffset, focusOffset) => {
-                _editorState = RichUtils.toggleLink(
+                let _editorState = RichUtils.toggleLink(
                     editorState,
                     SelectionState.createEmpty(block.getKey()).merge({
                         anchorOffset,
@@ -154,9 +154,9 @@ export default Reflux.createStore({
                     }),
                     null
                 );
+                this.onPublishEditorState(_editorState);
             });
         });
-       this.onPublishEditorState(_editorState);
     }
 
 

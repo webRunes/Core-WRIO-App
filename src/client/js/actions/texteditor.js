@@ -9,7 +9,7 @@ export default Reflux.createActions([
     'createNewImage',
     'editLink',
     'editImage',
-    'removeLink',
+    'removeEntity',
     'focus'
 
 ]);
