@@ -61,8 +61,8 @@ class CoreEditor extends React.Component {
         this.focus              = this.focus.bind(this);
 
         TextEditorStore.listen(this.onStatusChange.bind(this));
-        Reflux.listenTo(TextEditorStore,"onFocus");
         setTimeout(this.focus.bind(this),200);
+        window.editorFocus = this.onFocus.bind(this);
     }
 
 
