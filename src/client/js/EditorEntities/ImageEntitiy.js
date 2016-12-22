@@ -27,7 +27,7 @@ export default class ImageEntity extends React.Component {
 
     onLinkEdit (e) {
         e.preventDefault();
-        this.state.linkCallback("", this.state.src, this.state.description, this.state.entityKey);
+        this.state.linkCallback(this.state.title, this.state.src, this.state.description, this.state.entityKey);
     }
 
     componentWillReceiveProps(props) {
