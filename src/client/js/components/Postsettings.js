@@ -221,7 +221,7 @@ class Modal extends React.Component {
             <div className="modal-dialog">
                 <div className="modal-content">
                     <div className="modal-header">
-                        <h4 class="modal-title">Delete</h4>
+                        <h4 className="modal-title">Delete</h4>
                     </div>
                     <div className="modal-body">
                         Are you sure you want to delete?
