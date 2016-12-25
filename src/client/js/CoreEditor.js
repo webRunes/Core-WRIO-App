@@ -275,7 +275,7 @@ class CoreEditor extends React.Component {
                 error: false
             });
             parent.postMessage(JSON.stringify({
-                "closeTab": true
+                "followLink": `https://wr.io/${WrioStore.getWrioID()}/Plus-WRIO-App/index.html`
             }), "*");
         }).catch((err)=>{
             WrioActions.busy(false);
