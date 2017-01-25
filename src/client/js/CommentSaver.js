@@ -82,6 +82,7 @@ export default class CommentSaver extends React.Component {
             <div className="well enable-comment text-left">
                 <h4>Comments disabled</h4>
                 <p>Comments haven't been enabled by author</p>
+                <br />
                 <a className={buttonStyle} href="#" role="button" onClick={this.doSave.bind(this)}>
                     <span className="glyphicon glyphicon-comment"></span>
                     {this.state.busy ? <span><img src="https://default.wrioos.com/img/loading.gif"/>{this.state.msg}</span>:"Enable comments"}
