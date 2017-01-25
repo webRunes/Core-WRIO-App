@@ -91,7 +91,7 @@ class GenericLDJsonDocument {
 
     makeArticle(lang, keywords, author, widgetData,about) {
         return {
-            "@context": "http://schema.org",
+            "@context": "https://schema.org",
             "@type": "Article",
             "inLanguage": lang,
             "keywords": keywords,
