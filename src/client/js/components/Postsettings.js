@@ -12,6 +12,8 @@ function prepFileName(name) {
     return res.substring(0,120);
 }
 
+const createMode = () => window.location.pathname === "/create";
+
 export default class PostSettings extends React.Component {
     constructor(props) {
         super(props);
@@ -41,7 +43,7 @@ export default class PostSettings extends React.Component {
 
     storeListener(state) {
         this.setState({busy: state.busy});
-        if (state.header) {
+        if (state.header && createMode()) {
             if (!this.state.userStartedEditing) {
                 this.setState({
                     saveFile: prepFileName(state.header)
@@ -158,7 +160,7 @@ export default class PostSettings extends React.Component {
 
             <div className="col-xs-12">
                 <div className="pull-right">
-                    { window.location.pathname !== "/create" &&
+                    { !createMode() &&
                     <button type="button" className="btn btn-danger" onClick={() => this.setState({alert: true})} ><span className="glyphicon glyphicon-trash" ></span>Delete</button>}
                     <button type="button" className="btn btn-default" onClick={this.goBack.bind(this)}><span className="glyphicon glyphicon-remove"></span>Cancel</button>
                     <a href="#" className="btn btn-success" onClick={this.publish.bind(this)}>
@@ -172,13 +174,7 @@ export default class PostSettings extends React.Component {
     }
     goBack() {
         parent.postMessage(JSON.stringify({
-            "coreSaved": true
-        }), "*");
-    }
-    followLink(e) {
-        e.preventDefault();
-        parent.postMessage(JSON.stringify({
-            "followLink": this.getSaveUrl()
+            "coreSaved": true,
         }), "*");
     }
     deleteHandler () {
@@ -225,7 +221,7 @@ class Modal extends React.Component {
             <div className="modal-dialog">
                 <div className="modal-content">
                     <div className="modal-header">
-                        <h4 class="modal-title">Delete</h4>
+                        <h4 className="modal-title">Delete</h4>
                     </div>
                     <div className="modal-body">
                         Are you sure you want to delete?

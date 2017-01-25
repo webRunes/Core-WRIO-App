@@ -9,25 +9,7 @@ import ImageEntity from '../EditorEntities/ImageEntitiy.js';
 import SocialMediaEntity from '../EditorEntities/SocialMediaEntity.js';
 import JSONDocument from '../JSONDocument.js';
 import WrioActions from '../actions/wrio.js';
-
-// helper function
-const findEntitiesOfType = (type) => (contentBlock, callback) => {
-    contentBlock.findEntityRanges(
-        (character) => {
-            const entityKey = character.getEntity();
-            return (
-                !!entityKey &&
-                Entity.get(entityKey).getType() === type
-            );
-        },
-        callback
-    );
-};
-
-const findLinkEntities   = findEntitiesOfType('LINK');
-const findImageEntities  = findEntitiesOfType('IMAGE');
-const findSocialEntities = findEntitiesOfType('SOCIAL');
-const isImageLink = (filename) => (/\.(gif|jpg|jpeg|tiff|png)$/i).test(filename);
+import EntityTools,{getSelection,findLinkEntities,findImageEntities,findSocialEntities} from '../utils/entitytools.js';
 
 
 function appendHttp(url) {
@@ -49,36 +31,15 @@ export default Reflux.createStore({
     },
 
     setLinkEditCallback(cb) {
-        this.state.linkEditCallback = cb;
+        EntityTools.setLinkEditCallback(cb);
     },
     setImageEditCallback(cb) {
-        this.state.imageEditCallback = cb;
-    },
-
-    createLinkEntity(title,url,desc) {
-        return Entity.create('LINK', 'MUTABLE', {
-            linkTitle: title,
-            linkUrl: url,
-            linkDesc: desc,
-            editCallback: this.state.linkEditCallback
-        });
+        EntityTools.setImageEditCallback(cb);
     },
 
     getSelectedText() {
         const { editorState } = this.state;
-        var title = '';
-        const selectionState = editorState.getSelection();
-        const blockKey = selectionState.getAnchorKey();
-        const contentBlocks = editorState.getCurrentContent().getBlocksAsArray();
-        var start = selectionState.getStartOffset();
-        var end = selectionState.getEndOffset();
-
-        contentBlocks.forEach((block) => {
-            if(block.key === blockKey){
-                title = block.text.slice(start, end);
-            }
-        });
-        return title;
+        return getSelection(editorState);
     },
 
     onUpdateEditorState(state) {
@@ -88,17 +49,14 @@ export default Reflux.createStore({
             WrioActions.headerChanged(header);
         }
         this.oldHeader = header;
-        //this.trigger(this.state);
-        ///console.log("reaction",state);
     },
 
     onPublishEditorState(state) {
         this.state.editorState = state;
         this.trigger(this.state);
-        console.log("reaction",state);
     },
 
-    createEditorState(metaBlocks, mentions) {
+    createEditorState(metaBlocks, mentions, images) {
         const decorator = new CompositeDecorator([{
             strategy: findLinkEntities,
             component: LinkEntity
@@ -112,60 +70,34 @@ export default Reflux.createStore({
         }
         ]);
 
+        const valuesToKeys = (hash,value)=>{
+            let key = value['order']+1;
+            hash[key] = value['block'];
+            return hash;
+        };
+        const orderedBlocks = metaBlocks.reduce(valuesToKeys,{});
+
+        //console.log(orderedBlocks);
         const contentBlocks = metaBlocks.map(x => x.block);
 
         let editorState = contentBlocks.length > 0 ?
             EditorState.createWithContent(ContentState.createFromBlockArray(contentBlocks), decorator) :
             EditorState.createEmpty(decorator);
 
-
-        editorState = metaBlocks.reduce((editorState,metaBlock) => metaBlock.data ? this.constructSocial(editorState,metaBlock) : editorState, editorState);
-
-        return mentions.reduce((editorState,mention) => this.constructMention(editorState,contentBlocks,mention),editorState);
-
-    },
-
-    constructSocial(editorState,metaBlock) {
-        const contentBlock = metaBlock.block;
-        const blockData = metaBlock.data;
-        const entityKey = this._createImageSocialEntitity(blockData.sharedContent.url,blockData.headline);
-        const key = contentBlock.getKey();
-        const _editorState = EditorState.forceSelection(editorState,SelectionState.createEmpty(key));
-        return this._insertEntityKey(_editorState,entityKey);
-
-    },
-
-    constructMention(editorState, contentBlocks,mention) {
-        const entityKey = this.createLinkEntity(mention.linkWord,mention.url,mention.linkDesc);
-        const block = contentBlocks[mention.block];
-        if (!block) {
-            console.warn("Cannot create mention",mention);
-            return;
+        editorState = metaBlocks.reduce((editorState,metaBlock) => metaBlock.data ? EntityTools.constructSocial(editorState,metaBlock) : editorState, editorState);
+        if (images) {
+            editorState = images.reduce((editorState,mention) => EntityTools.constructImage(editorState,orderedBlocks,mention),editorState);
         }
-        const key = block.getKey();
 
-        try {
-            return RichUtils.toggleLink(
-                editorState,
-                SelectionState.createEmpty(key).merge({
-                    anchorOffset: mention.start,
-                    focusKey: key,
-                    focusOffset: mention.end
-                }),
-                entityKey
-            );
-        } catch (e){
-            console.error("Error mapping a mention",e);
-            return editorState;
-        }
+        return mentions.reduce((editorState,mention) => EntityTools.constructMention(editorState,orderedBlocks,mention),editorState);
+
     },
-
 
     onCreateNewLink(titleValue,urlValue,descValue) {
 
         urlValue = appendHttp(urlValue);
 
-        const entityKey = this.createLinkEntity(titleValue,urlValue,descValue);
+        const entityKey = EntityTools.createLinkEntity(titleValue,urlValue,descValue);
         const {editorState} = this.state;
 
         const e = Entity.get(entityKey).getData();
@@ -179,62 +111,41 @@ export default Reflux.createStore({
         this.onPublishEditorState(_editorState);
     },
 
+    onCreateNewImage (url,description,title) {
+        const entityKey = EntityTools.createImageSocialEntity(url,description,title);
+        const {editorState} = this.state;
+        this.onPublishEditorState(EntityTools.insertEntityKey(editorState,entityKey));
+    },
+
     onEditLink(titleValue,urlValue,descValue,linkEntityKey) {
         Entity.mergeData(linkEntityKey, {
             linkTitle: titleValue,
             linkUrl: urlValue,
             linkDesc: descValue
         });
-    },
-
-    onCreateNewImage (url,description,title) {
-        const entityKey = this._createImageSocialEntitity(url,description,title);
-        const {editorState} = this.state;
-        this.onPublishEditorState(this._insertEntityKey(editorState,entityKey));
-    },
-
-    _createImageSocialEntitity(url,description,title) {
-        const urlType = isImageLink(url) ? 'IMAGE' : 'SOCIAL';
-        const entityKey = Entity.create(urlType, 'IMMUTABLE',
-            {
-                src: url ,
-                description,
-                title,
-                editCallback: this.state.imageEditCallback
-            });
-        return entityKey;
-    },
-
-    _insertEntityKey(editorState, entityKey) {
-        const newEditorState = AtomicBlockUtils.insertAtomicBlock(
-            editorState,
-            entityKey,
-            ' '
-        );
-        return EditorState.forceSelection(
-            newEditorState,
-            editorState.getCurrentContent().getSelectionAfter()
-        );
+        editorFocus();
+      //  this.onPublishEditorState(EditorState.moveFocusToEnd(this.state.editorState));
     },
 
     onEditImage(src,description,title,linkEntityKey) {
         Entity.mergeData(linkEntityKey, {
             src,
+            title,
             description
         });
+        editorFocus();
+       // this.onPublishEditorState(EditorState.moveFocusToEnd(this.state.editorState));
     },
 
-
-
-    onRemoveLink(linkEntityKey) {
+    onRemoveEntity(entityKeyToRemove) {
         const {editorState} = this.state;
-        let _editorState;
+
         editorState.getCurrentContent().getBlockMap().map(block => {
             block.findEntityRanges(char => {
                 let entityKey = char.getEntity();
-                return !!entityKey && entityKey === linkEntityKey && Entity.get(entityKey).getType() === 'LINK';
+                return !!entityKey && entityKey === entityKeyToRemove;
             }, (anchorOffset, focusOffset) => {
-                _editorState = RichUtils.toggleLink(
+                let _editorState = RichUtils.toggleLink(
                     editorState,
                     SelectionState.createEmpty(block.getKey()).merge({
                         anchorOffset,
@@ -243,9 +154,9 @@ export default Reflux.createStore({
                     }),
                     null
                 );
+                this.onPublishEditorState(_editorState);
             });
         });
-       this.onPublishEditorState(_editorState);
     }
 
 

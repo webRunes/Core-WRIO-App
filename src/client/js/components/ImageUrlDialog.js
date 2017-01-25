@@ -35,7 +35,7 @@ export default class ImageUrlDialog extends LinkUrlDialog {
     onRemoveLink(e) {
         e.preventDefault();
         const {linkEntityKey} = this.state;
-        TextEditorActions.removeLink(linkEntityKey);
+        TextEditorActions.removeEntity(linkEntityKey);
         this.props.actions.closeDialog();
     }
 }

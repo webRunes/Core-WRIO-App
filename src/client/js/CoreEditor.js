@@ -44,7 +44,7 @@ class CoreEditor extends React.Component {
         TextEditorStore.setImageEditCallback(openImageEditPrompt);
 
         this.state = {
-            editorState:  EditorState.moveFocusToEnd (TextEditorStore.createEditorState(contentBlocks,mentions)),
+            editorState:  EditorState.moveFocusToEnd (TextEditorStore.createEditorState(contentBlocks,mentions,doc.images)),
             saveRelativePath: props.saveRelativePath,
             editUrl: props.editUrl,
             author: props.author,
@@ -61,8 +61,8 @@ class CoreEditor extends React.Component {
         this.focus              = this.focus.bind(this);
 
         TextEditorStore.listen(this.onStatusChange.bind(this));
-        Reflux.listenTo(TextEditorStore,"onFocus");
         setTimeout(this.focus.bind(this),200);
+        window.editorFocus = this.onFocus.bind(this);
     }
 
 
@@ -231,25 +231,34 @@ class CoreEditor extends React.Component {
             this.state.author,
             commentId,
             this.state.doc,
-            desc
+            desc,
+            url
         );
-        if (this.state.commentID) { // don't request comment id, if it already stored in the document
-            saveAction(this.state.commentID).then(()=>{
-                WrioActions.busy(false);
-                this.setState({
-                    error: false
-                });
-            }).catch((err)=> {
-                WrioActions.busy(false);
-                this.setState({
-                   error: true
-                });
-                console.log(err);
+
+        const doSave = (id) => saveAction(id).then(()=>{
+            WrioActions.busy(false);
+            this.setState({
+                error: false
             });
+        }).catch((err)=> {
+            WrioActions.busy(false);
+            this.setState({
+                error: true
+            });
+            console.log(err);
+        });
+
+        let commentID = this.state.commentID;
+
+        if (this.state.commentID) { // don't request comment id, if it already stored in the document
+           if (!WrioStore.areCommentsEnabled()) {
+               commentID = ''; // delete comment id if comments not enabled
+           }
+           doSave(commentID);
         } else {
             WrioActions.busy(true);
             WrioStore.requestCommentId(url,(err,id) => {
-                saveAction(id);
+                doSave(id);
             });
         }
     }
@@ -266,7 +275,7 @@ class CoreEditor extends React.Component {
                 error: false
             });
             parent.postMessage(JSON.stringify({
-                "closeTab": true
+                "followLink": `https://wr.io/${WrioStore.getWrioID()}/Plus-WRIO-App/index.html`
             }), "*");
         }).catch((err)=>{
             WrioActions.busy(false);

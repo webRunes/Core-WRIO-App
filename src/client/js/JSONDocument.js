@@ -6,7 +6,6 @@ import {extractMentions} from './mentions/mention';
 import Immutable from 'immutable';
 import {ContentBlock, CharacterMetadata, Entity} from 'draft-js';
 
-
 var cleshe = '<!DOCTYPE html><html><head><meta charset="utf-8">\n' +
     '<meta http-equiv="X-UA-Compatible" content="IE=edge">\n<meta name="viewport" content="width=device-width, initial-scale=1.0">\n' +
     '<noscript><meta http-equiv="refresh" content="0; URL=https://wrioos.com/no_jscript.html"></noscript>\n' +
@@ -30,13 +29,14 @@ const getMention = (name, about, link) => ({
         "about": about,
         "url": link
     });
-const getImageObject = (url, description) => ({
+export const getImageObject = (url, name, description) => ({
     "@type": "ImageObject",
     "contentUrl": url,
-    "description": description
+    description,
+    name
 });
 
-const getSocialMediaPosting = (src,description,title) => ({
+export const getSocialMediaPosting = (src,description,title) => ({
         "@type":"SocialMediaPosting",
         "sharedContent":{
             "@type":"WebPage",
@@ -46,6 +46,17 @@ const getSocialMediaPosting = (src,description,title) => ({
         }
     }
 );
+
+const getOrderOffset = (article) => {
+    let order = 0;
+    if (typeof article.name === "string") {
+        order++;
+    }
+    if (typeof article.about === "string") {
+        order++;
+    }
+    return order;
+};
 
 
 class GenericLDJsonDocument {
@@ -138,51 +149,52 @@ export default class JSONDocument extends GenericLDJsonDocument {
      */
 
     _parseArticlePart(subArticle, processUrl) {
-        let articleText = '';
         let res = [];
         let name = subArticle.name;
 
-        const wrap = (block,data) => new Object({block:block, data:data}); // wrap contentBlock to save metadata
+        const wrap = (block,data) => new Object({block:block, data:data, order: this.order}); // wrap contentBlock to save metadata
         const pushWrap = (block,data=null) => res.push(wrap(block,data));
 
-        if (this.name) {
+        if (subArticle.name) {
+            pushWrap(new ContentBlock([
+                ['text', name],
+                ['key', keyGen()],
+                ['characterList', this._createMetadata(name)],
+                ['type', 'header-two']
+            ]));
+            this.order++;
+        }
+
+        if (this.getElementOfType("Article").about) {
             this.order++;
         }
 
         if (subArticle['@type'] == 'SocialMediaPosting') {
             pushWrap(new ContentBlock([
-                ['text', articleText],
+                ['text', ' '],
                 ['key', keyGen()],
-                ['characterList', this._createMetadata(articleText)],
+                ['characterList', this._createMetadata(" ")],
                 ['type', 'unstyled']
             ]),subArticle);
             return res;
         }
 
-        pushWrap(new ContentBlock([
-            ['text', name],
-            ['key', keyGen()],
-            ['characterList', this._createMetadata(name)],
-            ['type', 'header-two']
-        ]));
-
-
         if (subArticle.articleBody) {
             subArticle.articleBody.forEach((paragraph, i) => {
-                articleText += paragraph;
+                let articleText = paragraph;
+                if (processUrl && subArticle.url) {
+                    articleText += subArticle.url;
+                }
+                pushWrap(new ContentBlock([
+                    ['text', articleText],
+                    ['key', keyGen()],
+                    ['characterList', this._createMetadata(articleText)],
+                    ['type', 'unstyled']
+                ]));
+                this.order++;
             });
         }
-        if (processUrl && subArticle.url) {
-            articleText += subArticle.url;
-        }
-        if (articleText !== '') {
-            pushWrap(new ContentBlock([
-                ['text', articleText],
-                ['key', keyGen()],
-                ['characterList', this._createMetadata(articleText)],
-                ['type', 'unstyled']
-            ]));
-        }
+
 
         return res;
     }
@@ -196,6 +208,7 @@ export default class JSONDocument extends GenericLDJsonDocument {
         this.order = 0;
         let article = this.getElementOfType("Article");
         this.mentions = article.mentions ? extractMentions(article.mentions) : [];
+        this.images = article.image ? extractMentions(article.image) : [];
         this.comment = article.comment;
         // parse article root
         let contentBlocks = this._parseArticlePart(article,false);
@@ -261,13 +274,7 @@ export default class JSONDocument extends GenericLDJsonDocument {
         });
 
         const formatMention = (url,text,blockIndex,offset) => `${url}?'${text}':${blockIndex},${offset}`;
-        let order = 0;
-        if (typeof article.name === "string") {
-            order++;
-        }
-        if (typeof article.about === "string") {
-            order++;
-        }
+        let order = getOrderOffset(article);
 
         blockMap.toArray().forEach((block, i) => {
             let entity;
@@ -294,10 +301,11 @@ export default class JSONDocument extends GenericLDJsonDocument {
                 if (entity) {
                     let data = entity.getData();
                     let url = data.src,
+                        name = data.title || '',
                         desc = data.description || '';
                     const linkText = block.getText().substring(anchorOffset, focusOffset);
                     article.image.push(
-                        getImageObject(`${url}?:${order+1},${anchorOffset}`,desc)
+                        getImageObject(`${url}?${order+i},${anchorOffset}`,name,desc)
                     );
                 }
             });
