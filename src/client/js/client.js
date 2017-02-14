@@ -10,7 +10,6 @@ import Immutable from 'immutable';
 import JSONDocument from './JSONDocument.js';
 import CommentSaver from './CommentSaver.js';
 import {urlMatch as CommentSaverUrlMatch} from './CommentSaver.js';
-import { getRegistredUser} from './webrunesAPI.js';
 import {parseEditingUrl, extractFileName, parseUrl, appendIndex} from './utils/url.js';
 import WrioStore from './stores/wrio.js';
 
