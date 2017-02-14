@@ -50,6 +50,7 @@ class CoreEditor extends React.Component {
             author: props.author,
             commentID: this.props.commentID,
             doc:doc,
+            registerPopup: false,
             error:false
         };
 
@@ -160,6 +161,13 @@ class CoreEditor extends React.Component {
 
         const about = this.state.doc.getElementOfType('Article').about || "";
 
+        if (this.state.registerPopup) {
+            return (<div className="well">
+                <h4> To enable comments, you need to create ethereum wallet. Please do it in the popup window.</h4>
+                <button className="btn btn-success" onClick={()=>this.setState({ registerPopup: false})}> Back </button>
+            </div>);
+        }
+
         return (
             <div className="clearfix">
             <div className="col-xs-12">
@@ -214,6 +222,35 @@ class CoreEditor extends React.Component {
         );
     }
 
+    shouldOpenPopup() {
+        const haveEthId = typeof WrioStore.getUser().ethereumWallet !== "undefined";
+        window.user = WrioStore.getUser();
+        return !haveEthId && WrioStore.areCommentsEnabled();
+    }
+
+    openCreateWalletPopup() {
+        const domain = process.env.DOMAIN;
+        const webGoldUrl = `//webgold.${domain}`;
+        if (this.shouldOpenPopup()) {
+            window.open(webGoldUrl+'/create_wallet','name','width=800,height=500');
+            this.setState({
+                registerPopup: true
+            });
+        }
+    }
+
+    waitPopupClosed(cb) {
+        if (!this.shouldOpenPopup()) {
+            return cb();
+        }
+        window.addEventListener("message", (msg) => {
+            const data = JSON.parse(msg.data);
+            if (data.reload) {
+                cb();
+            }
+        }, false);
+    }
+
     /**
      * Pulish file to store
      * @param action 'save' or 'saveas'
@@ -223,6 +260,9 @@ class CoreEditor extends React.Component {
      */
     publish(action,storageRelativePath,url,desc) {
         console.log(storageRelativePath,desc);
+
+        this.openCreateWalletPopup();
+
 
         const saveAction = (commentId) => SaveActions.execSave(
             this.state.editorState,
@@ -248,19 +288,27 @@ class CoreEditor extends React.Component {
             console.log(err);
         });
 
-        let commentID = this.state.commentID;
 
-        if (this.state.commentID) { // don't request comment id, if it already stored in the document
-           if (!WrioStore.areCommentsEnabled()) {
-               commentID = ''; // delete comment id if comments not enabled
-           }
-           doSave(commentID);
-        } else {
-            WrioActions.busy(true);
-            WrioStore.requestCommentId(url,(err,id) => {
-                doSave(id);
+        this.waitPopupClosed(() => {
+            let commentID = this.state.commentID;
+            this.setState({
+                registerPopup: false
             });
-        }
+
+            if (this.state.commentID) { // don't request comment id, if it already stored in the document
+                if (!WrioStore.areCommentsEnabled()) {
+                    commentID = ''; // delete comment id if comments not enabled
+                }
+                doSave(commentID);
+            } else {
+                WrioActions.busy(true);
+                WrioStore.requestCommentId(url,(err,id) => {
+                    doSave(id);
+                });
+            }
+        });
+
+
     }
 
     /**

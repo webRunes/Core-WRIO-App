@@ -61,7 +61,7 @@ export function getRegistredUser() {
             .withCredentials()
             .then(({body})=> {
                 console.log("Get_profile finish", body);
-                resolve(body.id);
+                resolve(body);
             }, (err)=> {
                 reject(err);
             });

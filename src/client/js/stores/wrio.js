@@ -11,8 +11,9 @@ export default Reflux.createStore({
             commentsEanbled: false,
             busy: false
         };
-        getRegistredUser().then((wrioID)=> {
-            this.state.wrioID = wrioID;
+        getRegistredUser().then((user)=> {
+            this.state.wrioID = user.id;
+            this.state.user = user;
             this.trigger(this.state);
             }
         ).catch((e)=> console.error("ERROR obtaining",e.stack));
@@ -44,6 +45,10 @@ export default Reflux.createStore({
 
     areCommentsEnabled () {
         return this.state.commentsEnabled;
+    },
+
+    getUser() {
+        return this.state.user;
     },
 
     onHeaderChanged(header) {
