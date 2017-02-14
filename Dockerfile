@@ -5,7 +5,7 @@ MAINTAINER denso.ffff@gmail.com
 RUN npm install -g yarn gulp
 
 COPY package.json /srv/package.json
-RUN cd /srv/ && yarn
+RUN cd /srv/ && yarn ; rm -fr ~/.cache
 COPY . /srv/www/
 
 EXPOSE 5004
