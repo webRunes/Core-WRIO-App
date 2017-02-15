@@ -25,7 +25,7 @@ if (nconf.get("server:workdomain") == '.wrioos.local')  {
 
 console.log(envs);
 var e = {
-    entry: './src/client/js/client.js',
+    entry: ['babel-polyfill','./src/client/js/client.js'],
     output:
     {
         path: '.',
@@ -49,7 +49,10 @@ var e = {
     },
     devtool: 'source-map',
     plugins: [
-        new webpack.DefinePlugin(envs)]
+        new webpack.DefinePlugin(envs)],
+    devServer: {
+        stats: 'errors-only',
+    }
 
 };
 
