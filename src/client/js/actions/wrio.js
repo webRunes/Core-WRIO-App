@@ -11,5 +11,6 @@ export default Reflux.createActions([
     'requestCommentId',
     'commentsEnabled',
     'busy',
-    'headerChanged'
+    'headerChanged',
+    'setDoc'
 ]);
