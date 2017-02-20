@@ -14,7 +14,7 @@ export default class CommentEnabler extends React.Component {
         this.handleInputChange = this.handleInputChange.bind(this);
         this.state = {
             isChecked: WrioStore.areCommentsEnabled()
-        }
+        };
     }
 
     componentDidMount() {
