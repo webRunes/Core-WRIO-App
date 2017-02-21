@@ -39,8 +39,15 @@ export default Reflux.createStore({
         });
     },
 
+    onSetDoc(doc) {
+        this.state.commentId=doc.getCommentID();
+        this.commentsEnabled = this.state.commentID !== "";
+        this.trigger(this.state);
+    },
+
     onCommentsEnabled(state) {
         this.state.commentsEnabled = state;
+        this.trigger(this.state);
     },
 
     areCommentsEnabled () {

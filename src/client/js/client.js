@@ -44,7 +44,6 @@ class Client extends Component {
             editUrl:'',
             coreAdditionalHeight: 200,
             mentions: [],
-            commentID: "",
             render: false,
             doc: null,
             error: false
@@ -92,7 +91,6 @@ class Client extends Component {
                 var doc = new JSONDocument(article);
                 this.setState({
                     doc: doc,
-                    commentID: doc.getCommentID()
                 });
             } catch (error) {
                 console.log("Unable to download source article",error);
@@ -112,8 +110,7 @@ class Client extends Component {
                 {this.state.render ? <CoreEditor doc={this.state.doc}
                             saveRelativePath={this.state.saveRelativePath}
                             editUrl={this.state.editUrl}
-                            author={this.formatAuthor(this.state.wrioID)}
-                            commentID={this.state.commentID} /> :
+                            author={this.formatAuthor(this.state.wrioID)} /> :
                     <Loading /> }
 
             </div>

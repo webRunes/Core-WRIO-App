@@ -43,12 +43,13 @@ class CoreEditor extends React.Component {
         TextEditorStore.setLinkEditCallback(openLinkEditPrompt);
         TextEditorStore.setImageEditCallback(openImageEditPrompt);
 
+        WrioActions.setDoc(doc);
+
         this.state = {
             editorState:  EditorState.moveFocusToEnd (TextEditorStore.createEditorState(contentBlocks,mentions,doc.images)),
             saveRelativePath: props.saveRelativePath,
             editUrl: props.editUrl,
             author: props.author,
-            commentID: this.props.commentID,
             doc:doc,
             registerPopup: false,
             error:false
@@ -130,11 +131,6 @@ class CoreEditor extends React.Component {
         );
     }
 
-    gotCommentID (id) {
-        this.setState({
-            commentID:id
-        });
-    }
 
     componentDidUpdate () {
         window.frameReady();
@@ -213,18 +209,29 @@ class CoreEditor extends React.Component {
                           onPublish={this.publish.bind(this)}
                           onDelete={this.deleteDocument.bind(this)}
                           description={about}
-
-                              commentID={this.state.commentID}
-                              author={this.props.author}
-                              editUrl={this.state.editUrl}
+                          commentID={this.state.commentID}
+                          author={this.props.author}
+                          editUrl={this.state.editUrl}
                     />
             </div>
         );
     }
 
+    componentDidMount() {
+        this.listener = WrioStore.listen(this.storeListener.bind(this));
+    }
+
+    componentWillUnmount() {
+        this.listener();
+    }
+
+    storeListener(state) {
+        this.setState({commentID: state.commentID});
+        this.openCreateWalletPopup();
+    }
+
     shouldOpenPopup() {
         const haveEthId = typeof WrioStore.getUser().ethereumWallet !== "undefined";
-        window.user = WrioStore.getUser();
         return !haveEthId && WrioStore.areCommentsEnabled();
     }
 
@@ -235,6 +242,12 @@ class CoreEditor extends React.Component {
             window.open(webGoldUrl+'/create_wallet','name','width=800,height=500');
             this.setState({
                 registerPopup: true
+            });
+            this.waitPopupClosed(() => {
+               WrioStore.getUser().ethereumWallet="new"; // TODO fix hack
+                this.setState({
+                    registerPopup: false
+                });
             });
         }
     }
@@ -261,7 +274,6 @@ class CoreEditor extends React.Component {
     publish(action,storageRelativePath,url,desc) {
         console.log(storageRelativePath,desc);
 
-        this.openCreateWalletPopup();
 
 
         const saveAction = (commentId) => SaveActions.execSave(
@@ -277,36 +289,26 @@ class CoreEditor extends React.Component {
 
         const doSave = (id) => saveAction(id).then(()=>{
             WrioActions.busy(false);
-            this.setState({
-                error: false
-            });
+            this.setState({error: false});
         }).catch((err)=> {
             WrioActions.busy(false);
-            this.setState({
-                error: true
-            });
+            this.setState({error: true});
             console.log(err);
         });
 
-
-        this.waitPopupClosed(() => {
-            let commentID = this.state.commentID;
-            this.setState({
-                registerPopup: false
-            });
-
-            if (this.state.commentID) { // don't request comment id, if it already stored in the document
-                if (!WrioStore.areCommentsEnabled()) {
-                    commentID = ''; // delete comment id if comments not enabled
-                }
-                doSave(commentID);
-            } else {
-                WrioActions.busy(true);
-                WrioStore.requestCommentId(url,(err,id) => {
-                    doSave(id);
-                });
+        let commentID = this.state.commentID;
+        if (this.state.commentID) { // don't request comment id, if it already stored in the document
+            if (!WrioStore.areCommentsEnabled()) {
+                commentID = ''; // delete comment id if comments not enabled
             }
-        });
+            doSave(commentID);
+        } else {
+            WrioActions.busy(true);
+            WrioStore.requestCommentId(url,(err,id) => {
+                doSave(id);
+            });
+        }
+
 
 
     }
@@ -341,7 +343,6 @@ CoreEditor.propTypes = {
     saveRelativePath: React.PropTypes.string,
     editUrl: React.PropTypes.string,
     author: React.PropTypes.string,
-    commentID: React.PropTypes.string
 };
 
 
