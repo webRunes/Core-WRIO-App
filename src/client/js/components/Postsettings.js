@@ -5,7 +5,7 @@
 import React from 'react';
 import {parseEditingUrl, extractFileName, parseUrl, appendIndex} from '../utils/url.js';
 import WrioStore from '../stores/wrio.js';
-import CommentEnabler from '../CommentEnabler.js';
+import CommentEnabler from './CommentEnabler.js';
 
 function prepFileName(name) {
     let res = name.replace(/ /g,'_');
@@ -38,7 +38,11 @@ export default class PostSettings extends React.Component {
     }
 
     componentDidMount() {
-        WrioStore.listen(this.storeListener.bind(this));
+        this.listener = WrioStore.listen(this.storeListener.bind(this));
+    }
+
+    componentWillUnmount() {
+        this.listener();
     }
 
     storeListener(state) {
