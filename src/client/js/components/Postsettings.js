@@ -114,60 +114,60 @@ export default class PostSettings extends React.Component {
         let savePath = this.getSaveUrl();
         const className ="form-group" +  (this.state.exceedLength ? " has-error" : "");
         return (<div className="form-horizontal">
-            <div className={className}>
-                <label htmlFor="id-Description" className="col-sm-4 col-md-3 control-label">Description</label>
-                <div className="col-sm-8 col-md-9">
-                    <textarea className="form-control" type="text" maxLength="512"
-                           cols="40"
-                           rows="6"
-                           placeholder="Optional. Max 512 characters"
-                           value={this.state.description}
-                           onChange={this.onChangeDescr.bind(this)} />
-                    <div className="help-block">
-                        {this.state.exceedLength && <span>Max {this.state.maxLength} characters</span>}
-                    </div>
-                </div>
+          <div className={className}>
+            <label htmlFor="id-Description" className="col-sm-4 col-md-3 control-label">Description</label>
+            <div className="col-sm-8 col-md-9">
+              <textarea className="form-control" type="text" maxLength="512"
+                cols="40"
+                rows="6"
+                placeholder="Optional. Max 512 characters"
+                value={this.state.description}
+                onChange={this.onChangeDescr.bind(this)} />
+              <div className="help-block">
+                {this.state.exceedLength && <span>Max {this.state.maxLength} characters</span>}
+              </div>
             </div>
-            <div className="form-group">
-                <label htmlFor="id-Storage" className="col-xs-12 col-sm-4 col-md-3 control-label"><span className="glyphicon glyphicon-question-sign" aria-hidden="true" data-toggle="tooltip" data-placement="left" title="Use [Save as..] to save your file locally for its further manual transfer to any server or service such as Google Drive, Dropbox, GitHub Pages and etc."></span> Storage</label>
-                <div className="col-xs-6 col-sm-4 col-md-4">
-                    <div className="btn-group dropdown-menu-full-width">
-                        <button type="button" className="btn btn-white btn-block dropdown-toggle ia-author" data-toggle="dropdown">
-                            <span className="caret"></span>{this.state.dropdownSource}
-                        </button>
-                        <ul className="dropdown-menu" role="menu">
-                            {this.genDropdownSource('save')}
-                            {this.genDropdownSource('saveas')}
-                        </ul>
-                    </div>
-                </div>
-                {!this.props.saveUrl && <div className="col-xs-6 col-sm-4 col-md-5">
-                    <input type="text"
-                           className="form-control"
-                           id="File-name"
-                           placeholder="Untitled"
-                           value={this.state.saveFile}
-                           onChange={this.onChangeFile.bind(this)}
-                        />
-                </div>}
+          </div>
+          <div className="form-group">
+            <label htmlFor="id-Storage" className="col-xs-12 col-sm-4 col-md-3 control-label"><span className="glyphicon glyphicon-question-sign" aria-hidden="true" data-toggle="tooltip" data-placement="left" title="Use [Save as..] to save your file locally for its further manual transfer to any server or service such as Google Drive, Dropbox, GitHub Pages and etc."></span> Storage</label>
+            <div className="col-xs-6 col-sm-4 col-md-4">
+              <div className="btn-group dropdown-menu-full-width">
+                <button type="button" className="btn btn-white btn-block dropdown-toggle ia-author" data-toggle="dropdown">
+                  <span className="caret"></span>{this.state.dropdownSource}
+                </button>
+                <ul className="dropdown-menu" role="menu">
+                  {this.genDropdownSource('save')}
+                  {this.genDropdownSource('saveas')}
+                </ul>
+              </div>
             </div>
-            <div className="form-group">
-                <label className="col-xs-12 col-sm-4 col-md-3 control-label hidden-xs">&nbsp;</label>
-                <div className="col-xs-12 col-sm-8 col-md-9">
-                    <div className="help-block">Your page will be live at {savePath}</div>
-                </div>
+            {!this.props.saveUrl && <div className="col-xs-6 col-sm-4 col-md-5">
+              <input type="text"
+                className="form-control"
+                id="File-name"
+                placeholder="Untitled"
+                value={this.state.saveFile}
+                onChange={this.onChangeFile.bind(this)}
+              />
+            </div>}
+          </div>
+          <div className="form-group">
+            <label className="col-xs-12 col-sm-4 col-md-3 control-label hidden-xs">&nbsp;</label>
+            <div className="col-xs-12 col-sm-8 col-md-9">
+              <div className="help-block">Your page will be live at {savePath}</div>
             </div>
-            <CommentEnabler commentID={this.props.commentID}
-                            author={this.props.author}
-                            editUrl={this.getSaveUrl()}
-                            />
+          </div>
+          <CommentEnabler commentID={this.props.commentID}
+            author={this.props.author}
+            editUrl={this.getSaveUrl()}
+          />
 
-            <div className="col-xs-12">
-                <div className="pull-right">
-                    { !createMode() &&
-                    <button type="button" className="btn btn-danger" onClick={() => this.setState({alert: true})} ><span className="glyphicon glyphicon-trash" ></span>Delete</button>}
-                    <button type="button" className="btn btn-default" onClick={this.goBack.bind(this)}><span className="glyphicon glyphicon-remove"></span>Cancel</button>
-                    <a href="#" className="btn btn-success" onClick={this.publish.bind(this)}>
+          <div className="col-xs-12">
+            <div className="pull-right">
+              {/* -Temp delete removing- { !createMode() &&
+              <button type="button" className="btn btn-danger" onClick={() => this.setState({alert: true})} ><span className="glyphicon glyphicon-trash" ></span>Delete</button>} */}
+              <button type="button" className="btn btn-default" onClick={this.goBack.bind(this)}><span className="glyphicon glyphicon-remove"></span>Cancel</button>
+              <a href="#" className="btn btn-success" onClick={this.publish.bind(this)}>
                         {this.state.busy ? loading : <span className="glyphicon glyphicon-open" />}
                        Publish</a>
                        <br /><br /><br /><br />
