@@ -164,6 +164,16 @@ export default class PostSettings extends React.Component {
                 </ul>
               </div>
             </div>
+           {!this.props.saveUrl && <div className="col-xs-6 col-sm-4 col-md-5">
+                  <input type="text"
+                         className="form-control"
+                         id="File-name"
+                         placeholder="Untitled"
+                         value={this.state.saveFile}
+                         onChange={this.onChangeFile.bind(this)}
+                      />
+              </div>}
+          </div>
             <WillBeLive savePath={savePath} />
             <CommentEnabler commentID={this.props.commentID}
                             author={this.props.author}
