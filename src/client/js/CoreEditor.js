@@ -211,7 +211,6 @@ class CoreEditor extends React.Component {
                           description={about}
                           commentID={this.state.commentID}
                           author={this.props.author}
-                          editUrl={this.state.editUrl}
                     />
             </div>
         );
@@ -273,8 +272,6 @@ class CoreEditor extends React.Component {
      */
     publish(action,storageRelativePath,url,desc) {
         console.log(storageRelativePath,desc);
-
-
 
         const saveAction = (commentId) => SaveActions.execSave(
             this.state.editorState,
