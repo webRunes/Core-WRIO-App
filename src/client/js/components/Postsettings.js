@@ -14,6 +14,19 @@ function prepFileName(name) {
 
 const createMode = () => window.location.pathname === "/create";
 
+
+const WillBeLive = (props) => {
+    return (<div className="form-group">
+        <label className="col-xs-12 col-sm-4 col-md-3 control-label hidden-xs">&nbsp;</label>
+        <div className="col-xs-12 col-sm-8 col-md-9">
+            <div className="help-block">Your page will be live at {props.savePath}</div>
+        </div>
+    </div>);
+};
+WillBeLive.propTypes = {
+    savePath:  React.PropTypes.string
+};
+
 export default class PostSettings extends React.Component {
     constructor(props) {
         super(props);
@@ -34,7 +47,6 @@ export default class PostSettings extends React.Component {
             alert: false
         };
         Object.assign(this.state,this.applyDescription(props.description));
-
     }
 
     componentDidMount() {
@@ -56,9 +68,7 @@ export default class PostSettings extends React.Component {
         }
     }
 
-    fileSavePattern() {
-        return `${this.state.saveFile}/index.html`;
-    }
+
 
     publish() {
         this.props.onPublish(this.source,this.fileSavePattern(), this.getSaveUrl(),this.state.description);
@@ -105,6 +115,19 @@ export default class PostSettings extends React.Component {
         </li>);
     }
 
+    fileSavePattern() {
+        if (this.props.saveUrl) {
+            const exp = /[0-9]+\/(.+)/;
+            const m = this.props.saveUrl.match(exp);
+            if (m[1]) {
+                return m[1];
+            }
+        } else {
+            return `${this.state.saveFile}/index.html`;
+        }
+
+    }
+
     getSaveUrl() {
         return this.props.saveUrl || `https://wr.io/${WrioStore.getWrioID()}/${this.fileSavePattern()}`;
     }
@@ -141,33 +164,27 @@ export default class PostSettings extends React.Component {
                 </ul>
               </div>
             </div>
-            {!this.props.saveUrl && <div className="col-xs-6 col-sm-4 col-md-5">
-              <input type="text"
-                className="form-control"
-                id="File-name"
-                placeholder="Untitled"
-                value={this.state.saveFile}
-                onChange={this.onChangeFile.bind(this)}
-              />
-            </div>}
+           {!this.props.saveUrl && <div className="col-xs-6 col-sm-4 col-md-5">
+                  <input type="text"
+                         className="form-control"
+                         id="File-name"
+                         placeholder="Untitled"
+                         value={this.state.saveFile}
+                         onChange={this.onChangeFile.bind(this)}
+                      />
+              </div>}
           </div>
-          <div className="form-group">
-            <label className="col-xs-12 col-sm-4 col-md-3 control-label hidden-xs">&nbsp;</label>
-            <div className="col-xs-12 col-sm-8 col-md-9">
-              <div className="help-block">Your page will be live at {savePath}</div>
-            </div>
-          </div>
-          <CommentEnabler commentID={this.props.commentID}
-            author={this.props.author}
-            editUrl={this.getSaveUrl()}
-          />
-
-          <div className="col-xs-12">
-            <div className="pull-right">
-              {/* -Temp delete removing- { !createMode() &&
-              <button type="button" className="btn btn-danger" onClick={() => this.setState({alert: true})} ><span className="glyphicon glyphicon-trash" ></span>Delete</button>} */}
-              <button type="button" className="btn btn-default" onClick={this.goBack.bind(this)}><span className="glyphicon glyphicon-remove"></span>Cancel</button>
-              <a href="#" className="btn btn-success" onClick={this.publish.bind(this)}>
+            <WillBeLive savePath={savePath} />
+            <CommentEnabler commentID={this.props.commentID}
+                            author={this.props.author}
+                            editUrl={this.getSaveUrl()}
+                            />
+            <div className="col-xs-12">
+                <div className="pull-right">
+                    {/* -Temp delete removing-!createMode() &&
+                    <button type="button" className="btn btn-danger" onClick={() => this.setState({alert: true})} ><span className="glyphicon glyphicon-trash" ></span>Delete</button>*/}
+                    <button type="button" className="btn btn-default" onClick={this.goBack.bind(this)}><span className="glyphicon glyphicon-remove"></span>Cancel</button>
+                    <a href="#" className="btn btn-success" onClick={this.publish.bind(this)}>
                         {this.state.busy ? loading : <span className="glyphicon glyphicon-open" />}
                        Publish</a>
                        <br /><br /><br /><br />
@@ -176,17 +193,17 @@ export default class PostSettings extends React.Component {
             {this.state.alert && <Modal  onCancel={() => this.setState({alert: false})} onOk={this.deleteHandler.bind(this)}/>}
         </div>);
     }
+
     goBack() {
         parent.postMessage(JSON.stringify({
-            "coreSaved": true,
+            "coreSaved": true
         }), "*");
     }
+
     deleteHandler () {
         this.setState({alert: false});
         this.props.onDelete(this.fileSavePattern());
     }
-
-
 }
 
 PostSettings.propTypes = {
