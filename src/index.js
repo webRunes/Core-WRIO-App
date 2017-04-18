@@ -36,7 +36,7 @@ function setupDevServer () {
     console.log("Devserv start");
     const webpack = require('webpack');
     const webpackDevMiddleware = require('webpack-dev-middleware');
-    const webpackHotMiddleware = require('webpack-hot-middleware');
+
     let config = require('../webpack.config');
     config.output.filename = 'client.js'; //override output filename
     config.output.path = '/';
