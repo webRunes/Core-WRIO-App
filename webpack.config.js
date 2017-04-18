@@ -7,6 +7,7 @@ var minify = false;
 
 if (nconf.get("server:workdomain") == '.wrioos.local')  {
     console.log("Got docker dev mode");
+
     envs = {
         "process.env": {
             NODE_ENV: JSON.stringify('dockerdev'),
@@ -28,7 +29,7 @@ var e = {
     entry: ['babel-polyfill','./src/client/js/client.js'],
     output:
     {
-        path: '.',
+        path:  path.resolve(__dirname,'.'),
         filename: './app/client/client.js',
         devtoolModuleFilenameTemplate: '[absolute-resource-path]'
     },
@@ -64,5 +65,6 @@ if (minify) {
     }));
     e.devtool = 'source-map';
 }
+
 
 module.exports = e;
