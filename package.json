@@ -48,9 +48,8 @@
     "react-popup": "^0.4.2",
     "should": "^6.0.3",
     "supertest": "^1.0.1",
-    "webpack": "1.13.3",
-    "webpack-dev-middleware": "1.8.4",
-    "webpack-hot-middleware": "2.13.2"
+    "webpack": "2.3.3",
+    "webpack-dev-middleware": "1.10.1"
   },
   "scripts": {
     "start": "echo \"Build Completed.\" ",
