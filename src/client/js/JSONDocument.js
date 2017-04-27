@@ -214,7 +214,8 @@ export default class JSONDocument extends GenericLDJsonDocument {
         let contentBlocks = this._parseArticlePart(article,false);
         // and merge it with data from the hasPart section
         contentBlocks = article.hasPart.reduce((r,subarticle) => {
-            r = r.concat(r,this._parseArticlePart(subarticle, true));
+            const chunk = this._parseArticlePart(subarticle, true);
+            r = r.concat(chunk);
             return r;
         },contentBlocks);
         this.contentBlocks = contentBlocks;
