@@ -29,6 +29,13 @@ Figure.propTypes = {
 
 // image template component for the editor
 
+
+function extractScripts(code) {
+    var extractscript=/(<script.+<\/script>)/gi.exec(code);
+    code.replace(extractscript[0],"");
+    return extractscript[1]
+}
+
 export default class SocialMediaEntity extends React.Component {
     constructor(props) {
         super(props);
@@ -62,6 +69,15 @@ export default class SocialMediaEntity extends React.Component {
                 if (err) {
                     console.error("Can't load embed ",data.sharedContent.url);
                 }
+                if (result.body.provider_name == 'Twitter') {
+                    setTimeout(() => window.twttr.widgets.load(),1000); // hack to reload twitter iframes
+                }
+                if (result.body.type == 'link') {
+                    this.setState({
+                        type:"link",
+                        object: result.body
+                    });
+                }
                 console.log(result.body.html);
                 this.setState({html:result.body.html});
             });
@@ -76,13 +92,25 @@ export default class SocialMediaEntity extends React.Component {
     componentWillReceiveProps(props) {
         this.setState(this.getProps(props));
     }
-    render() {
+
+    getContent() {
+        if (this.state.type == 'link') {
+            const data = this.state.object;
+            return (<a href={data.url}><img src={data.thumbnail_url} alt={data.description}/></a>);
+        }
         const htmlData = {__html: this.state.html};
-        const content = <div dangerouslySetInnerHTML={htmlData} />;
+        return  (<div dangerouslySetInnerHTML={htmlData} />);
+    }
+
+    render() {
+        const content = this.getContent();
         const title = this.state.title;
         const description= this.state.description;
-        return <div  onClick={this.onLinkEdit}> <Figure content={content} title={title} description={description}/></div>;
-    }}
+        return <div onClick={this.onLinkEdit}>
+                <Figure content={content} title={title} description={description}/>
+            </div>;
+    }
+}
 
 SocialMediaEntity.propTypes = {
     entityKey: React.PropTypes.string,
