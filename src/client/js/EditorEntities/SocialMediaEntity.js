@@ -30,12 +30,6 @@ Figure.propTypes = {
 // image template component for the editor
 
 
-function extractScripts(code) {
-    var extractscript=/(<script.+<\/script>)/gi.exec(code);
-    code.replace(extractscript[0],"");
-    return extractscript[1]
-}
-
 export default class SocialMediaEntity extends React.Component {
     constructor(props) {
         super(props);
