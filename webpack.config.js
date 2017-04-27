@@ -59,9 +59,11 @@ var e = {
 
 
 if (minify) {
-    e.plugins.push(new webpack.optimize.UglifyJsPlugin({
-        beautify: true,
-        mangle: false
+    e.plugins.push(new webpack.optimize.UglifyJsPlugin(
+        {
+            sourceMap: true,
+            beautify: true,
+            mangle: false
     }));
     e.devtool = 'source-map';
 }
