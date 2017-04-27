@@ -9,7 +9,7 @@ import getHttp from './getHttp.js';
 import {extractFileName, parseUrl,appendIndex} from './utils/url.js';
 
 export function urlMatch () {
-    return window.location.search.match(/\?comment_article=([\.0-9a-zA-Z%:\/?]*)/);
+    return window.location.search.match(/\?comment_article=([\. 0-9a-zA-Z%:\/?]*)/);
 }
 
 export default class CommentSaver extends React.Component {
@@ -57,6 +57,7 @@ export default class CommentSaver extends React.Component {
                 return saveToS3(this.state.saveUrl,html);
             }).then((res) => {
                     this.setState({msg:"Success!",busy:false});
+                    parent.postMessage(JSON.stringify({reload:true});
             }).catch((err) => {
                 console.log(err);
                 this.setState({msg:"Oops... something went wrong"});
