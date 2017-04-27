@@ -57,7 +57,7 @@ export default class CommentSaver extends React.Component {
                 return saveToS3(this.state.saveUrl,html);
             }).then((res) => {
                     this.setState({msg:"Success!",busy:false});
-                    parent.postMessage(JSON.stringify({reload:true});
+                    parent.postMessage(JSON.stringify({reload:true}));
             }).catch((err) => {
                 console.log(err);
                 this.setState({msg:"Oops... something went wrong"});
