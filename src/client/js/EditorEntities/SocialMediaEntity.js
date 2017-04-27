@@ -100,9 +100,9 @@ export default class SocialMediaEntity extends React.Component {
         const content = this.getContent();
         const title = this.state.title;
         const description= this.state.description;
-        return <div onClick={this.onLinkEdit}>
+        return (<div onClick={this.onLinkEdit}>
                 <Figure content={content} title={title} description={description}/>
-            </div>;
+            </div>);
     }
 }
 
