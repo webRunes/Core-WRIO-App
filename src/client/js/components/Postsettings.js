@@ -196,7 +196,7 @@ export default class PostSettings extends React.Component {
 
     goBack() {
         parent.postMessage(JSON.stringify({
-            "coreSaved": true
+            "followLink": `https://core.wrioos.com`
         }), "*");
     }
 

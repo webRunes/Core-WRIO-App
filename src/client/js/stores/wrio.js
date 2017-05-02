@@ -41,7 +41,7 @@ export default Reflux.createStore({
 
     onSetDoc(doc) {
         this.state.commentId=doc.getCommentID();
-        this.commentsEnabled = this.state.commentID !== "";
+        this.state.commentsEnabled = this.state.commentID !== "";
         this.trigger(this.state);
     },
 
