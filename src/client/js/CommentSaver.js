@@ -83,7 +83,7 @@ export default class CommentSaver extends React.Component {
             <ul className="breadcrumb"><li class="active">Comments</li></ul>
             <div className="well enable-comment text-left">
               <h4>Comments disabled</h4>
-              <p>Comments haven't been enabled by author</p>
+              <p>Comments haven't been enabled by you.</p>
               <br />
               <a className={buttonStyle} href="#" role="button" onClick={this.doSave.bind(this)}>
                 <span className="glyphicon glyphicon-comment"></span>
