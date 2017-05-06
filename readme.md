@@ -9,7 +9,7 @@ Document editor fror the LD+JSON documents.
 ## Official Hub
 [core.wrioos.com](https://core.wrioos.com)
 
-## Usage and useful information
+## Usage information
 
 Implemented using DraftJS library. 
 Usage: 
