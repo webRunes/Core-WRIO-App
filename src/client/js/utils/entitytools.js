@@ -59,7 +59,7 @@ export default class EntityTools {
         const newEditorState = AtomicBlockUtils.insertAtomicBlock( // TODO: first point of redundant empty block creation
             editorState,
             entityKey,
-            ''
+            ' '
         );
         const _s =  EditorState.forceSelection(
             newEditorState,

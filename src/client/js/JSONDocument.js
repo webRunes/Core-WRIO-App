@@ -262,6 +262,11 @@ export default class JSONDocument extends GenericLDJsonDocument {
                 return;
             }
 
+            if (blockText == " " || blockText == "") {
+                console.log("Deleting empty block");
+                return;
+            }
+
             if (i !== firstBlock.getKey()) {
                 if (isPart) {
                     if (blockType !== 'header-two') {
