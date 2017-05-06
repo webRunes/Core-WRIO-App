@@ -2,7 +2,7 @@
  * Created by michbil on 20.12.16.
  */
 
-import {AtomicBlockUtils, CompositeDecorator, ContentState, SelectionState, Editor, EditorState, Entity, RichUtils, CharacterMetadata, getDefaultKeyBinding,  Modifier} from 'draft-js';
+import {AtomicBlockUtils, CompositeDecorator, ContentState, SelectionState, Editor, EditorState, Entity, RichUtils, CharacterMetadata, getDefaultKeyBinding,  Modifier,convertToRaw} from 'draft-js';
 import {getImageObject} from '../JSONDocument.js';
 
 var linkEditCallback;
@@ -55,15 +55,20 @@ export default class EntityTools {
     }
 
     static insertEntityKey(editorState, entityKey) {
-        const newEditorState = AtomicBlockUtils.insertAtomicBlock(
+        // AtomicBlockUtils is adding extra paragraph, TODO: make workaround without it
+        const newEditorState = AtomicBlockUtils.insertAtomicBlock( // TODO: first point of redundant empty block creation
             editorState,
             entityKey,
-            ' '
+            ''
         );
-        return EditorState.forceSelection(
+        const _s =  EditorState.forceSelection(
             newEditorState,
             editorState.getCurrentContent().getSelectionAfter()
         );
+        console.log("STATE AFTER", convertToRaw(editorState.getCurrentContent()));
+        console.log("STATE AFTER", convertToRaw(newEditorState.getCurrentContent()));
+        console.log("STATE AFTER", convertToRaw(_s.getCurrentContent()));
+        return _s;
     }
 
 

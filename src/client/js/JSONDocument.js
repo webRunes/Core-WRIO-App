@@ -174,7 +174,7 @@ export default class JSONDocument extends GenericLDJsonDocument {
                 ['text', ' '],
                 ['key', keyGen()],
                 ['characterList', this._createMetadata(" ")],
-                ['type', 'unstyled']
+                ['type', 'atomic']
             ]),subArticle);
             return res;
         }
@@ -252,23 +252,33 @@ export default class JSONDocument extends GenericLDJsonDocument {
         article.name = firstBlock.getText();
         let isPart = false;
         blockMap.forEach((e, i) => {
+            const blockType = e.getType();
+            const blockText = e.getText();
+
+            console.log("Dump BLOCK: ", i , blockType, blockText);
+
+            if (blockType == "atomic" && blockText == " ") {
+                console.log("Deleting technical block");
+                return;
+            }
+
             if (i !== firstBlock.getKey()) {
                 if (isPart) {
-                    if (e.getType() !== 'header-two') {
-                        part.articleBody.push(e.getText());
+                    if (blockType !== 'header-two') {
+                        part.articleBody.push(blockText);
                         if (i === lastBlock.getKey()) {
                             article.hasPart.push(part);
                         }
                     } else {
                         article.hasPart.push(part);
-                        part = getPart(e.getText());
+                        part = getPart(blockText);
                     }
                 } else {
-                    if (e.getType() !== 'header-two') {
-                        article.articleBody.push(e.getText());
+                    if (blockType !== 'header-two') {
+                        article.articleBody.push(blockText);
                     } else {
                         isPart = true;
-                        part = getPart(e.getText());
+                        part = getPart(blockText);
                     }
                 }
             }
