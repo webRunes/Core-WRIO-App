@@ -15,6 +15,7 @@ Implemented using DraftJS library.
 Usage: 
 
 Typically used by inserting Core iframe into parent page.
+
 Iframe URL to create new document:
 ```
 https://core.wrioos.com/create
