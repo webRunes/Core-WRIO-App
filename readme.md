@@ -5,6 +5,12 @@
 Document editor fror the LD+JSON documents. 
 (coming soon)
 
+
+## Official Hub
+[core.wrioos.com](https://core.wrioos.com)
+
+## Usage and useful information
+
 Implemented using DraftJS library. 
 Usage: 
 
@@ -21,7 +27,5 @@ https://core.wrioos.com/edit?article=(URL encoded article URL)
 
 
 
-##Official Hub
-[core.wrioos.com](https://core.wrioos.com)
 
 Powered by [Open Copyright](https://opencopyright.wrioos.com)
