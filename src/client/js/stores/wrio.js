@@ -8,7 +8,8 @@ export default Reflux.createStore({
     init() {
         this.state= {
             wrioID: '',
-            commentsEanbled: false,
+            commentsEnabled: false,
+            commentID: "",
             busy: false
         };
         getRegistredUser().then((user)=> {
