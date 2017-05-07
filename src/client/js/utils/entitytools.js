@@ -65,9 +65,7 @@ export default class EntityTools {
             newEditorState,
             editorState.getCurrentContent().getSelectionAfter()
         );
-        console.log("STATE AFTER", convertToRaw(editorState.getCurrentContent()));
-        console.log("STATE AFTER", convertToRaw(newEditorState.getCurrentContent()));
-        console.log("STATE AFTER", convertToRaw(_s.getCurrentContent()));
+
         return _s;
     }
 
@@ -182,6 +180,8 @@ const findEntitiesOfType = (type) => (contentBlock, callback) => {
         callback
     );
 };
+
+
 
 export const findLinkEntities   = findEntitiesOfType('LINK');
 export const findImageEntities  = findEntitiesOfType('IMAGE');
