@@ -8,7 +8,7 @@ before_install:
   - docker run --name mongo -p 27017:27017 -d mongo mongod --smallfiles
   - docker build --tag core .
   - docker ps -a
-  - docker run --link mongo:mongo -v `pwd`:/srv/host core /bin/sh -c "cp /srv/host/config.json.travis /srv/www/config.json && gulp test"
+
 
 script:
   - docker ps -a

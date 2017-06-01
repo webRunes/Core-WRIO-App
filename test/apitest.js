@@ -44,7 +44,4 @@ describe("API unit tests", () => {
             .expect(200, done);
     });
 
-    after(() => {
-
-    });
 });
