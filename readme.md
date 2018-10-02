@@ -2,7 +2,7 @@
 
 # Core <sup>[WRIO](https://wrioos.com) App</sup>
 
-Document editor fror the LD+JSON documents. 
+LD+JSON page editor. 
 (more coming soon)
 
 
