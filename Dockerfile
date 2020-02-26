@@ -10,6 +10,9 @@ COPY . /srv/www/
 
 EXPOSE 5004
 
+# To handle 'not get uid/gid'
+RUN npm config set unsafe-perm true
+
 WORKDIR /srv/www
 RUN gulp
 
