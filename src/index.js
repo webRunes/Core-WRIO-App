@@ -3,7 +3,6 @@ const path = require("path");
 const fs = require("fs");
 const nconf = require("./server/wrio_nconf.js");
 
-
 var app = express();
 app.ready = () => {};
 
