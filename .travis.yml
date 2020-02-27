@@ -5,7 +5,7 @@ services:
 
 
 # To handle 'not get uid/gid'
-RUN npm install -g yarn gulp
+RUN npm install -g yarn gulp        
 RUN npm config set unsafe-perm true
 
 before_install:
