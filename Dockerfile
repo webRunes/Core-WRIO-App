@@ -3,6 +3,7 @@ MAINTAINER denso.ffff@gmail.com
 
 #RUN apk add --no-cache make gcc g++ python
 RUN npm install -g yarn gulp
+RUN npm config set unsafe-perm true
 
 COPY package.json /srv/package.json
 RUN cd /srv/ && yarn ; rm -fr ~/.cache
