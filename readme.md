@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/webRunes/Core-WRIO-App.svg?branch=master)](https://travis-ci.org/webRunes/Core-WRIO-App)
-
+ 
 # Core <sup>[WRIO](https://wrioos.com) App</sup>
 
 LD+JSON page editor. 
