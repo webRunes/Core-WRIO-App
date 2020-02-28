@@ -3,10 +3,6 @@ language: ruby
 services:
   - docker
 
-# To handle 'not get uid/gid'
-RUN npm install -g yarn gulp
-RUN npm config set unsafe-perm true
-
 before_install:
   - docker pull mongo:latest
   - docker run --name mongo -p 27017:27017 -d mongo mongod --smallfiles
