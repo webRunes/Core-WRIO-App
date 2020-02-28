@@ -5,7 +5,6 @@
 A LD+JSON page editor. 
 (more coming soon)
 
-
 ## Official Hub
 [core.wrioos.com](https://core.wrioos.com)
 
