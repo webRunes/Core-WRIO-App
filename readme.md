@@ -25,5 +25,4 @@ Iframe URL to edit document at URL:
 https://core.wrioos.com/edit?article=(URL encoded article URL)
 ```
 
-
 Powered by [Open Copyright](https://opencopyright.wrioos.com)
